@@ -3,6 +3,8 @@
 namespace FoundationElementorPlus\Widgets;
 
 use Elementor\Controls_Manager;
+use Elementor\Group_Control_Border;
+use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
 use Elementor\Repeater;
 use FoundationElementorPlus\Widgets\Base_Widget;
@@ -428,6 +430,46 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 			)
 		);
 
+		$this->add_responsive_control(
+			'header_spacing',
+			array(
+				'label'      => esc_html__( 'Header Bottom Space', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'rem', 'vh' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 160,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-awards-wall__header' => 'margin-bottom: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'header_max_width',
+			array(
+				'label'      => esc_html__( 'Header Max Width', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%', 'vw', 'rem' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 320,
+						'max' => 1400,
+					),
+					'%' => array(
+						'min' => 40,
+						'max' => 100,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-awards-wall__header' => 'max-width: {{SIZE}}{{UNIT}}; margin-left: auto; margin-right: auto;',
+				),
+			)
+		);
+
 		$this->add_control(
 			'card_padding',
 			array(
@@ -474,6 +516,42 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 			)
 		);
 
+		$this->add_responsive_control(
+			'card_min_height',
+			array(
+				'label'      => esc_html__( 'Card Min Height', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'vh', 'rem' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 180,
+						'max' => 900,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-awards-wall__card-inner' => 'min-height: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'feature_media_min_height',
+			array(
+				'label'      => esc_html__( 'Feature Media Min Height', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'vh', 'rem' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 180,
+						'max' => 900,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-awards-wall__feature-image' => 'min-height: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
 		$this->end_controls_section();
 	}
 
@@ -481,7 +559,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 		$this->start_controls_section(
 			'section_header_style',
 			array(
-				'label' => esc_html__( 'Header Typography', 'foundation-elementor-plus' ),
+				'label' => esc_html__( 'Header Text', 'foundation-elementor-plus' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
 			)
 		);
@@ -503,6 +581,28 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 		);
 
 		$this->add_control(
+			'header_eyebrow_color',
+			array(
+				'label'     => esc_html__( 'Eyebrow Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-awards-wall__pill' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'header_eyebrow_background',
+			array(
+				'label'     => esc_html__( 'Eyebrow Background', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-awards-wall__pill' => 'background: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
 			'title_heading',
 			array(
 				'label'     => esc_html__( 'Header Title Typography', 'foundation-elementor-plus' ),
@@ -516,6 +616,17 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 			array(
 				'name'     => 'header_title_typography',
 				'selector' => '{{WRAPPER}} .foundation-awards-wall__title',
+			)
+		);
+
+		$this->add_control(
+			'header_title_color',
+			array(
+				'label'     => esc_html__( 'Title Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-awards-wall__title' => 'color: {{VALUE}};',
+				),
 			)
 		);
 
@@ -536,6 +647,17 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 			)
 		);
 
+		$this->add_control(
+			'header_description_color',
+			array(
+				'label'     => esc_html__( 'Description Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-awards-wall__description' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
 		$this->end_controls_section();
 	}
 
@@ -543,8 +665,61 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 		$this->start_controls_section(
 			'section_card_style',
 			array(
-				'label' => esc_html__( 'Card Typography', 'foundation-elementor-plus' ),
+				'label' => esc_html__( 'Cards & Media', 'foundation-elementor-plus' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		$this->add_control(
+			'card_border_color',
+			array(
+				'label'     => esc_html__( 'Card Border Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-awards-wall__card-inner' => 'border-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Box_Shadow::get_type(),
+			array(
+				'name'     => 'card_shadow',
+				'selector' => '{{WRAPPER}} .foundation-awards-wall__card-inner',
+			)
+		);
+
+		$this->add_responsive_control(
+			'feature_media_radius',
+			array(
+				'label'      => esc_html__( 'Feature Media Radius', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'rem', '%' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 48,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-awards-wall__feature-image' => 'border-radius: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'feature_media_fit',
+			array(
+				'label'   => esc_html__( 'Feature Media Fit', 'foundation-elementor-plus' ),
+				'type'    => Controls_Manager::SELECT,
+				'default' => 'cover',
+				'options' => array(
+					'cover'   => esc_html__( 'Cover', 'foundation-elementor-plus' ),
+					'contain' => esc_html__( 'Contain', 'foundation-elementor-plus' ),
+				),
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-awards-wall__feature-image' => 'object-fit: {{VALUE}};',
+				),
 			)
 		);
 
@@ -561,6 +736,17 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 			array(
 				'name'     => 'card_eyebrow_typography',
 				'selector' => '{{WRAPPER}} .foundation-awards-wall__eyebrow',
+			)
+		);
+
+		$this->add_control(
+			'card_eyebrow_color',
+			array(
+				'label'     => esc_html__( 'Eyebrow Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-awards-wall__eyebrow' => 'color: {{VALUE}};',
+				),
 			)
 		);
 
@@ -582,6 +768,17 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 		);
 
 		$this->add_control(
+			'card_title_color',
+			array(
+				'label'     => esc_html__( 'Title Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-awards-wall__card-title' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
 			'card_meta_heading',
 			array(
 				'label'     => esc_html__( 'Card Meta Typography', 'foundation-elementor-plus' ),
@@ -595,6 +792,17 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 			array(
 				'name'     => 'card_meta_typography',
 				'selector' => '{{WRAPPER}} .foundation-awards-wall__meta',
+			)
+		);
+
+		$this->add_control(
+			'card_meta_color',
+			array(
+				'label'     => esc_html__( 'Meta Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-awards-wall__meta' => 'color: {{VALUE}};',
+				),
 			)
 		);
 
@@ -616,6 +824,17 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 		);
 
 		$this->add_control(
+			'card_copy_color',
+			array(
+				'label'     => esc_html__( 'Copy Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-awards-wall__text, {{WRAPPER}} .foundation-awards-wall__text p' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
 			'tag_heading',
 			array(
 				'label'     => esc_html__( 'Tag Typography', 'foundation-elementor-plus' ),
@@ -629,6 +848,28 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 			array(
 				'name'     => 'card_tag_typography',
 				'selector' => '{{WRAPPER}} .foundation-awards-wall__tag',
+			)
+		);
+
+		$this->add_control(
+			'card_tag_text_color',
+			array(
+				'label'     => esc_html__( 'Tag Text Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-awards-wall__tag' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'card_tag_background',
+			array(
+				'label'     => esc_html__( 'Tag Background', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-awards-wall__tag' => 'background: {{VALUE}};',
+				),
 			)
 		);
 

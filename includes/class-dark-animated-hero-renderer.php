@@ -72,7 +72,7 @@ final class Dark_Animated_Hero_Renderer {
 					'size'             => 'full',
 					'align'            => 'center',
 					'content_vertical_align' => 'center',
-					'min_height'       => '100vh',
+					'min_height'       => '100svh',
 					'eyebrow'          => '🏆 Multi-award winning. Disabled-led team.',
 					'title'            => '<span class="foundation-inkfire-brand"><img src="' . self::build_upload_url( '/2025/11/IMG_1089.png' ) . '" alt="Inkfire logo" style="height:1.5em; width:auto; display:inline-block; vertical-align:middle; margin-right:-4px; transform:translateY(-3px);"><span class="foundation-inkfire-brand-name">Inkfire</span></span> Building <br><span class="foundation-inkfire-gradient-wrap"><span class="foundation-inkfire-gradient-text">inclusive systems</span></span> that just work.',
 					'subhead'          => 'We design, build and co-create inclusive digital systems, and support them long-term, when you need things done properly, at scale. Trusted by charities, public sector teams and growing organisations across the UK.',
@@ -91,7 +91,7 @@ final class Dark_Animated_Hero_Renderer {
 					'size'             => 'compact',
 					'align'            => 'left',
 					'content_vertical_align' => 'center',
-					'min_height'       => '72vh',
+					'min_height'       => '72svh',
 					'eyebrow'          => '<span class="foundation-inkfire-pill foundation-inkfire-pill--crumb">{current_breadcrumb}</span><span class="foundation-inkfire-pill foundation-inkfire-pill--brand"><img src="' . self::build_upload_url( '/2025/11/IMG_1089.png' ) . '" alt="Inkfire logo"><span>Award winning</span></span><span class="foundation-inkfire-pill foundation-inkfire-pill--rating" aria-label="5 star rated"><span class="foundation-inkfire-rating-number">5</span><span class="foundation-inkfire-stars" aria-hidden="true">★</span><span class="foundation-inkfire-rating-label">rated</span></span>',
 					'kicker'           => '{current_title_plain}',
 					'title'            => 'Seen something you like? Partner with our disabled-led team ready to support your next project.',
@@ -111,7 +111,7 @@ final class Dark_Animated_Hero_Renderer {
 					'size'             => 'compact',
 					'align'            => 'left',
 					'content_vertical_align' => 'center',
-					'min_height'       => '76vh',
+					'min_height'       => '76svh',
 					'eyebrow'          => '<span class="foundation-inkfire-pill foundation-inkfire-pill--crumb">{current_breadcrumb}</span><span class="foundation-inkfire-pill foundation-inkfire-pill--brand"><img src="' . self::build_upload_url( '/2025/11/IMG_1089.png' ) . '" alt="Inkfire logo"><span>Award winning</span></span><span class="foundation-inkfire-pill foundation-inkfire-pill--rating" aria-label="5 star rated"><span class="foundation-inkfire-rating-number">5</span><span class="foundation-inkfire-stars" aria-hidden="true">★</span><span class="foundation-inkfire-rating-label">rated</span></span>',
 					'kicker'           => '{current_title_plain}',
 					'title'            => '{current_title}',
@@ -131,7 +131,7 @@ final class Dark_Animated_Hero_Renderer {
 					'size'             => 'compact',
 					'align'            => 'left',
 					'content_vertical_align' => 'center',
-					'min_height'       => '72vh',
+					'min_height'       => '72svh',
 					'eyebrow'          => 'SEO services',
 					'title'            => 'SEO systems that compound over time',
 					'subhead'          => 'Technical SEO, content strategy, and accessible search experiences designed to bring the right people to you and keep momentum building.',
@@ -150,7 +150,7 @@ final class Dark_Animated_Hero_Renderer {
 					'size'             => 'compact',
 					'align'            => 'left',
 					'content_vertical_align' => 'center',
-					'min_height'       => '72vh',
+					'min_height'       => '72svh',
 					'eyebrow'          => 'IT support',
 					'title'            => 'Reliable tech support without the usual friction',
 					'subhead'          => 'Managed IT, Microsoft 365, cybersecurity, and day-to-day support for organisations that need things handled properly.',
@@ -169,7 +169,7 @@ final class Dark_Animated_Hero_Renderer {
 					'size'             => 'compact',
 					'align'            => 'left',
 					'content_vertical_align' => 'center',
-					'min_height'       => '72vh',
+					'min_height'       => '72svh',
 					'eyebrow'          => 'Web development',
 					'title'            => 'Websites that are inclusive, fast, and built to grow',
 					'subhead'          => 'Custom web design and development for ambitious organisations that need performance, accessibility, and a strong technical foundation.',
@@ -188,7 +188,7 @@ final class Dark_Animated_Hero_Renderer {
 					'size'             => 'compact',
 					'align'            => 'left',
 					'content_vertical_align' => 'center',
-					'min_height'       => '72vh',
+					'min_height'       => '72svh',
 					'eyebrow'          => 'Branding and marketing',
 					'title'            => 'Brands and campaigns people remember for the right reasons',
 					'subhead'          => 'Strategy, storytelling, and inclusive creative marketing that helps people find you, trust you, and choose you.',
@@ -207,7 +207,7 @@ final class Dark_Animated_Hero_Renderer {
 					'size'             => 'compact',
 					'align'            => 'left',
 					'content_vertical_align' => 'center',
-					'min_height'       => '72vh',
+					'min_height'       => '72svh',
 					'eyebrow'          => 'Specialist support',
 					'title'            => 'Complex projects, shaped around what you actually need',
 					'subhead'          => 'For work that spans strategy, delivery, accessibility, and support, we shape a service around the outcome you need.',
@@ -237,6 +237,7 @@ final class Dark_Animated_Hero_Renderer {
 				isset( $settings['presets'][ $preset_key ] ) && is_array( $settings['presets'][ $preset_key ] ) ? $settings['presets'][ $preset_key ] : array(),
 				$preset_defaults
 			);
+			$settings['presets'][ $preset_key ]['min_height'] = self::normalize_viewport_unit( $settings['presets'][ $preset_key ]['min_height'] );
 		}
 
 		return $settings;
@@ -320,6 +321,7 @@ final class Dark_Animated_Hero_Renderer {
 		$align            = in_array( (string) $a['align'], array( 'center', 'left' ), true ) ? (string) $a['align'] : $default_preset['align'];
 		$content_vertical_align = in_array( (string) $a['content_vertical_align'], array( 'flex-start', 'center', 'flex-end' ), true ) ? (string) $a['content_vertical_align'] : ( isset( $default_preset['content_vertical_align'] ) ? (string) $default_preset['content_vertical_align'] : 'center' );
 		$height_strategy  = in_array( (string) $a['height_strategy'], array( 'preset', 'viewport', 'viewport_offset', 'content' ), true ) ? (string) $a['height_strategy'] : 'preset';
+		$a['min_height']  = self::normalize_viewport_unit( $a['min_height'] );
 		$headline_html    = self::normalize_icon_markup( self::replace_tokens( $a['h1_html'], $token_context ) );
 		$kicker_html      = self::normalize_icon_markup( self::replace_tokens( $a['kicker_html'], $token_context ) );
 		$subhead_html     = self::normalize_icon_markup( self::replace_tokens( $a['subhead'], $token_context ) );
@@ -498,7 +500,19 @@ final class Dark_Animated_Hero_Renderer {
 			$preset['feature_position'] = 'hidden';
 		}
 
+		$preset['min_height'] = self::normalize_viewport_unit( $preset['min_height'] );
+
 		return $preset;
+	}
+
+	private static function normalize_viewport_unit( $value ) {
+		$value = trim( (string) $value );
+
+		if ( '' === $value ) {
+			return $value;
+		}
+
+		return preg_replace( '/(?<![a-z])vh\b/i', 'svh', $value );
 	}
 
 	private static function get_palette_values( $palette = '' ) {

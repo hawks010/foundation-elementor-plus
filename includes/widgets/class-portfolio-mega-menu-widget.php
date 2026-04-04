@@ -3,6 +3,8 @@
 namespace FoundationElementorPlus\Widgets;
 
 use Elementor\Controls_Manager;
+use Elementor\Group_Control_Border;
+use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
 use FoundationElementorPlus\Widgets\Base_Widget;
 
@@ -77,6 +79,15 @@ class Portfolio_Mega_Menu_Widget extends Base_Widget {
 		);
 
 		$this->add_control(
+			'navigation_heading',
+			array(
+				'label'     => esc_html__( 'Navigation & Data', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_control(
 			'posts_to_show',
 			array(
 				'label'   => esc_html__( 'Portfolio Cards', 'foundation-elementor-plus' ),
@@ -136,6 +147,15 @@ class Portfolio_Mega_Menu_Widget extends Base_Widget {
 				'condition'     => array(
 					'show_nav' => 'yes',
 				),
+			)
+		);
+
+		$this->add_control(
+			'cta_heading',
+			array(
+				'label'     => esc_html__( 'CTA Card', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
 			)
 		);
 
@@ -225,7 +245,7 @@ class Portfolio_Mega_Menu_Widget extends Base_Widget {
 		$this->start_controls_section(
 			'section_layout',
 			array(
-				'label' => esc_html__( 'Layout', 'foundation-elementor-plus' ),
+				'label' => esc_html__( 'Shell & Layout', 'foundation-elementor-plus' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
 			)
 		);
@@ -272,12 +292,57 @@ class Portfolio_Mega_Menu_Widget extends Base_Widget {
 			)
 		);
 
+		$this->add_responsive_control(
+			'panel_radius',
+			array(
+				'label'      => esc_html__( 'Panel Radius', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'rem', '%' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 80,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__panel' => 'border-radius: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'panel_background',
+			array(
+				'label'     => esc_html__( 'Panel Background', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__panel' => 'background: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Border::get_type(),
+			array(
+				'name'     => 'panel_border',
+				'selector' => '{{WRAPPER}} .foundation-portfolio-mega-menu__panel',
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Box_Shadow::get_type(),
+			array(
+				'name'     => 'panel_shadow',
+				'selector' => '{{WRAPPER}} .foundation-portfolio-mega-menu__panel',
+			)
+		);
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
 			'section_nav_typography',
 			array(
-				'label' => esc_html__( 'Navigation Typography', 'foundation-elementor-plus' ),
+				'label' => esc_html__( 'Navigation', 'foundation-elementor-plus' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
 			)
 		);
@@ -290,12 +355,141 @@ class Portfolio_Mega_Menu_Widget extends Base_Widget {
 			)
 		);
 
+		$this->add_responsive_control(
+			'nav_item_padding',
+			array(
+				'label'      => esc_html__( 'Item Padding', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'rem', 'em' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__nav-link' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'nav_item_radius',
+			array(
+				'label'      => esc_html__( 'Item Radius', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'rem', '%' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 40,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__nav-link' => 'border-radius: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'nav_text_color',
+			array(
+				'label'     => esc_html__( 'Text Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__nav-link, {{WRAPPER}} .foundation-portfolio-mega-menu__nav-link:visited, {{WRAPPER}} .foundation-portfolio-mega-menu__nav-link:active' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'nav_background_color',
+			array(
+				'label'     => esc_html__( 'Background', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__nav-link' => 'background: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'nav_border_color',
+			array(
+				'label'     => esc_html__( 'Border Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__nav-link' => 'border-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'nav_hover_text_color',
+			array(
+				'label'     => esc_html__( 'Hover / Focus Text', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__nav-link:hover, {{WRAPPER}} .foundation-portfolio-mega-menu__nav-link:focus-visible' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'nav_hover_background_color',
+			array(
+				'label'     => esc_html__( 'Hover / Focus Background', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__nav-link:hover, {{WRAPPER}} .foundation-portfolio-mega-menu__nav-link:focus-visible' => 'background: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'nav_hover_border_color',
+			array(
+				'label'     => esc_html__( 'Hover / Focus Border', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__nav-link:hover, {{WRAPPER}} .foundation-portfolio-mega-menu__nav-link:focus-visible' => 'border-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'nav_current_text_color',
+			array(
+				'label'     => esc_html__( 'Featured Item Text', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__nav-link.is-all' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'nav_current_background_color',
+			array(
+				'label'     => esc_html__( 'Featured Item Background', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__nav-link.is-all' => 'background: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'nav_current_border_color',
+			array(
+				'label'     => esc_html__( 'Featured Item Border', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__nav-link.is-all' => 'border-color: {{VALUE}};',
+				),
+			)
+		);
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
 			'section_intro_typography',
 			array(
-				'label' => esc_html__( 'Intro Typography', 'foundation-elementor-plus' ),
+				'label' => esc_html__( 'Intro & CTA Copy', 'foundation-elementor-plus' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
 			)
 		);
@@ -324,12 +518,118 @@ class Portfolio_Mega_Menu_Widget extends Base_Widget {
 			)
 		);
 
+		$this->add_control(
+			'intro_eyebrow_color',
+			array(
+				'label'     => esc_html__( 'Eyebrow Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__eyebrow' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'intro_title_color',
+			array(
+				'label'     => esc_html__( 'Title Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__title' => 'color: {{VALUE}}; -webkit-text-fill-color: initial; background: none;',
+				),
+			)
+		);
+
+		$this->add_control(
+			'intro_body_color',
+			array(
+				'label'     => esc_html__( 'Body Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__intro' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'cta_box_background',
+			array(
+				'label'     => esc_html__( 'CTA Box Background', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__cta-box' => 'background: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'cta_box_border_color',
+			array(
+				'label'     => esc_html__( 'CTA Box Border', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__cta-box' => 'border-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'cta_box_radius',
+			array(
+				'label'      => esc_html__( 'CTA Box Radius', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'rem', '%' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 48,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__cta-box' => 'border-radius: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'cta_eyebrow_color',
+			array(
+				'label'     => esc_html__( 'CTA Eyebrow Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__cta-eyebrow' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'cta_title_color',
+			array(
+				'label'     => esc_html__( 'CTA Title Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__cta-title' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'cta_body_color',
+			array(
+				'label'     => esc_html__( 'CTA Body Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__cta-copy' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
 			'section_card_typography',
 			array(
-				'label' => esc_html__( 'Card Typography', 'foundation-elementor-plus' ),
+				'label' => esc_html__( 'Project Cards & Media', 'foundation-elementor-plus' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
 			)
 		);
@@ -347,6 +647,192 @@ class Portfolio_Mega_Menu_Widget extends Base_Widget {
 			array(
 				'name'     => 'project_body_typography',
 				'selector' => '{{WRAPPER}} .foundation-portfolio-mega-menu__project-excerpt',
+			)
+		);
+
+		$this->add_control(
+			'project_card_background',
+			array(
+				'label'     => esc_html__( 'Card Background', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__project-link' => 'background: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'project_card_border_color',
+			array(
+				'label'     => esc_html__( 'Card Border', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__card' => 'border-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Box_Shadow::get_type(),
+			array(
+				'name'     => 'project_card_shadow',
+				'selector' => '{{WRAPPER}} .foundation-portfolio-mega-menu__project-link',
+			)
+		);
+
+		$this->add_responsive_control(
+			'project_card_radius',
+			array(
+				'label'      => esc_html__( 'Card Radius', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'rem', '%' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 48,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__card, {{WRAPPER}} .foundation-portfolio-mega-menu__project-link' => 'border-radius: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'project_media_radius',
+			array(
+				'label'      => esc_html__( 'Media Radius', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'rem', '%' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 40,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__project-media' => 'border-radius: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'breadcrumb_color',
+			array(
+				'label'     => esc_html__( 'Breadcrumb Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__breadcrumb' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'project_title_color',
+			array(
+				'label'     => esc_html__( 'Project Title Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__project-title' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'project_body_color',
+			array(
+				'label'     => esc_html__( 'Project Body Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__project-excerpt' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'section_button_styles',
+			array(
+				'label' => esc_html__( 'Buttons & Links', 'foundation-elementor-plus' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		$this->add_control(
+			'primary_button_text_color',
+			array(
+				'label'     => esc_html__( 'Primary Button Text', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__primary, {{WRAPPER}} .foundation-portfolio-mega-menu__primary:visited, {{WRAPPER}} .foundation-portfolio-mega-menu__primary:active' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'primary_button_background',
+			array(
+				'label'     => esc_html__( 'Primary Button Background', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__primary' => 'background-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'primary_button_border_color',
+			array(
+				'label'     => esc_html__( 'Primary Button Border', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__primary' => 'border-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'primary_button_hover_text_color',
+			array(
+				'label'     => esc_html__( 'Primary Hover Text', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__primary:hover, {{WRAPPER}} .foundation-portfolio-mega-menu__primary:focus-visible' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'primary_button_hover_background',
+			array(
+				'label'     => esc_html__( 'Primary Hover Background', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__primary:hover, {{WRAPPER}} .foundation-portfolio-mega-menu__primary:focus-visible' => 'background-color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'secondary_link_color',
+			array(
+				'label'     => esc_html__( 'Secondary Link Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__secondary, {{WRAPPER}} .foundation-portfolio-mega-menu__secondary:visited, {{WRAPPER}} .foundation-portfolio-mega-menu__secondary:active, {{WRAPPER}} .foundation-portfolio-mega-menu__project-open, {{WRAPPER}} .foundation-portfolio-mega-menu__project-open:visited, {{WRAPPER}} .foundation-portfolio-mega-menu__project-open:active' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'secondary_link_hover_color',
+			array(
+				'label'     => esc_html__( 'Secondary Hover Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-portfolio-mega-menu__secondary:hover, {{WRAPPER}} .foundation-portfolio-mega-menu__secondary:focus-visible, {{WRAPPER}} .foundation-portfolio-mega-menu__project-link:hover .foundation-portfolio-mega-menu__project-open, {{WRAPPER}} .foundation-portfolio-mega-menu__project-link:focus-visible .foundation-portfolio-mega-menu__project-open' => 'color: {{VALUE}};',
+				),
 			)
 		);
 

@@ -3,6 +3,7 @@
 namespace FoundationElementorPlus\Widgets;
 
 use Elementor\Controls_Manager;
+use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Box_Shadow;
 use Elementor\Repeater;
 use Elementor\Utils;
@@ -45,7 +46,7 @@ class Rubiks_Gallery_Widget extends Base_Widget {
 		$this->start_controls_section(
 			'section_content',
 			array(
-				'label' => esc_html__( 'Media Items', 'foundation-elementor-plus' ),
+				'label' => esc_html__( 'Media', 'foundation-elementor-plus' ),
 			)
 		);
 
@@ -192,6 +193,46 @@ class Rubiks_Gallery_Widget extends Base_Widget {
 		);
 
 		$this->add_responsive_control(
+			'stage_max_width',
+			array(
+				'label'      => esc_html__( 'Stage Max Width', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%', 'vw', 'rem' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 240,
+						'max' => 1400,
+					),
+					'%' => array(
+						'min' => 40,
+						'max' => 100,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-rubiks-gallery' => 'max-width: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'stage_margin_bottom',
+			array(
+				'label'      => esc_html__( 'Bottom Margin', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'rem', 'vh' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 120,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-rubiks-gallery' => 'margin-bottom: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
 			'card_gap',
 			array(
 				'label'      => esc_html__( 'Card Gap', 'foundation-elementor-plus' ),
@@ -305,9 +346,57 @@ class Rubiks_Gallery_Widget extends Base_Widget {
 		$this->end_controls_section();
 
 		$this->start_controls_section(
+			'section_cards',
+			array(
+				'label' => esc_html__( 'Cards & Surface', 'foundation-elementor-plus' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		$this->add_control(
+			'surface_background',
+			array(
+				'label'     => esc_html__( 'Surface Background', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-rubiks-gallery__surface' => 'background: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'media_background',
+			array(
+				'label'     => esc_html__( 'Media Background', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-rubiks-gallery__video, {{WRAPPER}} .foundation-rubiks-gallery__lottie' => 'background: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Border::get_type(),
+			array(
+				'name'     => 'card_border',
+				'selector' => '{{WRAPPER}} .foundation-rubiks-gallery__card::after',
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Box_Shadow::get_type(),
+			array(
+				'name'     => 'surface_shadow',
+				'selector' => '{{WRAPPER}} .foundation-rubiks-gallery__card::before',
+			)
+		);
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
 			'section_media',
 			array(
-				'label' => esc_html__( 'Media', 'foundation-elementor-plus' ),
+				'label' => esc_html__( 'Media Treatment', 'foundation-elementor-plus' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
 			)
 		);

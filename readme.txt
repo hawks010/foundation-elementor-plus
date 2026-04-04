@@ -1,0 +1,77 @@
+=== Foundation Elementor Plus ===
+Contributors: hawks010
+Tags: elementor, widgets, agency, design
+Requires at least: 6.4
+Tested up to: 6.9.4
+Requires PHP: 7.4
+Stable tag: 1.3.3
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+
+Foundation Elementor Plus is Inkfire's modular Elementor widget suite for Foundation-powered WordPress sites.
+
+== Description ==
+
+Foundation Elementor Plus packages the custom Elementor widgets, shared helpers, admin settings, and integrations used across Inkfire's Foundation builds.
+
+Key points:
+
+* Preserves live Elementor widget slugs and saved control IDs.
+* Registers widget CSS and JavaScript only for enabled widgets.
+* Includes a production-oriented admin settings screen for widget toggles and integrations.
+* Supports GitHub release-based plugin updates without depending on WordPress.org.
+* Keeps uninstall cleanup scoped to plugin-owned options and transient caches.
+
+== Installation ==
+
+1. Upload the `foundation-elementor-plus` folder to `/wp-content/plugins/`.
+2. Activate `Foundation Elementor Plus` in WordPress.
+3. Ensure Elementor is installed and active.
+4. Open `Foundation > Elementor Plus` to review enabled widgets and integrations.
+
+== GitHub Updates ==
+
+This plugin includes a built-in GitHub updater aimed at the repository:
+
+`hawks010/foundation-elementor-plus`
+
+Recommended release flow:
+
+1. Push plugin changes to the GitHub repository.
+2. Create a GitHub release whose tag matches the plugin version, for example `1.3.3`.
+3. WordPress will detect the newer release in the plugin updates screen.
+
+If the repository is private, add a token in `wp-config.php`:
+
+`define( 'FOUNDATION_ELEMENTOR_PLUS_GITHUB_TOKEN', 'your-github-token-here' );`
+
+The token should have at least repository read access for the target repository.
+
+== Frequently Asked Questions ==
+
+= Will uninstall delete Elementor content? =
+
+No. The uninstall routine removes plugin-owned options, counters, and transient caches only. Elementor content stored in posts is left intact.
+
+= Can I preserve plugin settings on uninstall? =
+
+Yes. Add this to `wp-config.php` before deleting the plugin:
+
+`define( 'FOUNDATION_ELEMENTOR_PLUS_PRESERVE_DATA', true );`
+
+== Changelog ==
+
+= 1.3.3 =
+
+* Added built-in GitHub release update support for repository-based deployments.
+* Added WordPress distribution metadata in `readme.txt`.
+* Replaced the uninstall routine with a multisite-aware cleanup pass.
+* Included the latest control-surface and builder-stability improvements from the production audit.
+
+= 1.3.2 =
+
+* Synced the audited production build to Blueprint.
+
+= 1.3.1 =
+
+* Improved asset loading, builder stability, and admin settings handling.

@@ -1,0 +1,580 @@
+.elementor-widget-foundation-live-roles,
+.elementor-widget-foundation-live-roles .elementor-widget-container {
+  height: 100%;
+}
+
+.foundation-live-roles {
+  --foundation-live-roles-shell-radius: 38px;
+  --foundation-live-roles-shell-bg: rgba(17, 20, 33, 0.94);
+  --foundation-live-roles-accent-a: rgba(251, 204, 190, 0.14);
+  --foundation-live-roles-accent-b: rgba(18, 181, 165, 0.18);
+  --foundation-live-roles-role-bg: rgba(255, 255, 255, 0.06);
+  --foundation-live-roles-role-radius: 22px;
+  --foundation-live-roles-hero-gap: 22px;
+  --foundation-live-roles-role-gap: 14px;
+  --foundation-live-roles-filter-gap: 10px;
+  --foundation-live-roles-status-open: #18b5a5;
+  --foundation-live-roles-status-processing: #f4b063;
+  --foundation-live-roles-status-closed: #f27979;
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  font-family: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+}
+
+.foundation-live-roles,
+.foundation-live-roles * {
+  box-sizing: border-box;
+}
+
+.foundation-live-roles__shell {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: var(--foundation-live-roles-width, 95%);
+  max-width: none;
+  min-height: 100%;
+  flex: 1 1 auto;
+  margin: 0 auto;
+  padding: 32px;
+  border-radius: var(--foundation-live-roles-shell-radius);
+  background:
+    radial-gradient(circle at 0% 0%, var(--foundation-live-roles-accent-a), transparent 34%),
+    radial-gradient(circle at 100% 0%, var(--foundation-live-roles-accent-b), transparent 40%),
+    linear-gradient(135deg, rgba(12, 16, 28, 0.98), var(--foundation-live-roles-shell-bg));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 18px 42px rgba(5, 8, 16, 0.3);
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.foundation-live-roles__shell::before,
+.foundation-live-roles__shell::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 999px;
+  filter: blur(10px);
+  opacity: 0.8;
+}
+
+.foundation-live-roles__shell::before {
+  inset: auto auto -14% -10%;
+  width: min(420px, 42vw);
+  height: min(420px, 42vw);
+  background: radial-gradient(circle, rgba(251, 204, 190, 0.16), transparent 68%);
+}
+
+.foundation-live-roles__shell::after {
+  inset: -16% -8% auto auto;
+  width: min(440px, 44vw);
+  height: min(440px, 44vw);
+  background: radial-gradient(circle, rgba(18, 181, 165, 0.12), transparent 70%);
+}
+
+.foundation-live-roles__hero,
+.foundation-live-roles__filters,
+.foundation-live-roles__list,
+.foundation-live-roles__empty {
+  position: relative;
+  z-index: 1;
+}
+
+.foundation-live-roles__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 420px);
+  grid-template-areas:
+    "main summary"
+    "intro intro";
+  gap: var(--foundation-live-roles-hero-gap);
+  align-items: start;
+  margin-bottom: 22px;
+}
+
+.foundation-live-roles__hero-main {
+  grid-area: main;
+  min-width: 0;
+}
+
+.foundation-live-roles__summary {
+  grid-area: summary;
+}
+
+.foundation-live-roles__intro {
+  grid-area: intro;
+  max-width: none;
+}
+
+.foundation-live-roles__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.82rem;
+  line-height: 1.1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #fbd0c3;
+}
+
+.foundation-live-roles__eyebrow-dot,
+.foundation-live-roles__status-dot {
+  display: inline-flex;
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  background: var(--foundation-live-roles-status-open);
+  box-shadow: 0 0 0 6px rgba(24, 181, 165, 0.12);
+  flex-shrink: 0;
+}
+
+.foundation-live-roles__title {
+  margin: 0;
+  max-width: 10ch;
+  font-family: "Montserrat", sans-serif;
+  font-size: clamp(2.2rem, 5vw, 4.2rem);
+  line-height: 0.94;
+  letter-spacing: -0.055em;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.foundation-live-roles__intro,
+.foundation-live-roles__intro p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.foundation-live-roles__intro p + p {
+  margin-top: 0.8em;
+}
+
+.foundation-live-roles__summary {
+  padding: 20px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.foundation-live-roles__summary-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.foundation-live-roles__summary-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fbd0c3;
+  flex-shrink: 0;
+}
+
+.foundation-live-roles__summary-icon,
+.foundation-live-roles__summary-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.foundation-live-roles__summary-eyebrow {
+  margin: 0 0 4px;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.64);
+}
+
+.foundation-live-roles__summary-text {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.94);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.foundation-live-roles__summary-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+}
+
+.foundation-live-roles__summary-item {
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(8, 10, 18, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.foundation-live-roles__summary-item--open {
+  box-shadow: inset 3px 0 0 var(--foundation-live-roles-status-open);
+}
+
+.foundation-live-roles__summary-item--processing {
+  box-shadow: inset 3px 0 0 var(--foundation-live-roles-status-processing);
+}
+
+.foundation-live-roles__summary-item--closed {
+  box-shadow: inset 3px 0 0 var(--foundation-live-roles-status-closed);
+}
+
+.foundation-live-roles__summary-count {
+  display: block;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.6rem;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: #ffffff;
+}
+
+.foundation-live-roles__summary-label {
+  display: block;
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.foundation-live-roles__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--foundation-live-roles-filter-gap);
+  margin-bottom: 18px;
+}
+
+.foundation-live-roles__filter {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  border-radius: 999px;
+  min-height: 44px;
+  padding: 10px 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+  font-size: 0.94rem;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease, border-color .2s ease;
+}
+
+.foundation-live-roles__filter:hover {
+  transform: translateY(-1px);
+}
+
+.foundation-live-roles__filter.is-active {
+  background: linear-gradient(135deg, rgba(18, 181, 165, 0.24), rgba(18, 181, 165, 0.12));
+  border-color: rgba(18, 181, 165, 0.46);
+}
+
+.foundation-live-roles__filter:focus-visible,
+.foundation-live-roles__toggle:focus-visible,
+.foundation-live-roles__link:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+.foundation-live-roles__filter-count {
+  display: inline-flex;
+  min-width: 24px;
+  min-height: 24px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 0.82rem;
+  line-height: 1;
+  padding: 0 6px;
+}
+
+.foundation-live-roles__list {
+  display: grid;
+  gap: var(--foundation-live-roles-role-gap);
+  flex: 1 1 auto;
+  align-content: start;
+}
+
+.foundation-live-roles__role {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-radius: var(--foundation-live-roles-role-radius);
+  background: var(--foundation-live-roles-role-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  padding: 18px 20px;
+  transition: background .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.foundation-live-roles__role:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.05)),
+    var(--foundation-live-roles-role-bg);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 14px 28px rgba(3, 6, 14, 0.22);
+  transform: translateY(-1px);
+}
+
+.foundation-live-roles__toggle {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.foundation-live-roles__toggle:hover,
+.foundation-live-roles__toggle:focus,
+.foundation-live-roles__toggle:focus-visible {
+  background: transparent;
+  background-color: transparent;
+  color: inherit;
+  text-decoration: none;
+}
+
+.foundation-live-roles__toggle-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.foundation-live-roles__status-dot--open {
+  background: var(--foundation-live-roles-status-open);
+  box-shadow: 0 0 0 6px rgba(24, 181, 165, 0.12);
+}
+
+.foundation-live-roles__status-dot--processing {
+  background: var(--foundation-live-roles-status-processing);
+  box-shadow: 0 0 0 6px rgba(244, 176, 99, 0.12);
+}
+
+.foundation-live-roles__status-dot--closed {
+  background: var(--foundation-live-roles-status-closed);
+  box-shadow: 0 0 0 6px rgba(242, 121, 121, 0.12);
+}
+
+.foundation-live-roles__role-title {
+  display: block;
+  min-width: 0;
+  font-family: "Montserrat", sans-serif;
+  font-size: clamp(1rem, 1.45vw, 1.22rem);
+  line-height: 1.12;
+  letter-spacing: -0.05em;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.foundation-live-roles__toggle-meta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+}
+
+.foundation-live-roles__status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 0.9rem;
+  line-height: 1.2;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.foundation-live-roles__status-pill--open {
+  color: #eafffa;
+  background: rgba(24, 181, 165, 0.16);
+  border-color: rgba(24, 181, 165, 0.36);
+}
+
+.foundation-live-roles__status-pill--processing {
+  color: #fff7ea;
+  background: rgba(244, 176, 99, 0.16);
+  border-color: rgba(244, 176, 99, 0.34);
+}
+
+.foundation-live-roles__status-pill--closed {
+  color: #fff0f0;
+  background: rgba(242, 121, 121, 0.16);
+  border-color: rgba(242, 121, 121, 0.34);
+}
+
+.foundation-live-roles__chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  flex-shrink: 0;
+  transition: transform .2s ease;
+}
+
+.foundation-live-roles__chevron svg {
+  width: 18px;
+  height: 18px;
+}
+
+.foundation-live-roles__chevron path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.foundation-live-roles__toggle[aria-expanded="true"] .foundation-live-roles__chevron {
+  transform: rotate(180deg);
+}
+
+.foundation-live-roles__role:hover .foundation-live-roles__chevron,
+.foundation-live-roles__toggle:focus-visible .foundation-live-roles__chevron {
+  background: rgba(18, 181, 165, 0.12);
+  border-color: rgba(18, 181, 165, 0.34);
+  color: #fbd0c3;
+}
+
+.foundation-live-roles__panel {
+  padding-top: 14px;
+}
+
+.foundation-live-roles__panel-copy,
+.foundation-live-roles__panel-copy p {
+  margin: 0;
+  max-width: 72ch;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.foundation-live-roles__panel-copy p + p {
+  margin-top: 0.8em;
+}
+
+.foundation-live-roles__panel-footer {
+  margin-top: 14px;
+}
+
+.foundation-live-roles__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  color: #ffffff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.foundation-live-roles__link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.foundation-live-roles__link-icon,
+.foundation-live-roles__link-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.foundation-live-roles__empty {
+  margin-top: 18px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 1200px) {
+  .foundation-live-roles__hero {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "main"
+      "summary"
+      "intro";
+  }
+
+  .foundation-live-roles__title {
+    max-width: 11ch;
+  }
+
+  .foundation-live-roles__summary-list {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .foundation-live-roles__shell {
+    width: 90%;
+    padding: 24px 18px;
+    border-radius: min(35px, var(--foundation-live-roles-shell-radius));
+  }
+
+  .foundation-live-roles__title {
+    max-width: none;
+    font-size: clamp(2rem, 11vw, 3rem);
+  }
+
+  .foundation-live-roles__filters {
+    margin-bottom: 14px;
+  }
+
+  .foundation-live-roles__toggle {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .foundation-live-roles__toggle-meta {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .foundation-live-roles__status-pill {
+    white-space: normal;
+  }
+}

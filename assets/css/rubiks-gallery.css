@@ -1,0 +1,134 @@
+.foundation-rubiks-gallery {
+	--foundation-rubiks-padding: 40px;
+	--foundation-rubiks-gap: 20px;
+	--foundation-rubiks-radius: 35px;
+	--foundation-rubiks-stage-ratio: 3 / 2;
+	--foundation-rubiks-move-duration: 760ms;
+	position: relative;
+	width: 100%;
+	max-width: 100%;
+	margin: 0 auto 40px;
+	padding: var(--foundation-rubiks-padding);
+	aspect-ratio: var(--foundation-rubiks-stage-ratio);
+	box-sizing: border-box;
+	background: transparent;
+	perspective: 1000px;
+	overflow: hidden;
+}
+
+.foundation-rubiks-gallery__stage {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+.foundation-rubiks-gallery__card {
+	position: absolute;
+	width: calc(50% - (var(--foundation-rubiks-gap) / 2));
+	height: calc(50% - (var(--foundation-rubiks-gap) / 2));
+	transform-style: preserve-3d;
+	will-change: top, left;
+	transition:
+		top var(--foundation-rubiks-move-duration) cubic-bezier(0.2, 0.8, 0.2, 1),
+		left var(--foundation-rubiks-move-duration) cubic-bezier(0.2, 0.8, 0.2, 1);
+	backface-visibility: hidden;
+	contain: layout paint;
+	transform: translateZ(0);
+}
+
+.foundation-rubiks-gallery[data-foundation-rubiks-static="true"] .foundation-rubiks-gallery__card {
+	will-change: auto;
+	contain: layout paint;
+}
+
+.foundation-rubiks-gallery__card::before {
+	content: "";
+	position: absolute;
+	inset: 4px;
+	border-radius: var(--foundation-rubiks-radius);
+	background: #fff;
+	transform: translateZ(-1px);
+	box-shadow: 0 10px 20px -2px rgba(0, 0, 0, 0.5);
+}
+
+.foundation-rubiks-gallery__card::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: var(--foundation-rubiks-radius);
+	pointer-events: none;
+	transform: translateZ(1px);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 45%, rgba(255, 255, 255, 0) 100%);
+}
+
+.foundation-rubiks-gallery__surface,
+.foundation-rubiks-gallery__image,
+.foundation-rubiks-gallery__video,
+.foundation-rubiks-gallery__lottie {
+	width: 100%;
+	height: 100%;
+	border-radius: var(--foundation-rubiks-radius);
+}
+
+.foundation-rubiks-gallery__surface {
+	position: relative;
+	overflow: hidden;
+	background: linear-gradient(135deg, #0e4f4d 0%, #13141f 100%);
+	transform: translateZ(0);
+}
+
+.foundation-rubiks-gallery__image,
+.foundation-rubiks-gallery__video {
+	display: block;
+	object-fit: cover;
+	object-position: top center;
+	border: 0;
+	margin: 0;
+}
+
+.foundation-rubiks-gallery__video {
+	background: #10161b;
+}
+
+.foundation-rubiks-gallery__lottie {
+	background: linear-gradient(135deg, rgba(50, 177, 144, 0.16) 0%, rgba(241, 142, 92, 0.12) 100%);
+}
+
+.foundation-rubiks-gallery__lottie svg,
+.foundation-rubiks-gallery__lottie canvas {
+	width: 100% !important;
+	height: 100% !important;
+	display: block;
+}
+
+.foundation-rubiks-gallery__card:focus-visible {
+	outline: none;
+}
+
+.foundation-rubiks-gallery__card:focus-visible::after,
+.foundation-rubiks-gallery__card:focus-within::after {
+	box-shadow: inset 0 0 0 3px #151622;
+}
+
+.foundation-rubiks-gallery__data {
+	display: none;
+}
+
+@media (max-width: 767px) {
+	.foundation-rubiks-gallery {
+		aspect-ratio: var(--foundation-rubiks-stage-ratio);
+		max-width: 400px;
+		--foundation-rubiks-padding: 30px;
+	}
+
+	.foundation-rubiks-gallery__card {
+		transition: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.foundation-rubiks-gallery__card {
+		transition: none;
+	}
+}

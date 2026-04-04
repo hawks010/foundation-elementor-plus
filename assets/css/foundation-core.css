@@ -1,0 +1,77 @@
+:root {
+  --foundation-a11y-focus-ring: #fbccbf;
+  --foundation-a11y-focus-offset: 3px;
+  --foundation-a11y-focus-width: 2px;
+}
+
+.foundation-widget-shell [hidden] {
+  display: none !important;
+}
+
+.foundation-widget-shell :where(a, button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: var(--foundation-a11y-focus-width) solid var(--foundation-a11y-focus-ring);
+  outline-offset: var(--foundation-a11y-focus-offset);
+}
+
+.foundation-widget-shell .screen-reader-text,
+.foundation-widget-shell .foundation-sender-newsletter__sr {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.foundation-widget--motion-off,
+.foundation-widget--motion-off * {
+  scroll-behavior: auto !important;
+}
+
+.foundation-widget--motion-off * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .foundation-widget-shell,
+  .foundation-widget-shell * {
+    scroll-behavior: auto !important;
+  }
+
+  .foundation-widget-shell * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.foundation-widget-shell :where(
+  button,
+  [type="button"],
+  [type="submit"],
+  select,
+  .imh-icon-button,
+  .imh-inline-cta-btn,
+  .imh-quick-action,
+  .imh-pill-button,
+  .imh-card-toggle,
+  .imh-card-link,
+  .foundation-bounce-rail__arrow,
+  .foundation-bounce-rail__all,
+  .foundation-y-hero__arrow,
+  .foundation-y-hero__cta,
+  .foundation-process-carousel__arrow,
+  .foundation-team-loop__toggle,
+  .foundation-portfolio-mosaic__load-more,
+  .foundation-portfolio-mega-menu__primary,
+  .foundation-portfolio-mega-menu__secondary,
+  .foundation-live-roles__filter
+) {
+  min-height: 44px;
+  min-width: 44px;
+}

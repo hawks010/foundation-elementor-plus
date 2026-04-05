@@ -602,7 +602,7 @@ class Sender_Newsletter_Widget extends Base_Widget {
 
 			if ( is_array( $title_words ) && count( $title_words ) > 1 ) {
 				$last_word = array_pop( $title_words );
-				$title_markup  = esc_html( implode( ' ', $title_words ) ) . ' ';
+				$title_markup  = '<span class="foundation-sender-newsletter__title-prefix">' . esc_html( implode( ' ', $title_words ) ) . '</span>';
 				$title_markup .= '<span class="foundation-sender-newsletter__title-break">' . esc_html( $last_word ) . '</span>';
 			} else {
 				$title_markup = esc_html( $title_text );

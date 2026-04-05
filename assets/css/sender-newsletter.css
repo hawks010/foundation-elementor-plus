@@ -92,13 +92,21 @@
 	letter-spacing: -0.04em;
 	font-weight: 700;
 	color: var(--fsn-text);
-	text-wrap: balance;
 	text-shadow: 0 1px 2px rgba(18, 12, 35, 0.18);
-	max-width: 11ch;
+	max-width: none;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.04em;
 }
 
+.foundation-sender-newsletter__title-prefix,
 .foundation-sender-newsletter__title-break {
 	display: block;
+}
+
+.foundation-sender-newsletter__title-prefix {
+	white-space: nowrap;
 }
 
 .foundation-sender-newsletter__text {
@@ -429,6 +437,10 @@
 	.foundation-sender-newsletter__title {
 		font-size: clamp(1.3rem, 6.3vw, 1.72rem);
 		line-height: 1.04;
+	}
+
+	.foundation-sender-newsletter__title-prefix {
+		white-space: normal;
 	}
 
 	.foundation-sender-newsletter__text {

@@ -280,14 +280,14 @@
       baseVelocityDissipation: velocityDissipation,
       idleDensityDissipation: 2.2,
       idleVelocityDissipation: 1.15,
-      autoAcceleration: isTouchDevice ? 0.00016 : 0.0004,
-      autoFriction: isTouchDevice ? 0.94 : 0.96,
-      autoForceMultiplier: isTouchDevice ? 3000 : 5600,
-      autoColorCycleStep: isTouchDevice ? 0.0032 : 0.006,
-      autoRadius: isTouchDevice ? 0.19 : 0.26,
-      autoMinForceThreshold: isTouchDevice ? 6 : 4,
-      autoStartVelocityX: isTouchDevice ? 0.006 : 0.012,
-      autoStartVelocityY: isTouchDevice ? 0.0048 : 0.01
+      autoAcceleration: isTouchDevice ? 0.00024 : 0.0004,
+      autoFriction: isTouchDevice ? 0.952 : 0.96,
+      autoForceMultiplier: isTouchDevice ? 3900 : 5600,
+      autoColorCycleStep: isTouchDevice ? 0.0042 : 0.006,
+      autoRadius: isTouchDevice ? 0.21 : 0.26,
+      autoMinForceThreshold: isTouchDevice ? 4.2 : 4,
+      autoStartVelocityX: isTouchDevice ? 0.0084 : 0.012,
+      autoStartVelocityY: isTouchDevice ? 0.0068 : 0.01
     };
 
     section.addEventListener('mouseenter', (event) => {

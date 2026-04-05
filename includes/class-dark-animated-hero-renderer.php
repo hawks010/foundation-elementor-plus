@@ -484,6 +484,10 @@ final class Dark_Animated_Hero_Renderer {
 	}
 
 	private static function render_autoplay_toggle() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return '';
+		}
+
 		if ( self::$autoplay_toggle_rendered ) {
 			return '';
 		}

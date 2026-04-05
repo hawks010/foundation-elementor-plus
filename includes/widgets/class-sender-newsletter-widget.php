@@ -613,44 +613,50 @@ class Sender_Newsletter_Widget extends Base_Widget {
 					<?php endif; ?>
 				</div>
 
-				<?php if ( $show_first ) : ?>
-					<div class="foundation-sender-newsletter__field">
-						<label class="foundation-sender-newsletter__sr" for="<?php echo esc_attr( $widget_id ); ?>-first-name"><?php echo esc_html__( 'First name', 'foundation-elementor-plus' ); ?></label>
-						<input type="text" id="<?php echo esc_attr( $widget_id ); ?>-first-name" name="first_name" placeholder="<?php echo esc_attr__( 'First name', 'foundation-elementor-plus' ); ?>" autocomplete="given-name">
-					</div>
-				<?php endif; ?>
+				<div class="foundation-sender-newsletter__main">
+					<div class="foundation-sender-newsletter__form-row">
+						<?php if ( $show_first ) : ?>
+							<div class="foundation-sender-newsletter__field">
+								<label class="foundation-sender-newsletter__sr" for="<?php echo esc_attr( $widget_id ); ?>-first-name"><?php echo esc_html__( 'First name', 'foundation-elementor-plus' ); ?></label>
+								<input type="text" id="<?php echo esc_attr( $widget_id ); ?>-first-name" name="first_name" placeholder="<?php echo esc_attr__( 'First name', 'foundation-elementor-plus' ); ?>" autocomplete="given-name">
+							</div>
+						<?php endif; ?>
 
-				<div class="foundation-sender-newsletter__field foundation-sender-newsletter__field--email">
-					<label class="foundation-sender-newsletter__sr" for="<?php echo esc_attr( $widget_id ); ?>-email"><?php echo esc_html__( 'Email address', 'foundation-elementor-plus' ); ?></label>
-					<input type="email" id="<?php echo esc_attr( $widget_id ); ?>-email" name="email" placeholder="<?php echo esc_attr__( 'Email address', 'foundation-elementor-plus' ); ?>" autocomplete="email" required>
+						<div class="foundation-sender-newsletter__field foundation-sender-newsletter__field--email">
+							<label class="foundation-sender-newsletter__sr" for="<?php echo esc_attr( $widget_id ); ?>-email"><?php echo esc_html__( 'Email address', 'foundation-elementor-plus' ); ?></label>
+							<input type="email" id="<?php echo esc_attr( $widget_id ); ?>-email" name="email" placeholder="<?php echo esc_attr__( 'Email address', 'foundation-elementor-plus' ); ?>" autocomplete="email" required>
+						</div>
+
+						<div class="foundation-sender-newsletter__action">
+							<button type="submit"><?php echo esc_html( $button_text ); ?></button>
+						</div>
+					</div>
+
+					<?php if ( $show_interests && ! empty( $interest_items ) ) : ?>
+						<div class="foundation-sender-newsletter__interests" aria-label="<?php echo esc_attr__( 'Contact preferences', 'foundation-elementor-plus' ); ?>">
+							<?php foreach ( $interest_items as $interest_key => $interest_label ) : ?>
+								<label class="foundation-sender-newsletter__check">
+									<input type="checkbox" name="interests[]" value="<?php echo esc_attr( $interest_key ); ?>">
+									<span class="foundation-sender-newsletter__check-box" aria-hidden="true"></span>
+									<span class="foundation-sender-newsletter__check-label"><?php echo esc_html( $interest_label ); ?></span>
+								</label>
+							<?php endforeach; ?>
+						</div>
+					<?php endif; ?>
+
+					<div class="foundation-sender-newsletter__footer">
+						<div class="foundation-sender-newsletter__message" aria-live="polite"></div>
+
+						<?php if ( '' !== $privacy_line ) : ?>
+							<p class="foundation-sender-newsletter__privacy"><?php echo esc_html( $privacy_line ); ?></p>
+						<?php endif; ?>
+					</div>
 				</div>
 
 				<div class="foundation-sender-newsletter__honeypot" aria-hidden="true">
 					<label for="<?php echo esc_attr( $widget_id ); ?>-company"><?php echo esc_html__( 'Company', 'foundation-elementor-plus' ); ?></label>
 					<input type="text" id="<?php echo esc_attr( $widget_id ); ?>-company" name="company" tabindex="-1" autocomplete="off">
 				</div>
-
-				<div class="foundation-sender-newsletter__action">
-					<button type="submit"><?php echo esc_html( $button_text ); ?></button>
-				</div>
-
-				<?php if ( $show_interests && ! empty( $interest_items ) ) : ?>
-					<div class="foundation-sender-newsletter__interests" aria-label="<?php echo esc_attr__( 'Contact preferences', 'foundation-elementor-plus' ); ?>">
-						<?php foreach ( $interest_items as $interest_key => $interest_label ) : ?>
-							<label class="foundation-sender-newsletter__check">
-								<input type="checkbox" name="interests[]" value="<?php echo esc_attr( $interest_key ); ?>">
-								<span class="foundation-sender-newsletter__check-box" aria-hidden="true"></span>
-								<span class="foundation-sender-newsletter__check-label"><?php echo esc_html( $interest_label ); ?></span>
-							</label>
-						<?php endforeach; ?>
-					</div>
-				<?php endif; ?>
-
-				<div class="foundation-sender-newsletter__message" aria-live="polite"></div>
-
-				<?php if ( '' !== $privacy_line ) : ?>
-					<p class="foundation-sender-newsletter__privacy"><?php echo esc_html( $privacy_line ); ?></p>
-				<?php endif; ?>
 			</form>
 		</div>
 		<?php

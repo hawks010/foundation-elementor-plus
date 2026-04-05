@@ -1643,6 +1643,6 @@
 
 @media (max-width: 862px) {
     .foundation-inkfire-brand img {
-        margin-bottom: 0 !important;
+        margin-bottom: -5px !important;
     }
 }

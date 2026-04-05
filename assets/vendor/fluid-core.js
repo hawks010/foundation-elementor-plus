@@ -21,6 +21,7 @@ function foundationInkfireGenerateCanvas(canvas, overrideConfig) {
     COLOR_UPDATE_SPEED: 10,
     PAUSED: false,
     MAX_PIXEL_RATIO: 1.25,
+    ALLOW_TOUCH_INPUT: true,
     BRAND_PALETTE: ['#13141F', '#1C1D2D', '#CE3D27', '#E27200', '#0E6055', '#07A079', '#FBCCBF', '#F2F2F2'],
     // DARK MODE BACKGROUND: #1C1D2D -> RGB(28, 29, 45)
     BACK_COLOR: { r: 28, g: 29, b: 45 },
@@ -845,42 +846,44 @@ function foundationInkfireGenerateCanvas(canvas, overrideConfig) {
     var pointer = pointers[0]
     if (pointer) updatePointerUpData(pointer)
   })
-  canvas.addEventListener(
-    'touchstart',
-    function (e) {
-      var touches = e.targetTouches
-      while (touches.length >= pointers.length) pointers.push(new Pointer())
+  if (config.ALLOW_TOUCH_INPUT !== false) {
+    canvas.addEventListener(
+      'touchstart',
+      function (e) {
+        var touches = e.targetTouches
+        while (touches.length >= pointers.length) pointers.push(new Pointer())
+        for (var i = 0; i < touches.length; i++) {
+          var posX = scaleByPixelRatio(touches[i].pageX)
+          var posY = scaleByPixelRatio(touches[i].pageY)
+          updatePointerDownData(pointers[i + 1], touches[i].identifier, posX, posY)
+        }
+      },
+      { passive: true }
+    )
+    canvas.addEventListener(
+      'touchmove',
+      function (e) {
+        var touches = e.targetTouches
+        for (var i = 0; i < touches.length; i++) {
+          var pointer = pointers[i + 1]
+          if (!pointer || !pointer.down) continue
+          var posX = scaleByPixelRatio(touches[i].pageX)
+          var posY = scaleByPixelRatio(touches[i].pageY)
+          updatePointerMoveData(pointer, posX, posY)
+        }
+      },
+      { passive: true }
+    )
+    window.addEventListener('touchend', function (e) {
+      var touches = e.changedTouches
       for (var i = 0; i < touches.length; i++) {
-        var posX = scaleByPixelRatio(touches[i].pageX)
-        var posY = scaleByPixelRatio(touches[i].pageY)
-        updatePointerDownData(pointers[i + 1], touches[i].identifier, posX, posY)
+        var pointer = pointers.find(function (p) {
+          return p.id === touches[i].identifier
+        })
+        if (pointer) updatePointerUpData(pointer)
       }
-    },
-    { passive: true }
-  )
-  canvas.addEventListener(
-    'touchmove',
-    function (e) {
-      var touches = e.targetTouches
-      for (var i = 0; i < touches.length; i++) {
-        var pointer = pointers[i + 1]
-        if (!pointer || !pointer.down) continue
-        var posX = scaleByPixelRatio(touches[i].pageX)
-        var posY = scaleByPixelRatio(touches[i].pageY)
-        updatePointerMoveData(pointer, posX, posY)
-      }
-    },
-    { passive: true }
-  )
-  window.addEventListener('touchend', function (e) {
-    var touches = e.changedTouches
-    for (var i = 0; i < touches.length; i++) {
-      var pointer = pointers.find(function (p) {
-        return p.id === touches[i].identifier
-      })
-      if (pointer) updatePointerUpData(pointer)
-    }
-  })
+    })
+  }
   window.addEventListener('mouseup', function () {
     var pointer = pointers[0]
     if (pointer) updatePointerUpData(pointer)

@@ -13,17 +13,20 @@
   const shouldDisableFluid =
     window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
     !hasWebGL() ||
-    typeof window.foundationInkfireGenerateCanvas !== 'function' ||
-    isTouchDevice;
+    typeof window.foundationInkfireGenerateCanvas !== 'function';
 
-  let currentMode = 'hover';
+  let currentMode = isTouchDevice ? 'auto' : 'hover';
   if (urlModeOverride === 'hover' || urlModeOverride === 'auto') {
     currentMode = urlModeOverride;
   } else {
     try {
       const storedMode = localStorage.getItem(AUTOPLAY_STORAGE_KEY);
-      if (storedMode === 'hover') currentMode = storedMode;
+      if (storedMode === 'hover' || storedMode === 'auto') currentMode = storedMode;
     } catch (error) {}
+  }
+
+  if (isTouchDevice && currentMode === 'hover') {
+    currentMode = 'auto';
   }
 
   const sectionStates = [];
@@ -168,13 +171,13 @@
     const maxChannel = Math.max(red, green, blue);
     const minChannel = Math.min(red, green, blue);
     const brightness = (red * 0.299 + green * 0.587 + blue * 0.114) / 255;
-    let intensity = typeof forcedIntensity === 'number' ? forcedIntensity : 0.11;
+    let intensity = typeof forcedIntensity === 'number' ? forcedIntensity : 0.082;
 
     if (typeof forcedIntensity !== 'number') {
-      if (brightness < 0.22) intensity = 0.135;
-      if (brightness > 0.86) intensity = 0.06;
+      if (brightness < 0.22) intensity = 0.098;
+      if (brightness > 0.86) intensity = 0.05;
     }
-    if (maxChannel - minChannel < 18) intensity *= 0.92;
+    if (maxChannel - minChannel < 18) intensity *= 0.9;
 
     return {
       r: (red / 255) * intensity,
@@ -212,24 +215,27 @@
     const isOrangePalette = paletteKey === 'inkfire_orange';
     const isGradientPalette = paletteKey === 'inkfire_gradient';
     const isWarmPalette = isOrangePalette || isGradientPalette;
+    const forcedPaletteIntensity = isTouchDevice
+      ? (isHomepageHero ? 0.086 : (isWarmPalette ? 0.082 : 0.078))
+      : (isHomepageHero ? 0.094 : (isWarmPalette ? 0.088 : 0.082));
     const fluidPalette = palette
-      .map((hex) => hexToFluidColor(hex, isHomepageHero ? 0.14 : (isWarmPalette ? 0.125 : 0.12)))
+      .map((hex) => hexToFluidColor(hex, forcedPaletteIntensity))
       .filter(Boolean);
 
-    const simResolution = isMobileViewport ? 56 : (isHomepageHero ? 112 : (isLargeViewport ? 104 : 96));
+    const simResolution = isMobileViewport ? 40 : (isHomepageHero ? 88 : (isLargeViewport ? 92 : 84));
     const dyeResolution = isMobileViewport
-      ? 448
+      ? 384
       : (isHomepageHero
-        ? (isLargeViewport ? 1024 : (isDenseScreen ? 960 : 896))
-        : (isTabletViewport ? 768 : (isLargeViewport ? 960 : 896)));
-    const bloomIterations = isHomepageHero ? 5 : 4;
-    const bloomResolution = isHomepageHero ? 320 : (isWarmPalette ? 256 : 224);
-    const bloomIntensity = isHomepageHero ? 0.38 : (isWarmPalette ? 0.34 : 0.3);
-    const bloomThreshold = isHomepageHero ? 0.58 : (isWarmPalette ? 0.6 : 0.64);
-    const bloomSoftKnee = isHomepageHero ? 0.5 : (isWarmPalette ? 0.48 : 0.42);
-    const maxPixelRatio = isHomepageHero ? 1.35 : (isWarmPalette ? 1.3 : 1.2);
-    const densityDissipation = 0.88;
-    const velocityDissipation = 0.3;
+        ? (isLargeViewport ? 896 : (isDenseScreen ? 832 : 768))
+        : (isTabletViewport ? 640 : (isLargeViewport ? 832 : 768)));
+    const bloomIterations = isTouchDevice ? 3 : (isHomepageHero ? 4 : 3);
+    const bloomResolution = isTouchDevice ? 160 : (isHomepageHero ? 224 : (isWarmPalette ? 192 : 176));
+    const bloomIntensity = isTouchDevice ? 0.11 : (isHomepageHero ? 0.18 : (isWarmPalette ? 0.16 : 0.14));
+    const bloomThreshold = isTouchDevice ? 0.74 : (isHomepageHero ? 0.71 : (isWarmPalette ? 0.7 : 0.72));
+    const bloomSoftKnee = isTouchDevice ? 0.24 : (isHomepageHero ? 0.28 : (isWarmPalette ? 0.3 : 0.26));
+    const maxPixelRatio = isTouchDevice ? 1 : (isHomepageHero ? 1.12 : (isWarmPalette ? 1.1 : 1.05));
+    const densityDissipation = isTouchDevice ? 0.94 : 0.9;
+    const velocityDissipation = isTouchDevice ? 0.34 : 0.3;
 
     window.foundationInkfireGenerateCanvas(canvas, {
       SIM_RESOLUTION: simResolution,
@@ -244,6 +250,7 @@
       BLOOM_INTENSITY: bloomIntensity,
       BLOOM_THRESHOLD: bloomThreshold,
       BLOOM_SOFT_KNEE: bloomSoftKnee,
+      ALLOW_TOUCH_INPUT: !isTouchDevice,
       PAUSED: false,
       BRAND_PALETTE: palette
     });

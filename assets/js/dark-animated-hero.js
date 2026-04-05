@@ -344,6 +344,15 @@
     );
   }
 
+  function clearFluid(state) {
+    if (
+      state.canvas.__foundationInkfireFluid &&
+      typeof state.canvas.__foundationInkfireFluid.clear === 'function'
+    ) {
+      state.canvas.__foundationInkfireFluid.clear();
+    }
+  }
+
   function clearHoverSettleTimers(state) {
     window.clearTimeout(state.idleClearTimeoutId);
     window.clearTimeout(state.idlePauseTimeoutId);
@@ -368,6 +377,7 @@
       if (currentMode !== 'hover') return;
       endInteraction(state);
       state.section.classList.remove('foundation-inkfire-splash--active');
+      clearFluid(state);
       restoreFluidDissipation(state);
       setPaused(state, true);
     }, 1100);

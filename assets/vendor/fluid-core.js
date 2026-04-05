@@ -532,6 +532,29 @@ function foundationInkfireGenerateCanvas(canvas, overrideConfig) {
     target.texelSizeY = 1.0 / h
     return target
   }
+  function clearFBO(target) {
+    if (!target || !target.fbo) return
+    gl.bindFramebuffer(gl.FRAMEBUFFER, target.fbo)
+    gl.viewport(0, 0, target.width, target.height)
+    gl.clearColor(0.0, 0.0, 0.0, 0.0)
+    gl.clear(gl.COLOR_BUFFER_BIT)
+  }
+  function clearDoubleFBO(target) {
+    if (!target) return
+    clearFBO(target.read)
+    clearFBO(target.write)
+  }
+  function clearSimulation() {
+    clearDoubleFBO(dye)
+    clearDoubleFBO(velocity)
+    clearFBO(divergence)
+    clearFBO(curl)
+    clearDoubleFBO(pressure)
+    clearFBO(bloom)
+    bloomFramebuffers.forEach(clearFBO)
+    clearFBO(sunrays)
+    clearFBO(sunraysTemp)
+  }
   function createTextureAsync(url) {
     var texture = gl.createTexture()
     gl.bindTexture(gl.TEXTURE_2D, texture)
@@ -1013,6 +1036,9 @@ function foundationInkfireGenerateCanvas(canvas, overrideConfig) {
       if (typeof velocity === 'number') {
         config.VELOCITY_DISSIPATION = velocity;
       }
+    },
+    clear: function () {
+      clearSimulation();
     },
     triggerSplat: function (x, y, dx, dy, r, g, b, radius) {
       if (arguments.length > 1) {

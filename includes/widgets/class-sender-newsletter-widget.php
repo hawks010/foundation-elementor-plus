@@ -594,6 +594,20 @@ class Sender_Newsletter_Widget extends Base_Widget {
 		$privacy_line   = ! empty( $settings['privacy_statement'] ) ? (string) $settings['privacy_statement'] : '';
 		$form_class     = 'foundation-sender-newsletter';
 		$interest_items = Sender_Newsletter::get_interest_option_labels();
+		$title_markup   = '';
+
+		if ( ! empty( $settings['title'] ) ) {
+			$title_text  = trim( (string) $settings['title'] );
+			$title_words = preg_split( '/\s+/', $title_text );
+
+			if ( is_array( $title_words ) && count( $title_words ) > 1 ) {
+				$last_word = array_pop( $title_words );
+				$title_markup  = esc_html( implode( ' ', $title_words ) ) . ' ';
+				$title_markup .= '<span class="foundation-sender-newsletter__title-break">' . esc_html( $last_word ) . '</span>';
+			} else {
+				$title_markup = esc_html( $title_text );
+			}
+		}
 
 		if ( ! Sender_Newsletter::is_ready() ) {
 			echo '<div class="foundation-sender-newsletter__notice">' . esc_html__( 'Sender is not configured yet. Connect Sender first, then use this widget.', 'foundation-elementor-plus' ) . '</div>';
@@ -605,8 +619,8 @@ class Sender_Newsletter_Widget extends Base_Widget {
 		>
 			<form class="<?php echo esc_attr( $form_class ); ?>" method="post" aria-label="<?php echo esc_attr__( 'Newsletter signup form', 'foundation-elementor-plus' ); ?>" novalidate>
 				<div class="foundation-sender-newsletter__intro">
-					<?php if ( ! empty( $settings['title'] ) ) : ?>
-						<h3 class="foundation-sender-newsletter__title"><?php echo esc_html( $settings['title'] ); ?></h3>
+					<?php if ( '' !== $title_markup ) : ?>
+						<h3 class="foundation-sender-newsletter__title"><?php echo wp_kses( $title_markup, array( 'span' => array( 'class' => array() ) ) ); ?></h3>
 					<?php endif; ?>
 					<?php if ( ! empty( $settings['intro_text'] ) ) : ?>
 						<p class="foundation-sender-newsletter__text"><?php echo esc_html( $settings['intro_text'] ); ?></p>

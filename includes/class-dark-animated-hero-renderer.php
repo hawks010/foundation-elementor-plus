@@ -864,9 +864,17 @@ final class Dark_Animated_Hero_Renderer {
 		$team_link_url = ! empty( $settings['team_link_url'] ) ? $settings['team_link_url'] : '/about-us/meet-the-team/';
 		$avatars_markup = '';
 
-		if ( shortcode_exists( 'ink_team_management' ) ) {
-			$avatars_markup = trim( do_shortcode( '[ink_team_management class="foundation-team-inline--hero"]' ) );
+		if ( shortcode_exists( 'ink_team_homepage' ) ) {
+			$avatars_markup = trim( do_shortcode( '[ink_team_homepage class="foundation-team-inline--hero"]' ) );
 		} elseif ( shortcode_exists( 'ink_team' ) ) {
+			$avatars_markup = trim( do_shortcode( '[ink_team department="homepage" class="foundation-team-inline--hero"]' ) );
+		}
+
+		if ( '' === $avatars_markup && shortcode_exists( 'ink_team_management' ) ) {
+			$avatars_markup = trim( do_shortcode( '[ink_team_management class="foundation-team-inline--hero"]' ) );
+		}
+
+		if ( '' === $avatars_markup && shortcode_exists( 'ink_team' ) ) {
 			$avatars_markup = trim( do_shortcode( '[ink_team department="management" class="foundation-team-inline--hero"]' ) );
 		}
 

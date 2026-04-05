@@ -877,6 +877,10 @@ final class Team_Inline_Images {
 		$options = $this->get_option();
 		$images  = isset( $options[ $department ] ) ? $options[ $department ] : array();
 
+		if ( empty( $images ) && 'homepage' === $department ) {
+			$images = isset( $options['management'] ) ? $options['management'] : array();
+		}
+
 		if ( empty( $images ) && 'all' !== $department ) {
 			$images = isset( $options['all'] ) ? $options['all'] : array();
 		}
@@ -900,12 +904,13 @@ final class Team_Inline_Images {
 	 */
 	public static function get_department_options() {
 		return array(
-			'all'       => __( 'All Team', 'foundation-elementor-plus' ),
+			'all'        => __( 'All Team', 'foundation-elementor-plus' ),
+			'homepage'   => __( 'Homepage Hero', 'foundation-elementor-plus' ),
 			'management' => __( 'Management', 'foundation-elementor-plus' ),
-			'it'        => __( 'IT', 'foundation-elementor-plus' ),
-			'web'       => __( 'Web', 'foundation-elementor-plus' ),
-			'marketing' => __( 'Marketing', 'foundation-elementor-plus' ),
-			'branding'  => __( 'Branding', 'foundation-elementor-plus' ),
+			'it'         => __( 'IT', 'foundation-elementor-plus' ),
+			'web'        => __( 'Web', 'foundation-elementor-plus' ),
+			'marketing'  => __( 'Marketing', 'foundation-elementor-plus' ),
+			'branding'   => __( 'Branding', 'foundation-elementor-plus' ),
 		);
 	}
 

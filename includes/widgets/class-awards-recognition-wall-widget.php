@@ -384,7 +384,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 			)
 		);
 
-		$this->add_control(
+		$this->add_responsive_control(
 			'section_padding',
 			array(
 				'label'      => esc_html__( 'Section Padding', 'foundation-elementor-plus' ),
@@ -404,7 +404,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 			)
 		);
 
-		$this->add_control(
+		$this->add_responsive_control(
 			'grid_gap',
 			array(
 				'label'      => esc_html__( 'Block Gap', 'foundation-elementor-plus' ),
@@ -470,7 +470,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 			)
 		);
 
-		$this->add_control(
+		$this->add_responsive_control(
 			'card_padding',
 			array(
 				'label'      => esc_html__( 'Card Padding', 'foundation-elementor-plus' ),
@@ -490,7 +490,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 			)
 		);
 
-		$this->add_control(
+		$this->add_responsive_control(
 			'card_radius',
 			array(
 				'label'      => esc_html__( 'Card Radius', 'foundation-elementor-plus' ),

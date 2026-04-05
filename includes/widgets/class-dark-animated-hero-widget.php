@@ -34,11 +34,14 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 	}
 
 	public function get_style_depends(): array {
-		return $this->get_foundation_style_depends();
+		return $this->get_foundation_style_depends( array( 'foundation-elementor-plus-dark-animated-hero' ) );
 	}
 
 	public function get_script_depends(): array {
-		return array();
+		return array(
+			'foundation-elementor-plus-fluid-core',
+			'foundation-elementor-plus-dark-animated-hero',
+		);
 	}
 
 	protected function register_controls() {

@@ -102,11 +102,9 @@
 }
 
 /* Homepage-only handoff tuning for the decorative curve banner below the home hero.
-   The hero keeps its reserved top/bottom padding; we only rebalance the overlap depth
-   so the curve rises into the reserved space at each breakpoint. */
-.page-id-30 .elementor-element.elementor-element-1fb6a09 {
-    bottom: -94px;
-}
+   Leave the original overlap untouched on normal screens, and only nudge the curve
+   upward a little on genuinely short viewports where the reserved bottom space
+   reads as an oversized gap. */
 
 .foundation-inkfire-splash--palette-inkfire-gradient {
     background:
@@ -1187,10 +1185,6 @@
 }
 
 @media (max-width: 1024px) {
-    .page-id-30 .elementor-element.elementor-element-1fb6a09 {
-        bottom: -30px;
-    }
-
     .foundation-inkfire-splash {
         --foundation-inkfire-hero-padding-top: 100px;
     }
@@ -1270,10 +1264,6 @@
 }
 
 @media (max-width: 768px) {
-    .page-id-30 .elementor-element.elementor-element-1fb6a09 {
-        bottom: -140px;
-    }
-
     .foundation-inkfire-splash {
         --foundation-inkfire-hero-padding-top: 80px;
         --foundation-inkfire-hero-padding-right: 20px;
@@ -1434,6 +1424,24 @@
     .foundation-inkfire-splash--align-left .foundation-inkfire-button-row,
     .foundation-inkfire-splash--align-left .foundation-inkfire-trust-bar {
         align-items: flex-start;
+    }
+}
+
+@media (min-width: 1025px) and (max-height: 980px) {
+    .page-id-30 .elementor-element.elementor-element-1fb6a09 {
+        bottom: -124px;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) and (max-height: 900px) {
+    .page-id-30 .elementor-element.elementor-element-1fb6a09 {
+        bottom: -122px;
+    }
+}
+
+@media (max-width: 768px) and (max-height: 500px) and (orientation: landscape) {
+    .page-id-30 .elementor-element.elementor-element-1fb6a09 {
+        bottom: -128px;
     }
 }
 

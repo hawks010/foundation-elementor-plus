@@ -279,7 +279,15 @@
       baseDensityDissipation: densityDissipation,
       baseVelocityDissipation: velocityDissipation,
       idleDensityDissipation: 2.2,
-      idleVelocityDissipation: 1.15
+      idleVelocityDissipation: 1.15,
+      autoAcceleration: isTouchDevice ? 0.00016 : 0.0004,
+      autoFriction: isTouchDevice ? 0.94 : 0.96,
+      autoForceMultiplier: isTouchDevice ? 3000 : 5600,
+      autoColorCycleStep: isTouchDevice ? 0.0032 : 0.006,
+      autoRadius: isTouchDevice ? 0.19 : 0.26,
+      autoMinForceThreshold: isTouchDevice ? 6 : 4,
+      autoStartVelocityX: isTouchDevice ? 0.006 : 0.012,
+      autoStartVelocityY: isTouchDevice ? 0.0048 : 0.01
     };
 
     section.addEventListener('mouseenter', (event) => {
@@ -559,20 +567,20 @@
         state.targetY = 0.24 + Math.random() * 0.48;
       }
 
-      state.velocityX += (state.targetX - state.pointerX) * 0.0004;
-      state.velocityY += (state.targetY - state.pointerY) * 0.0004;
-      state.velocityX *= 0.96;
-      state.velocityY *= 0.96;
+      state.velocityX += (state.targetX - state.pointerX) * state.autoAcceleration;
+      state.velocityY += (state.targetY - state.pointerY) * state.autoAcceleration;
+      state.velocityX *= state.autoFriction;
+      state.velocityY *= state.autoFriction;
       state.pointerX += state.velocityX;
       state.pointerY += state.velocityY;
 
-      const forceX = state.velocityX * 5600;
-      const forceY = state.velocityY * 5600;
+      const forceX = state.velocityX * state.autoForceMultiplier;
+      const forceY = state.velocityY * state.autoForceMultiplier;
 
-      state.colorCycle += 0.006;
+      state.colorCycle += state.autoColorCycleStep;
       const fluidColor = pickAmbientColor(state, state.colorCycle);
 
-      if (Math.abs(forceX) + Math.abs(forceY) > 4) {
+      if (Math.abs(forceX) + Math.abs(forceY) > state.autoMinForceThreshold) {
         state.canvas.__foundationInkfireFluid.triggerSplat(
           state.pointerX,
           state.pointerY,
@@ -581,7 +589,7 @@
           fluidColor.r,
           fluidColor.g,
           fluidColor.b,
-          0.26
+          state.autoRadius
         );
       }
     }
@@ -594,8 +602,8 @@
     if (!state.isVisible) return;
     state.pointerX = 0.5;
     state.pointerY = 0.5;
-    state.velocityX = 0.012;
-    state.velocityY = 0.01;
+    state.velocityX = state.autoStartVelocityX;
+    state.velocityY = state.autoStartVelocityY;
     seedAutoplay(state);
     triggerHoverBurst(state);
     runAutoplayLoop(state);

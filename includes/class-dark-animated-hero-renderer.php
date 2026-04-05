@@ -862,20 +862,29 @@ final class Dark_Animated_Hero_Renderer {
 		$settings      = self::get_settings();
 		$team_images   = self::get_lines( $settings['team_images'] );
 		$team_link_url = ! empty( $settings['team_link_url'] ) ? $settings['team_link_url'] : '/about-us/meet-the-team/';
+		$avatars_markup = '';
 
-		if ( empty( $team_images ) ) {
-			return '';
+		if ( shortcode_exists( 'ink_team_management' ) ) {
+			$avatars_markup = trim( do_shortcode( '[ink_team_management class="foundation-team-inline--hero"]' ) );
+		} elseif ( shortcode_exists( 'ink_team' ) ) {
+			$avatars_markup = trim( do_shortcode( '[ink_team department="management" class="foundation-team-inline--hero"]' ) );
 		}
 
-		$output  = '<div class="foundation-inkfire-avatar-group" role="img" aria-label="Inkfire team: disabled-led creative and tech experts">';
-		$output .= '<div class="foundation-inkfire-avatars" aria-hidden="true">';
+		if ( '' === $avatars_markup ) {
+			if ( empty( $team_images ) ) {
+				return '';
+			}
 
-		foreach ( $team_images as $index => $url ) {
-			$margin  = 0 === $index ? '0' : '-15px';
-			$output .= '<img class="foundation-inkfire-avatar" src="' . esc_url( $url ) . '" alt="" aria-hidden="true" loading="lazy" style="margin-left:' . esc_attr( $margin ) . ';position:relative;z-index:' . ( 10 - (int) $index ) . ';">';
+			$avatars_markup  = '<span class="foundation-team-inline foundation-team-inline--hero" role="img" aria-label="Inkfire team: disabled-led creative and tech experts">';
+			foreach ( $team_images as $index => $url ) {
+				$margin         = 0 === $index ? '0' : '-15px';
+				$avatars_markup .= '<img class="foundation-team-inline__avatar foundation-inkfire-avatar" src="' . esc_url( $url ) . '" alt="" aria-hidden="true" loading="lazy" style="margin-left:' . esc_attr( $margin ) . ';position:relative;z-index:' . ( 10 - (int) $index ) . ';">';
+			}
+			$avatars_markup .= '</span>';
 		}
 
-		$output .= '</div>';
+		$output  = '<div class="foundation-inkfire-avatar-group">';
+		$output .= $avatars_markup;
 		$output .= '<a href="' . esc_url( $team_link_url ) . '" class="foundation-inkfire-meet-team-link" aria-label="Meet the Inkfire team">';
 		$output .= '<span class="foundation-inkfire-meet-text">' . esc_html( $settings['team_link_text'] ) . '</span>';
 		$output .= '<span class="foundation-inkfire-meet-arrow"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>';

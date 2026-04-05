@@ -8,6 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Dark_Animated_Hero_Renderer {
 	const OPTION_KEY = 'foundation_dark_animated_hero_settings';
+	private static $autoplay_toggle_rendered = false;
 
 	private static function get_palette_presets() {
 		return array(
@@ -474,10 +475,38 @@ final class Dark_Animated_Hero_Renderer {
 					<?php endif; ?>
 				</div>
 			</div>
+
+			<?php echo self::render_autoplay_toggle(); ?>
 		</section>
 		<?php
 
 		return ob_get_clean();
+	}
+
+	private static function render_autoplay_toggle() {
+		if ( self::$autoplay_toggle_rendered ) {
+			return '';
+		}
+
+		self::$autoplay_toggle_rendered = true;
+
+		ob_start();
+		?>
+		<button
+			id="foundation-inkfire-autoplay-toggle"
+			class="foundation-inkfire-autoplay-toggle is-on"
+			type="button"
+			data-foundation-inkfire-autoplay-toggle
+			aria-pressed="true"
+			aria-label="<?php echo esc_attr__( 'Toggle hero animation autoplay mode', 'foundation-elementor-plus' ); ?>"
+		>
+			<span class="foundation-inkfire-autoplay-toggle__dot" aria-hidden="true"></span>
+			<span class="foundation-inkfire-autoplay-toggle__prefix"><?php echo esc_html__( 'Animation', 'foundation-elementor-plus' ); ?></span>
+			<span class="foundation-inkfire-autoplay-toggle__label" data-foundation-inkfire-toggle-label><?php echo esc_html__( 'AUTO', 'foundation-elementor-plus' ); ?></span>
+		</button>
+		<?php
+
+		return trim( ob_get_clean() );
 	}
 
 	private static function get_preset_config( $preset_key ) {

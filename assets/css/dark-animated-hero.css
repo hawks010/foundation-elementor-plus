@@ -101,6 +101,13 @@
     opacity: 0.72;
 }
 
+/* Homepage-only handoff tuning for the decorative curve banner below the home hero.
+   The hero keeps its reserved top/bottom padding; we only rebalance the overlap depth
+   so the curve rises into the reserved space at each breakpoint. */
+.page-id-30 .elementor-element.elementor-element-1fb6a09 {
+    bottom: -94px;
+}
+
 .foundation-inkfire-splash--palette-inkfire-gradient {
     background:
         radial-gradient(112% 132% at 100% 0%, rgba(219,88,68,0.18) 0%, transparent 74%),
@@ -1180,6 +1187,10 @@
 }
 
 @media (max-width: 1024px) {
+    .page-id-30 .elementor-element.elementor-element-1fb6a09 {
+        bottom: -30px;
+    }
+
     .foundation-inkfire-splash {
         --foundation-inkfire-hero-padding-top: 100px;
     }
@@ -1259,6 +1270,10 @@
 }
 
 @media (max-width: 768px) {
+    .page-id-30 .elementor-element.elementor-element-1fb6a09 {
+        bottom: -140px;
+    }
+
     .foundation-inkfire-splash {
         --foundation-inkfire-hero-padding-top: 80px;
         --foundation-inkfire-hero-padding-right: 20px;

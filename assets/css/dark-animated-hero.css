@@ -1433,12 +1433,6 @@
         height: 34px;
     }
 
-    .foundation-inkfire-brand img {
-        transform: translateY(-2px) !important;
-        vertical-align: bottom !important;
-        margin-bottom: -8px !important;
-    }
-
     .foundation-inkfire-splash--compact {
         --foundation-inkfire-hero-padding-top: 188px;
         --foundation-inkfire-hero-padding-right: 20px;
@@ -1637,11 +1631,18 @@
 }
 
 .foundation-inkfire-brand img {
+    transform: translateY(-2px) !important;
     vertical-align: bottom !important;
 }
 
-@media (hover: none) and (pointer: coarse) {
+@media (min-width: 863px) {
     .foundation-inkfire-brand img {
-        margin-bottom: 0px !important;
+        margin-bottom: -8px !important;
+    }
+}
+
+@media (max-width: 862px) {
+    .foundation-inkfire-brand img {
+        margin-bottom: 0 !important;
     }
 }

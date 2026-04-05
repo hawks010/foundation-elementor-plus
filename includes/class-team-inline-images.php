@@ -668,10 +668,10 @@ final class Team_Inline_Images {
 
 						const html = rows.map((row, index) => {
 							const src = row.querySelector('img').getAttribute('src');
-							return '<img src="' + src + '" alt="" aria-hidden="true" style="width:45px;height:45px;border-radius:50%;object-fit:cover;border:3px solid #0b0c15;margin-left:' + (index === 0 ? '0' : '-15px') + ';position:relative;z-index:' + (rows.length + 10 - index) + ';box-sizing:content-box;">';
+							return '<img class="foundation-team-inline__avatar" src="' + src + '" alt="" aria-hidden="true" style="margin-left:' + (index === 0 ? '0' : '-15px') + ';position:relative;z-index:' + (rows.length + 10 - index) + ';">';
 						}).join('');
 
-						preview.innerHTML = '<span role="img" aria-label="' + previewLabel.replace(/"/g, '&quot;') + '" style="display:inline-flex;vertical-align:middle;align-items:center;margin:0 5px;">' + html + '</span>';
+						preview.innerHTML = '<span class="foundation-team-inline foundation-team-inline--stacked" role="img" aria-label="' + previewLabel.replace(/"/g, '&quot;') + '">' + html + '</span>';
 					};
 
 					const escapeHtml = (value) => {

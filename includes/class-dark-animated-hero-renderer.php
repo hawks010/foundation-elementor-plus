@@ -872,7 +872,7 @@ final class Dark_Animated_Hero_Renderer {
 
 		foreach ( $team_images as $index => $url ) {
 			$margin  = 0 === $index ? '0' : '-15px';
-			$output .= '<img src="' . esc_url( $url ) . '" alt="" aria-hidden="true" loading="lazy" style="width:45px;height:45px;border-radius:50%;object-fit:cover;border:3px solid #11121b;margin-left:' . esc_attr( $margin ) . ';position:relative;z-index:' . ( 10 - (int) $index ) . ';box-sizing:content-box;display:block;">';
+			$output .= '<img class="foundation-inkfire-avatar" src="' . esc_url( $url ) . '" alt="" aria-hidden="true" loading="lazy" style="margin-left:' . esc_attr( $margin ) . ';position:relative;z-index:' . ( 10 - (int) $index ) . ';">';
 		}
 
 		$output .= '</div>';

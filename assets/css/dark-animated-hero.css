@@ -657,6 +657,20 @@
 
 .foundation-inkfire-avatars {
     display: flex;
+    --foundation-inkfire-avatar-size: 45px;
+    --foundation-inkfire-avatar-border-width: 3px;
+}
+
+.foundation-inkfire-avatar {
+    width: var(--foundation-inkfire-avatar-size);
+    height: var(--foundation-inkfire-avatar-size);
+    min-width: var(--foundation-inkfire-avatar-size);
+    min-height: var(--foundation-inkfire-avatar-size);
+    border-radius: 50%;
+    object-fit: cover;
+    border: var(--foundation-inkfire-avatar-border-width) solid #11121b;
+    box-sizing: content-box;
+    display: block;
 }
 
 .foundation-inkfire-meet-team-link {
@@ -1107,6 +1121,13 @@
 
     .foundation-inkfire-team-strip-link {
         justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .foundation-inkfire-avatars {
+        --foundation-inkfire-avatar-size: 37px;
+        --foundation-inkfire-avatar-border-width: 2px;
     }
 }
 

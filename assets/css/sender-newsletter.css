@@ -298,6 +298,11 @@
 	text-shadow: 0 1px 2px rgba(18, 12, 35, 0.16);
 }
 
+.foundation-sender-newsletter__message:empty {
+	display: none;
+	min-height: 0;
+}
+
 .foundation-sender-newsletter__message.is-error {
 	color: #ffd3d3;
 }

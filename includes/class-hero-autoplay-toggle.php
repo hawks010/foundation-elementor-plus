@@ -36,14 +36,16 @@ final class Hero_Autoplay_Toggle {
 			<style>
 				.foundation-inkfire-autoplay-toggle {
 					position: fixed;
-					right: max(24px, env(safe-area-inset-right, 0px) + 24px);
+					left: 50%;
+					transform: translateX(-50%);
 					bottom: max(24px, env(safe-area-inset-bottom, 0px) + 24px);
 					z-index: 1005;
 					display: inline-flex;
 					align-items: center;
-					gap: 10px;
+					gap: 8px;
 					min-height: 44px;
-					padding: 10px 16px;
+					padding: 8px 14px;
+					max-width: calc(100vw - 32px);
 					border: 1px solid rgba(255,255,255,0.18);
 					border-radius: 999px;
 					background: rgba(21, 22, 34, 0.72);
@@ -51,15 +53,15 @@ final class Hero_Autoplay_Toggle {
 					backdrop-filter: blur(14px);
 					-webkit-backdrop-filter: blur(14px);
 					color: #fff5f1;
-					font: 600 0.82rem/1 "Montserrat", system-ui, sans-serif;
-					letter-spacing: 0.06em;
+					font: 600 0.76rem/1 "Montserrat", system-ui, sans-serif;
+					letter-spacing: 0.05em;
 					text-transform: uppercase;
 					cursor: pointer;
 					transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
 				}
 
 				.foundation-inkfire-autoplay-toggle:hover {
-					transform: translateY(-1px);
+					transform: translateX(-50%) translateY(-1px);
 					background: rgba(21, 22, 34, 0.82);
 					border-color: rgba(255,255,255,0.28);
 				}
@@ -70,11 +72,11 @@ final class Hero_Autoplay_Toggle {
 				}
 
 				.foundation-inkfire-autoplay-toggle__dot {
-					width: 10px;
-					height: 10px;
+					width: 8px;
+					height: 8px;
 					border-radius: 999px;
 					background: #32B190;
-					box-shadow: 0 0 0 6px rgba(50,177,144,0.18);
+					box-shadow: 0 0 0 5px rgba(50,177,144,0.18);
 					flex: 0 0 auto;
 					transition: background-color 180ms ease, box-shadow 180ms ease;
 				}
@@ -89,16 +91,16 @@ final class Hero_Autoplay_Toggle {
 
 				.foundation-inkfire-autoplay-toggle:not(.is-on) .foundation-inkfire-autoplay-toggle__dot {
 					background: #F18E5C;
-					box-shadow: 0 0 0 6px rgba(241,142,92,0.18);
+					box-shadow: 0 0 0 5px rgba(241,142,92,0.18);
 				}
 
 				@media (max-width: 768px) {
 					.foundation-inkfire-autoplay-toggle {
-						right: max(16px, env(safe-area-inset-right, 0px) + 16px);
 						bottom: max(16px, env(safe-area-inset-bottom, 0px) + 16px);
-						padding: 10px 14px;
-						font-size: 0.76rem;
-						letter-spacing: 0.04em;
+						padding: 8px 12px;
+						font-size: 0.72rem;
+						letter-spacing: 0.035em;
+						max-width: calc(100vw - 24px);
 					}
 				}
 

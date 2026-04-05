@@ -107,8 +107,9 @@
 
 .foundation-sender-newsletter__main {
 	display: grid;
-	gap: 18px;
+	gap: 14px;
 	min-width: 0;
+	align-content: center;
 }
 
 .foundation-sender-newsletter__form-row {
@@ -216,6 +217,7 @@
 	flex-wrap: wrap;
 	gap: 10px;
 	align-items: center;
+	align-content: center;
 }
 
 .foundation-sender-newsletter__check {
@@ -284,10 +286,7 @@
 }
 
 .foundation-sender-newsletter__footer {
-	display: grid;
-	grid-template-columns: minmax(0, 1fr) auto;
-	gap: 16px;
-	align-items: start;
+	display: block;
 	min-width: 0;
 }
 
@@ -312,8 +311,15 @@
 	font-size: 0.92rem;
 	line-height: 1.45;
 	color: var(--fsn-text-muted);
-	text-align: right;
+	text-align: left;
 	text-shadow: 0 1px 2px rgba(18, 12, 35, 0.2);
+	flex: 1 1 260px;
+	max-width: 44ch;
+	padding-left: 6px;
+}
+
+.foundation-sender-newsletter__privacy--standalone {
+	padding-left: 0;
 }
 
 .foundation-sender-newsletter__honeypot,
@@ -346,7 +352,7 @@
 	}
 
 	.foundation-sender-newsletter__intro {
-		padding-right: 0;
+		padding: 0;
 	}
 
 	.foundation-sender-newsletter__text {
@@ -368,12 +374,11 @@
 	}
 
 	.foundation-sender-newsletter__footer {
-		grid-template-columns: 1fr;
-		gap: 10px;
+		margin-top: 2px;
 	}
 
-	.foundation-sender-newsletter__privacy {
-		text-align: left;
+	.foundation-sender-newsletter__interests {
+		gap: 10px 8px;
 	}
 }
 
@@ -406,6 +411,7 @@
 
 	.foundation-sender-newsletter__interests {
 		gap: 8px;
+		align-items: stretch;
 	}
 
 	.foundation-sender-newsletter__check {
@@ -416,6 +422,13 @@
 		width: 100%;
 		justify-content: flex-start;
 		padding: 0 14px;
+	}
+
+	.foundation-sender-newsletter__privacy {
+		flex-basis: 100%;
+		max-width: none;
+		padding-left: 0;
+		font-size: 0.9rem;
 	}
 }
 

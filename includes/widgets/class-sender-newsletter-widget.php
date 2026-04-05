@@ -641,15 +641,17 @@ class Sender_Newsletter_Widget extends Base_Widget {
 									<span class="foundation-sender-newsletter__check-label"><?php echo esc_html( $interest_label ); ?></span>
 								</label>
 							<?php endforeach; ?>
+
+							<?php if ( '' !== $privacy_line ) : ?>
+								<p class="foundation-sender-newsletter__privacy"><?php echo esc_html( $privacy_line ); ?></p>
+							<?php endif; ?>
 						</div>
+					<?php elseif ( '' !== $privacy_line ) : ?>
+						<p class="foundation-sender-newsletter__privacy foundation-sender-newsletter__privacy--standalone"><?php echo esc_html( $privacy_line ); ?></p>
 					<?php endif; ?>
 
 					<div class="foundation-sender-newsletter__footer">
 						<div class="foundation-sender-newsletter__message" aria-live="polite"></div>
-
-						<?php if ( '' !== $privacy_line ) : ?>
-							<p class="foundation-sender-newsletter__privacy"><?php echo esc_html( $privacy_line ); ?></p>
-						<?php endif; ?>
 					</div>
 				</div>
 

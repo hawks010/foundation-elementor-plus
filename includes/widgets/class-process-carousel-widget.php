@@ -8,19 +8,19 @@ use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
 use Elementor\Icons_Manager;
 use Elementor\Repeater;
-use FoundationElementorPlus\Widgets\Base_Widget;
+use Elementor\Widget_Base;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Process_Carousel_Widget extends Base_Widget {
+class Process_Carousel_Widget extends Widget_Base {
 	public function get_name() {
 		return 'foundation-process-carousel';
 	}
 
 	public function get_title() {
-		return esc_html__( 'Process Carousel', 'foundation-elementor-plus' );
+		return esc_html__( 'Foundation Process Carousel', 'foundation-elementor-plus' );
 	}
 
 	public function get_icon() {
@@ -36,7 +36,7 @@ class Process_Carousel_Widget extends Base_Widget {
 	}
 
 	public function get_style_depends(): array {
-		return $this->get_foundation_style_depends( array( 'foundation-elementor-plus-process-carousel' ) );
+		return array( 'foundation-elementor-plus-process-carousel' );
 	}
 
 	public function get_script_depends(): array {
@@ -50,7 +50,6 @@ class Process_Carousel_Widget extends Base_Widget {
 		$this->register_step_style_controls();
 		$this->register_card_style_controls();
 		$this->register_arrow_style_controls();
-		$this->register_accessibility_controls();
 	}
 
 	protected function render() {
@@ -64,7 +63,7 @@ class Process_Carousel_Widget extends Base_Widget {
 			return;
 		}
 		?>
-		<section <?php echo $this->get_widget_root_attributes( $settings, array( 'id' => $widget_id, 'class' => 'foundation-process-carousel', 'data-foundation-process-carousel' => true ) ); ?>>
+		<section id="<?php echo esc_attr( $widget_id ); ?>" class="foundation-process-carousel" data-foundation-process-carousel>
 			<div class="foundation-process-carousel__wrap">
 				<?php if ( ! empty( $settings['eyebrow'] ) ) : ?>
 					<p class="foundation-process-carousel__eyebrow"><?php echo esc_html( $settings['eyebrow'] ); ?></p>
@@ -82,20 +81,8 @@ class Process_Carousel_Widget extends Base_Widget {
 
 				<div class="foundation-process-carousel__steps" role="tablist" aria-label="<?php esc_attr_e( 'Process steps', 'foundation-elementor-plus' ); ?>">
 					<?php foreach ( $steps as $index => $step ) : ?>
-						<?php
-						$step_label = ! empty( $step['step_label'] ) ? $step['step_label'] : sprintf( 'Step %d', $index + 1 );
-						$step_tab_id = $widget_id . '-tab-' . $index;
-						$step_panel_id = $widget_id . '-panel-' . $index;
-						?>
-						<button
-							id="<?php echo esc_attr( $step_tab_id ); ?>"
-							class="foundation-process-carousel__step<?php echo 0 === $index ? ' is-active' : ''; ?>"
-							type="button"
-							data-process-step="<?php echo esc_attr( (string) $index ); ?>"
-							role="tab"
-							aria-selected="<?php echo 0 === $index ? 'true' : 'false'; ?>"
-							aria-controls="<?php echo esc_attr( $step_panel_id ); ?>"
-						>
+						<?php $step_label = ! empty( $step['step_label'] ) ? $step['step_label'] : sprintf( 'Step %d', $index + 1 ); ?>
+						<button class="foundation-process-carousel__step<?php echo 0 === $index ? ' is-active' : ''; ?>" type="button" data-process-step="<?php echo esc_attr( (string) $index ); ?>" role="tab" aria-selected="<?php echo 0 === $index ? 'true' : 'false'; ?>">
 							<?php echo esc_html( $step_label ); ?>
 						</button>
 					<?php endforeach; ?>
@@ -113,16 +100,8 @@ class Process_Carousel_Widget extends Base_Widget {
 								$heading      = ! empty( $step['card_title'] ) ? $step['card_title'] : sprintf( 'Step %d', $index + 1 );
 								$description  = ! empty( $step['card_description'] ) ? $step['card_description'] : '';
 								$list_entries = $this->split_list_items( $step['card_list'] ?? '' );
-								$step_tab_id  = $widget_id . '-tab-' . $index;
-								$step_panel_id = $widget_id . '-panel-' . $index;
 								?>
-								<div
-									id="<?php echo esc_attr( $step_panel_id ); ?>"
-									class="foundation-process-carousel__card"
-									data-process-card="<?php echo esc_attr( (string) $index ); ?>"
-									role="tabpanel"
-									aria-labelledby="<?php echo esc_attr( $step_tab_id ); ?>"
-								>
+								<div class="foundation-process-carousel__card" data-process-card="<?php echo esc_attr( (string) $index ); ?>" role="tabpanel">
 									<div class="foundation-process-carousel__card-left">
 										<h3><?php echo esc_html( $heading ); ?></h3>
 										<div class="foundation-process-carousel__card-copy">
@@ -372,7 +351,7 @@ class Process_Carousel_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Section Padding', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%', 'em', 'rem', 'vw', 'vh', 'custom' ),
+				'size_units' => array( 'px', '%', 'em', 'rem' ),
 				'default'    => array(
 					'top'      => 20,
 					'right'    => 0,
@@ -390,12 +369,12 @@ class Process_Carousel_Widget extends Base_Widget {
 		$this->add_responsive_control(
 			'content_width',
 			array(
-				'label'      => esc_html__( 'Content Max Width', 'foundation-elementor-plus' ),
+				'label'      => esc_html__( 'Content Width', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', '%', 'vw', 'rem' ),
+				'size_units' => array( 'px', '%' ),
 				'default'    => array(
-					'unit' => 'px',
-					'size' => 1400,
+					'unit' => '%',
+					'size' => 95,
 				),
 				'range'      => array(
 					'px' => array(
@@ -408,7 +387,7 @@ class Process_Carousel_Widget extends Base_Widget {
 					),
 				),
 				'selectors'  => array(
-					'{{WRAPPER}} .foundation-process-carousel__wrap' => 'max-width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .foundation-process-carousel__wrap' => 'width: {{SIZE}}{{UNIT}}; max-width: none;',
 				),
 			)
 		);
@@ -418,7 +397,7 @@ class Process_Carousel_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Step Pills Gap', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'em', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 12,
@@ -440,7 +419,7 @@ class Process_Carousel_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Carousel Gap', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'em', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 20,
@@ -462,7 +441,7 @@ class Process_Carousel_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Visible Next Slide', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 180,
@@ -484,7 +463,7 @@ class Process_Carousel_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Space Between Slides', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'em', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 40,
@@ -506,7 +485,7 @@ class Process_Carousel_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Card Padding', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%', 'em', 'rem', 'vw', 'vh', 'custom' ),
+				'size_units' => array( 'px', '%', 'em', 'rem' ),
 				'default'    => array(
 					'top'      => 50,
 					'right'    => 50,
@@ -526,7 +505,7 @@ class Process_Carousel_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Card Radius', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 36,
@@ -700,7 +679,7 @@ class Process_Carousel_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Backdrop Blur', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem' ),
+				'size_units' => array( 'px' ),
 				'range'      => array(
 					'px' => array(
 						'min' => 0,
@@ -762,7 +741,7 @@ class Process_Carousel_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Backdrop Blur', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem' ),
+				'size_units' => array( 'px' ),
 				'range'      => array(
 					'px' => array(
 						'min' => 0,
@@ -892,7 +871,7 @@ class Process_Carousel_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Arrow Icon Size', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'em', 'vw' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 20,

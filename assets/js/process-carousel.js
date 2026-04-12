@@ -1,12 +1,4 @@
 (function () {
-  function isElementorEditMode() {
-    return !!(
-      window.elementorFrontend &&
-      typeof window.elementorFrontend.isEditMode === "function" &&
-      window.elementorFrontend.isEditMode()
-    );
-  }
-
   function initProcessCarousel(root) {
     if (!root || root.dataset.foundationProcessReady === "true") {
       return;
@@ -18,8 +10,6 @@
     var next = root.querySelector("[data-process-next]");
     var prev = root.querySelector("[data-process-prev]");
     var index = 0;
-    var pendingFrame = 0;
-    var isEditorPreview = isElementorEditMode();
 
     if (!track || !cards.length || !steps.length) {
       return;
@@ -60,17 +50,6 @@
       });
     }
 
-    function scheduleUpdate() {
-      if (pendingFrame) {
-        window.cancelAnimationFrame(pendingFrame);
-      }
-
-      pendingFrame = window.requestAnimationFrame(function () {
-        pendingFrame = 0;
-        update();
-      });
-    }
-
     steps.forEach(function (step) {
       step.addEventListener("click", function () {
         index = parseInt(step.getAttribute("data-process-step"), 10) || 0;
@@ -93,8 +72,8 @@
       });
     }
 
-    window.addEventListener("resize", scheduleUpdate);
-    window.addEventListener("load", scheduleUpdate);
+    window.addEventListener("resize", update);
+    window.addEventListener("load", update);
     root.addEventListener("keydown", function (event) {
       if (event.key === "ArrowRight") {
         event.preventDefault();
@@ -110,24 +89,6 @@
     });
 
     update();
-    scheduleUpdate();
-
-    if ("ResizeObserver" in window) {
-      var observer = new ResizeObserver(function () {
-        scheduleUpdate();
-      });
-
-      observer.observe(root);
-      observer.observe(track);
-
-      cards.forEach(function (card) {
-        observer.observe(card);
-      });
-    }
-
-    if (isEditorPreview) {
-      window.setTimeout(scheduleUpdate, 120);
-    }
   }
 
   function initAll(scope) {

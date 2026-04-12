@@ -3,22 +3,21 @@
 namespace FoundationElementorPlus\Widgets;
 
 use Elementor\Controls_Manager;
-use Elementor\Group_Control_Typography;
 use Elementor\Repeater;
 use Elementor\Utils;
-use FoundationElementorPlus\Widgets\Base_Widget;
+use Elementor\Widget_Base;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Mobile_Header_Widget extends Base_Widget {
+class Mobile_Header_Widget extends Widget_Base {
 	public function get_name() {
 		return 'foundation-mobile-header';
 	}
 
 	public function get_title() {
-		return esc_html__( 'Mobile Header', 'foundation-elementor-plus' );
+		return esc_html__( 'Foundation Mobile Glass Header', 'foundation-elementor-plus' );
 	}
 
 	public function get_icon() {
@@ -34,7 +33,7 @@ class Mobile_Header_Widget extends Base_Widget {
 	}
 
 	public function get_style_depends(): array {
-		return $this->get_foundation_style_depends( array( 'foundation-elementor-plus-mobile-header' ) );
+		return array( 'foundation-elementor-plus-mobile-header' );
 	}
 
 	public function get_script_depends(): array {
@@ -46,8 +45,6 @@ class Mobile_Header_Widget extends Base_Widget {
 		$this->register_quick_action_controls();
 		$this->register_menu_controls();
 		$this->register_footer_controls();
-		$this->register_style_controls();
-		$this->register_accessibility_controls();
 	}
 
 	protected function render() {
@@ -61,17 +58,17 @@ class Mobile_Header_Widget extends Base_Widget {
 		$search_action  = home_url( '/' );
 		$search_copy    = ! empty( $settings['search_placeholder'] ) ? $settings['search_placeholder'] : 'Search services, resources, case studies...';
 		$quick_actions  = ! empty( $settings['quick_actions'] ) && is_array( $settings['quick_actions'] ) ? array_values( $settings['quick_actions'] ) : array();
-		$menu_sections  = ! empty( $settings['menu_sections'] ) && is_array( $settings['menu_sections'] ) ? array_values( $settings['menu_sections'] ) : array();
-		$menu_sections  = $this->backfill_menu_sections( $menu_sections );
-		$social_links   = ! empty( $settings['social_links'] ) && is_array( $settings['social_links'] ) ? array_values( $settings['social_links'] ) : array();
-		$inline_actions = $this->get_inline_actions( $quick_actions );
-		$default_index  = $this->get_default_open_index( $menu_sections );
+		$menu_sections   = ! empty( $settings['menu_sections'] ) && is_array( $settings['menu_sections'] ) ? array_values( $settings['menu_sections'] ) : array();
+		$menu_sections   = $this->normalize_panel_keys( $this->backfill_menu_sections( $menu_sections ) );
+		$social_links    = ! empty( $settings['social_links'] ) && is_array( $settings['social_links'] ) ? array_values( $settings['social_links'] ) : array();
+		$inline_actions  = $this->get_inline_actions( $quick_actions );
+		$default_index   = $this->get_default_open_index( $menu_sections );
 
 		if ( empty( $menu_sections ) ) {
 			return;
 		}
 		?>
-		<div <?php echo $this->get_widget_root_attributes( $settings, array( 'id' => $widget_id, 'class' => 'inkfire-mobile-header', 'data-inkfire-header' => true ) ); ?>>
+		<div class="inkfire-mobile-header" id="<?php echo esc_attr( $widget_id ); ?>" data-inkfire-header>
 			<header class="imh-header" aria-label="<?php esc_attr_e( 'Mobile site header', 'foundation-elementor-plus' ); ?>">
 				<div class="imh-topbar">
 					<a class="<?php echo esc_attr( $home_link_class ); ?>" href="<?php echo esc_url( $home_url ); ?>" aria-label="<?php esc_attr_e( 'Go to homepage', 'foundation-elementor-plus' ); ?>">
@@ -174,25 +171,37 @@ class Mobile_Header_Widget extends Base_Widget {
 
 					<div class="imh-menu-body">
 						<?php if ( ! empty( $quick_actions ) ) : ?>
-							<div class="imh-quick-actions">
-								<?php foreach ( $quick_actions as $action ) : ?>
-									<?php
-									$action_label = ! empty( $action['label'] ) ? $action['label'] : '';
-									$action_url   = $this->get_link_url( $action['url'] ?? array() );
-									$action_class = ! empty( $action['style_variant'] ) && 'primary' === $action['style_variant']
-										? 'imh-quick-action imh-quick-action-primary'
-										: 'imh-quick-action';
+							<div class="imh-menu-group imh-menu-group-actions">
+								<div class="imh-menu-group-header">
+									<span class="imh-menu-group-label"><?php esc_html_e( 'Quick Actions', 'foundation-elementor-plus' ); ?></span>
+								</div>
+								<div class="imh-quick-actions">
+									<?php foreach ( $quick_actions as $action ) : ?>
+										<?php
+										$action_label = ! empty( $action['label'] ) ? $action['label'] : '';
+										$action_display_label = $this->get_menu_quick_action_label( $action_label );
+										$action_url   = $this->get_link_url( $action['url'] ?? array() );
+										$action_class = ! empty( $action['style_variant'] ) && 'primary' === $action['style_variant']
+											? 'imh-quick-action imh-quick-action-primary'
+											: 'imh-quick-action';
 
-									if ( '' === $action_label ) {
-										continue;
-									}
-									?>
-									<a class="<?php echo esc_attr( $action_class ); ?>" href="<?php echo esc_url( $action_url ? $action_url : '#' ); ?>">
-										<?php echo esc_html( $action_label ); ?>
-									</a>
-								<?php endforeach; ?>
+										if ( '' === $action_label ) {
+											continue;
+										}
+										?>
+										<a class="<?php echo esc_attr( $action_class ); ?>" href="<?php echo esc_url( $action_url ? $action_url : '#' ); ?>">
+											<?php echo esc_html( $action_display_label ); ?>
+										</a>
+									<?php endforeach; ?>
+								</div>
 							</div>
 						<?php endif; ?>
+
+						<div class="imh-menu-group imh-menu-group-nav">
+							<div class="imh-menu-group-header">
+								<span class="imh-menu-group-label"><?php esc_html_e( 'Browse', 'foundation-elementor-plus' ); ?></span>
+							</div>
+						</div>
 
 						<div class="imh-accordion">
 							<?php foreach ( $menu_sections as $index => $item ) : ?>
@@ -200,8 +209,12 @@ class Mobile_Header_Widget extends Base_Widget {
 								$item_title       = ! empty( $item['title'] ) ? $item['title'] : sprintf( 'Section %d', $index + 1 );
 								$item_subtitle    = ! empty( $item['subtitle'] ) ? $item['subtitle'] : '';
 								$item_featured    = ! empty( $item['show_featured'] ) && 'yes' === $item['show_featured'];
-								$item_pills       = $this->parse_pill_rows( $item['utility_rows'] ?? '' );
-								$item_sections    = $this->parse_section_rows( $item['section_rows'] ?? '' );
+								$item_pills       = $this->parse_pill_rows( (string) ( $item['utility_rows'] ?? '' ) );
+								$item_sections    = $this->get_panel_sections( $item );
+								$item_link_count  = 0;
+								foreach ( $item_sections as $section_group ) {
+									$item_link_count += ! empty( $section_group['items'] ) && is_array( $section_group['items'] ) ? count( $section_group['items'] ) : 0;
+								}
 								$item_panel_id    = $widget_id . '-panel-' . ( $index + 1 );
 								$is_open          = $default_index >= 0 && $index === $default_index;
 								$item_state_class = $is_open ? ' is-active' : '';
@@ -215,7 +228,22 @@ class Mobile_Header_Widget extends Base_Widget {
 												<span class="imh-accordion-subtitle"><?php echo esc_html( $item_subtitle ); ?></span>
 											<?php endif; ?>
 										</span>
-										<span class="imh-chevron" aria-hidden="true"></span>
+										<span class="imh-accordion-meta">
+											<?php if ( $item_link_count > 0 ) : ?>
+												<span class="imh-accordion-count">
+													<?php
+													echo esc_html(
+														sprintf(
+															/* translators: %d: number of links in the panel. */
+															_n( '%d link', '%d links', $item_link_count, 'foundation-elementor-plus' ),
+															$item_link_count
+														)
+													);
+													?>
+												</span>
+											<?php endif; ?>
+											<span class="imh-chevron" aria-hidden="true"></span>
+										</span>
 									</button>
 
 									<div class="imh-accordion-panel" id="<?php echo esc_attr( $item_panel_id ); ?>"<?php echo $is_open ? '' : ' hidden'; ?>>
@@ -305,6 +333,9 @@ class Mobile_Header_Widget extends Base_Widget {
 
 						<?php if ( $this->has_footer_content( $settings, $social_links ) ) : ?>
 							<div class="imh-menu-footer">
+								<div class="imh-menu-group-header">
+									<span class="imh-menu-group-label"><?php esc_html_e( 'Contact', 'foundation-elementor-plus' ); ?></span>
+								</div>
 								<?php if ( ! empty( $settings['footer_phone'] ) || ! empty( $settings['footer_email'] ) || ! empty( $settings['footer_address'] ) || ! empty( $settings['footer_hours'] ) ) : ?>
 									<div class="imh-contact-block" aria-label="<?php esc_attr_e( 'Contact details', 'foundation-elementor-plus' ); ?>">
 										<?php if ( ! empty( $settings['footer_phone'] ) ) : ?>
@@ -450,6 +481,53 @@ class Mobile_Header_Widget extends Base_Widget {
 				),
 				'selectors'  => array(
 					'{{WRAPPER}} .inkfire-mobile-header' => 'width: min(100%, {{SIZE}}{{UNIT}}); max-width: none;',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'glass_header_padding',
+			array(
+				'label'      => esc_html__( 'Glass Header Padding', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', 'rem' ),
+				'default'    => array(
+					'top'    => 8,
+					'right'  => 10,
+					'bottom' => 8,
+					'left'   => 10,
+					'unit'   => 'px',
+					'isLinked' => false,
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .inkfire-mobile-header .imh-topbar' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'glass_header_button_gap',
+			array(
+				'label'      => esc_html__( 'Header Button Gap', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'rem' ),
+				'range'      => array(
+					'px'  => array(
+						'min' => 0,
+						'max' => 40,
+					),
+					'rem' => array(
+						'min' => 0,
+						'max' => 3,
+					),
+				),
+				'default'    => array(
+					'unit' => 'px',
+					'size' => 8,
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .inkfire-mobile-header .imh-topbar' => 'gap: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .inkfire-mobile-header .imh-inline-cta' => 'gap: {{SIZE}}{{UNIT}};',
 				),
 			)
 		);
@@ -619,6 +697,8 @@ class Mobile_Header_Widget extends Base_Widget {
 	}
 
 	private function register_menu_controls() {
+		$panel_options = $this->get_panel_key_options();
+
 		$this->start_controls_section(
 			'section_menu',
 			array(
@@ -635,6 +715,18 @@ class Mobile_Header_Widget extends Base_Widget {
 				'type'        => Controls_Manager::TEXT,
 				'default'     => esc_html__( 'Menu Item', 'foundation-elementor-plus' ),
 				'label_block' => true,
+			)
+		);
+
+		$repeater->add_control(
+			'panel_key',
+			array(
+				'label'       => esc_html__( 'Panel Key', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::SELECT,
+				'options'     => $panel_options,
+				'default'     => 'about_us',
+				'label_block' => true,
+				'description' => esc_html__( 'Used to connect the structured utility pills and submenu link fields below.', 'foundation-elementor-plus' ),
 			)
 		);
 
@@ -736,24 +828,70 @@ class Mobile_Header_Widget extends Base_Widget {
 		$repeater->add_control(
 			'utility_rows',
 			array(
-				'label'       => esc_html__( 'Utility Pills', 'foundation-elementor-plus' ),
+				'label'       => esc_html__( 'Quick Links', 'foundation-elementor-plus' ),
 				'type'        => Controls_Manager::TEXTAREA,
 				'rows'        => 5,
 				'label_block' => true,
-				'description' => esc_html__( 'One pill per line using: Label | URL', 'foundation-elementor-plus' ),
+				'description' => esc_html__( 'One quick link per line using: Label | URL', 'foundation-elementor-plus' ),
 				'default'     => '',
 			)
 		);
 
-		$repeater->add_control(
-			'section_rows',
+		$section_link_repeater = new Repeater();
+
+		$section_link_repeater->add_control(
+			'section_label',
 			array(
-				'label'       => esc_html__( 'Panel Links', 'foundation-elementor-plus' ),
-				'type'        => Controls_Manager::TEXTAREA,
-				'rows'        => 12,
-				'label_block' => true,
-				'description' => esc_html__( 'One row per link using: Section Label | Item Title | Description | URL', 'foundation-elementor-plus' ),
+				'label'       => esc_html__( 'Group Label', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::TEXT,
 				'default'     => '',
+				'label_block' => true,
+			)
+		);
+
+		$section_link_repeater->add_control(
+			'item_title',
+			array(
+				'label'       => esc_html__( 'Link Title', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::TEXT,
+				'default'     => '',
+				'label_block' => true,
+			)
+		);
+
+		$section_link_repeater->add_control(
+			'item_description',
+			array(
+				'label'       => esc_html__( 'Short Description', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::TEXTAREA,
+				'rows'        => 3,
+				'default'     => '',
+				'label_block' => true,
+			)
+		);
+
+		$section_link_repeater->add_control(
+			'item_url',
+			array(
+				'label'       => esc_html__( 'Link URL', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::URL,
+				'placeholder' => 'https://example.com',
+				'default'     => array(
+					'url' => '',
+				),
+			)
+		);
+
+		$repeater->add_control(
+			'section_links',
+			array(
+				'label'       => esc_html__( 'Sublinks', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::REPEATER,
+				'fields'      => $section_link_repeater->get_controls(),
+				'title_field' => '{{{ section_label }}}: {{{ item_title }}}',
+				'button_text' => esc_html__( 'Add Sublink', 'foundation-elementor-plus' ),
+				'description' => esc_html__( 'Add one sublink per row. The group label becomes the card heading.', 'foundation-elementor-plus' ),
+				'default'     => array(),
 			)
 		);
 
@@ -868,247 +1006,6 @@ class Mobile_Header_Widget extends Base_Widget {
 		$this->end_controls_section();
 	}
 
-	private function register_style_controls() {
-		$this->start_controls_section(
-			'section_shell_style',
-			array(
-				'label' => esc_html__( 'Shell Style', 'foundation-elementor-plus' ),
-				'tab'   => Controls_Manager::TAB_STYLE,
-			)
-		);
-
-		$this->add_responsive_control(
-			'topbar_padding',
-			array(
-				'label'      => esc_html__( 'Top Bar Padding', 'foundation-elementor-plus' ),
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%', 'em', 'rem', 'vw', 'vh', 'custom' ),
-				'selectors'  => array(
-					'{{WRAPPER}} .inkfire-mobile-header .imh-topbar' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'topbar_gap',
-			array(
-				'label'      => esc_html__( 'Top Bar Gap', 'foundation-elementor-plus' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'em', 'vw' ),
-				'range'      => array(
-					'px' => array(
-						'min' => 0,
-						'max' => 40,
-					),
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} .inkfire-mobile-header .imh-topbar' => 'gap: {{SIZE}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'topbar_radius',
-			array(
-				'label'      => esc_html__( 'Top Bar Radius', 'foundation-elementor-plus' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', '%' ),
-				'range'      => array(
-					'px' => array(
-						'min' => 0,
-						'max' => 48,
-					),
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} .inkfire-mobile-header .imh-topbar' => 'border-radius: {{SIZE}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'topbar_text_color',
-			array(
-				'label'     => esc_html__( 'Top Bar Text', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .inkfire-mobile-header .imh-topbar, {{WRAPPER}} .inkfire-mobile-header .imh-topbar a, {{WRAPPER}} .inkfire-mobile-header .imh-topbar button' => 'color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'topbar_background_color',
-			array(
-				'label'     => esc_html__( 'Top Bar Background', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .inkfire-mobile-header .imh-topbar' => 'background-color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'topbar_border_color',
-			array(
-				'label'     => esc_html__( 'Top Bar Border', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .inkfire-mobile-header .imh-topbar' => 'border-color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->end_controls_section();
-
-		$this->start_controls_section(
-			'section_brand_style',
-			array(
-				'label' => esc_html__( 'Brand Style', 'foundation-elementor-plus' ),
-				'tab'   => Controls_Manager::TAB_STYLE,
-			)
-		);
-
-		$this->add_group_control(
-			Group_Control_Typography::get_type(),
-			array(
-				'name'     => 'brand_typography',
-				'selector' => '{{WRAPPER}} .inkfire-mobile-header .imh-brand',
-			)
-		);
-
-		$this->add_control(
-			'brand_text_color',
-			array(
-				'label'     => esc_html__( 'Brand Color', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .inkfire-mobile-header .imh-brand' => 'color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'brand_gap',
-			array(
-				'label'      => esc_html__( 'Brand Gap', 'foundation-elementor-plus' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'em', 'vw' ),
-				'range'      => array(
-					'px' => array(
-						'min' => 0,
-						'max' => 32,
-					),
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} .inkfire-mobile-header .imh-home' => 'gap: {{SIZE}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->end_controls_section();
-
-		$this->start_controls_section(
-			'section_action_style',
-			array(
-				'label' => esc_html__( 'Action Buttons', 'foundation-elementor-plus' ),
-				'tab'   => Controls_Manager::TAB_STYLE,
-			)
-		);
-
-		$this->add_responsive_control(
-			'icon_button_size',
-			array(
-				'label'      => esc_html__( 'Button Size', 'foundation-elementor-plus' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vw' ),
-				'range'      => array(
-					'px' => array(
-						'min' => 40,
-						'max' => 88,
-					),
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} .inkfire-mobile-header .imh-icon-button' => 'width: {{SIZE}}{{UNIT}}; height: {{SIZE}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'icon_button_radius',
-			array(
-				'label'      => esc_html__( 'Button Radius', 'foundation-elementor-plus' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', '%' ),
-				'range'      => array(
-					'px' => array(
-						'min' => 0,
-						'max' => 32,
-					),
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} .inkfire-mobile-header .imh-icon-button' => 'border-radius: {{SIZE}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'icon_button_text_color',
-			array(
-				'label'     => esc_html__( 'Button Icon Color', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .inkfire-mobile-header .imh-icon-button' => 'color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'icon_button_background_color',
-			array(
-				'label'     => esc_html__( 'Button Background', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .inkfire-mobile-header .imh-icon-button' => 'background-color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'icon_button_border_color',
-			array(
-				'label'     => esc_html__( 'Button Border', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .inkfire-mobile-header .imh-icon-button' => 'border-color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'icon_button_active_text_color',
-			array(
-				'label'     => esc_html__( 'Active Icon Color', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .inkfire-mobile-header .imh-menu-toggle.is-open, {{WRAPPER}} .inkfire-mobile-header .imh-menu-toggle[aria-expanded="true"], {{WRAPPER}} .inkfire-mobile-header .imh-search-toggle[aria-expanded="true"]' => 'color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'icon_button_active_background_color',
-			array(
-				'label'     => esc_html__( 'Active Background', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .inkfire-mobile-header .imh-menu-toggle.is-open, {{WRAPPER}} .inkfire-mobile-header .imh-menu-toggle[aria-expanded="true"], {{WRAPPER}} .inkfire-mobile-header .imh-search-toggle[aria-expanded="true"]' => 'background-color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->end_controls_section();
-	}
-
 	private function get_logo_url( array $settings ): string {
 		if ( ! empty( $settings['logo']['url'] ) ) {
 			return (string) $settings['logo']['url'];
@@ -1176,16 +1073,11 @@ class Mobile_Header_Widget extends Base_Widget {
 	private function parse_section_rows( string $rows ): array {
 		$grouped = array();
 
-		foreach ( preg_split( "/\\r\\n|\\r|\\n/", $rows ) as $line ) {
-			$line = trim( (string) $line );
-			if ( '' === $line ) {
-				continue;
-			}
-
-			$parts = array_map( 'trim', explode( '|', $line ) );
-			$parts = array_pad( $parts, 4, '' );
-
-			list( $section_label, $item_title, $item_description, $item_url ) = $parts;
+		foreach ( $this->parse_section_row_items( $rows ) as $item ) {
+			$section_label    = $item['section_label'];
+			$item_title       = $item['item_title'];
+			$item_description = $item['item_description'];
+			$item_url         = $item['item_url'];
 
 			if ( '' === $section_label || '' === $item_title ) {
 				continue;
@@ -1206,6 +1098,135 @@ class Mobile_Header_Widget extends Base_Widget {
 		}
 
 		return array_values( $grouped );
+	}
+
+	private function parse_section_row_items( string $rows ): array {
+		$items = array();
+
+		foreach ( preg_split( "/\\r\\n|\\r|\\n/", $rows ) as $line ) {
+			$line = trim( (string) $line );
+			if ( '' === $line ) {
+				continue;
+			}
+
+			$parts = array_map( 'trim', explode( '|', $line ) );
+			$parts = array_pad( $parts, 4, '' );
+
+			list( $section_label, $item_title, $item_description, $item_url ) = $parts;
+
+			if ( '' === $section_label || '' === $item_title ) {
+				continue;
+			}
+
+			$items[] = array(
+				'section_label'    => $section_label,
+				'item_title'       => $item_title,
+				'item_description' => $item_description,
+				'item_url'         => $item_url,
+			);
+		}
+
+		return $items;
+	}
+
+	private function normalize_panel_section_links( array $rows ): array {
+		$items = array();
+
+		foreach ( $rows as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+
+			$section_label    = trim( (string) ( $row['section_label'] ?? '' ) );
+			$item_title       = trim( (string) ( $row['item_title'] ?? '' ) );
+			$item_description = trim( (string) ( $row['item_description'] ?? '' ) );
+			$item_url         = $this->get_link_url( $row['item_url'] ?? array() );
+
+			if ( '' === $section_label || '' === $item_title ) {
+				continue;
+			}
+
+			$items[] = array(
+				'section_label'    => $section_label,
+				'item_title'       => $item_title,
+				'item_description' => $item_description,
+				'item_url'         => $item_url,
+			);
+		}
+
+		return $items;
+	}
+
+	private function get_panel_sections( array $section ): array {
+		$structured_rows = $this->normalize_panel_section_links( $section['section_links'] ?? array() );
+
+		if ( ! empty( $structured_rows ) ) {
+			$grouped = array();
+
+			foreach ( $structured_rows as $item ) {
+				$section_label = $item['section_label'];
+
+				if ( ! isset( $grouped[ $section_label ] ) ) {
+					$grouped[ $section_label ] = array(
+						'label' => $section_label,
+						'items' => array(),
+					);
+				}
+
+				$grouped[ $section_label ]['items'][] = array(
+					'title'       => $item['item_title'],
+					'description' => $item['item_description'],
+					'url'         => $item['item_url'],
+				);
+			}
+
+			return array_values( $grouped );
+		}
+
+		return $this->parse_section_rows( (string) ( $section['section_rows'] ?? '' ) );
+	}
+
+	private function normalize_panel_keys( array $menu_sections ): array {
+		foreach ( $menu_sections as $index => $section ) {
+			if ( ! is_array( $section ) ) {
+				continue;
+			}
+
+			$menu_sections[ $index ]['panel_key'] = $this->get_panel_key_for_section( $section );
+		}
+
+		return $menu_sections;
+	}
+
+	private function get_panel_key_for_section( array $section ): string {
+		$panel_key = $this->sanitize_panel_key( $section['panel_key'] ?? '' );
+
+		if ( '' !== $panel_key ) {
+			return $panel_key;
+		}
+
+		$title = strtolower( trim( wp_strip_all_tags( (string) ( $section['title'] ?? '' ) ) ) );
+
+		switch ( $title ) {
+			case 'about us':
+				return 'about_us';
+			case 'our services':
+				return 'our_services';
+			case 'resource hub':
+				return 'resource_hub';
+			case 'portfolio':
+				return 'portfolio';
+			case 'foundation':
+				return 'foundation';
+			default:
+				return 'about_us';
+		}
+	}
+
+	private function sanitize_panel_key( $value ): string {
+		$value = sanitize_key( (string) $value );
+
+		return array_key_exists( $value, $this->get_panel_key_options() ) ? $value : '';
 	}
 
 	private function get_default_quick_actions(): array {
@@ -1257,16 +1278,39 @@ class Mobile_Header_Widget extends Base_Widget {
 		return $items;
 	}
 
+	private function get_menu_quick_action_label( string $label ): string {
+		$normalized = strtolower( trim( wp_strip_all_tags( $label ) ) );
+
+		switch ( $normalized ) {
+			case 'start a project':
+				return esc_html__( 'Start Project', 'foundation-elementor-plus' );
+			case 'contact':
+				return esc_html__( 'Contact Us', 'foundation-elementor-plus' );
+			case 'portfolio':
+				return esc_html__( 'Our Work', 'foundation-elementor-plus' );
+			case 'blog':
+				return esc_html__( 'Insights', 'foundation-elementor-plus' );
+			default:
+				return $label;
+		}
+	}
+
 	private function backfill_menu_sections( array $menu_sections ): array {
 		foreach ( $menu_sections as $index => $section ) {
 			$title = isset( $section['title'] ) ? strtolower( trim( wp_strip_all_tags( (string) $section['title'] ) ) ) : '';
+
+			$current_rows = isset( $section['section_rows'] ) ? (string) $section['section_rows'] : '';
+
+			if ( empty( $section['section_links'] ) && '' !== $current_rows ) {
+				$menu_sections[ $index ]['section_links'] = $this->parse_section_row_items( $current_rows );
+			}
 
 			if ( 'our services' !== $title ) {
 				continue;
 			}
 
-			$current_rows                          = isset( $section['section_rows'] ) ? (string) $section['section_rows'] : '';
-			$menu_sections[ $index ]['section_rows'] = $this->backfill_service_section_rows( $current_rows );
+			$menu_sections[ $index ]['section_rows']  = $this->backfill_service_section_rows( $current_rows );
+			$menu_sections[ $index ]['section_links'] = $this->parse_section_row_items( $menu_sections[ $index ]['section_rows'] );
 			break;
 		}
 
@@ -1307,9 +1351,81 @@ class Mobile_Header_Widget extends Base_Widget {
 		);
 	}
 
+	private function get_panel_key_options(): array {
+		return array(
+			'about_us'      => esc_html__( 'About Us', 'foundation-elementor-plus' ),
+			'our_services'  => esc_html__( 'Our Services', 'foundation-elementor-plus' ),
+			'resource_hub'  => esc_html__( 'Resource Hub', 'foundation-elementor-plus' ),
+			'portfolio'     => esc_html__( 'Portfolio', 'foundation-elementor-plus' ),
+			'foundation'    => esc_html__( 'Foundation', 'foundation-elementor-plus' ),
+		);
+	}
+
 	private function get_default_menu_sections(): array {
+		$about_rows = implode(
+			"\n",
+			array(
+				'Who we are | Our Story | How Inkfire came to be | ' . home_url( '/about-us/' ),
+				'Who we are | Our Values | Culture, care and high standards | ' . home_url( '/about-us/' ),
+				'Our People | Meet the Team | The strategists, creatives and developers behind the scenes | ' . home_url( '/about-us/' ),
+				'Our People | Careers | Remote-first, inclusive roles that matter | ' . home_url( '/about-us/' ),
+				'Our Impact | Client Stories | Real-world outcomes for organisations | ' . home_url( '/portfolio/' ),
+				'Our Impact | Awards & Recognition | Recognition for inclusive design and tech | ' . home_url( '/about-us/' ),
+			)
+		);
+		$services_rows = implode(
+			"\n",
+			array(
+				'Tech & Support | IT Support | Ongoing IT, Microsoft 365, security | ' . home_url( '/services/tech-support/it-support/' ),
+				'Tech & Support | Customer Helpdesk & Support | Helpdesk setup and support systems | ' . home_url( '/services/tech-support/customer-helpdesk-support/' ),
+				'Tech & Support | Project-Based IT Support | Migrations, systems and security improvements | ' . home_url( '/services/tech-support/project-based-it-support/' ),
+				'Tech & Support | Virtual Assistance | Admin, inbox and scheduling support | ' . home_url( '/services/tech-support/virtual-assistance/' ),
+				'Web & Accessibility | Web Development | High-performing, scalable websites | ' . home_url( '/services/web-accessibility/web-development/' ),
+				'Web & Accessibility | Maintenance & Hosting | Managed hosting and proactive support | ' . home_url( '/services/web-accessibility/maintenance-hosting-performance/' ),
+				'Web & Accessibility | Copywriting & Messaging | Clear, accessible content and messaging | ' . home_url( '/services/web-accessibility/copywriting-messaging/' ),
+				'Web & Accessibility | Accessibility & Inclusive Design | Audits, guidance and inclusive UX | ' . home_url( '/services/web-accessibility/accessibility-inclusive-design/' ),
+				'Creative & Marketing | Branding | Distinctive logos and identity systems | ' . home_url( '/services/creative-marketing/branding/' ),
+				'Creative & Marketing | Marketing & PR | Campaigns, outreach and visibility | ' . home_url( '/services/creative-marketing/marketing-pr/' ),
+				'Creative & Marketing | Social Media Management | Content planning and inclusive socials | ' . home_url( '/services/creative-marketing/social-media-management/' ),
+				'Creative & Marketing | Print & Packaging | Custom labels, packaging and print design | ' . home_url( '/services/creative-marketing/print-packaging/' ),
+				'Business Support | Virtual Business Support | Flexible remote support for admin, digital systems and day-to-day tasks | ' . home_url( '/services/business-support/virtual-business-support/' ),
+				'Business Support | Digital & Business Planning | Strategic planning for digital projects, services and sustainable growth | ' . home_url( '/services/business-support/digital-business-planning/' ),
+				'Business Support | Access to Work Support | Guidance and support for Access to Work applications and workplace adjustments | ' . home_url( '/services/business-support/access-to-work-support/' ),
+				'Business Support | Training & Handover Support | Training sessions and documentation to help teams manage tools and systems | ' . home_url( '/services/business-support/training-handover-support/' ),
+			)
+		);
+		$resource_rows = implode(
+			"\n",
+			array(
+				'Browse | Knowledge Base | Step-by-step guides and troubleshooting help | https://help.inkfire.co.uk/',
+				'Browse | Press, Media & Community Highlights | Announcements and interviews | ' . home_url( '/category/press-and-media/' ),
+				'Browse | What’s New at Inkfire | Latest projects, tips and behind-the-scenes updates | ' . home_url( '/category/news/' ),
+				'Browse | Mali TV | Short practical videos on tech, design and Inkfire life | https://www.youtube.com/@mali.and.m.e',
+				'Browse | Case Studies | Examples of accessible digital work in action | ' . home_url( '/portfolio/' ),
+			)
+		);
+		$portfolio_rows = implode(
+			"\n",
+			array(
+				'Portfolio archive | All Work | Open the full archive and browse everything in one place | ' . home_url( '/portfolio/' ),
+				'Portfolio archive | Web Projects | Sites, platforms, UX and digital builds | ' . home_url( '/services/web-accessibility/' ),
+				'Portfolio archive | Marketing Work | Branding, campaigns and creative delivery | ' . home_url( '/services/creative-marketing/' ),
+				'Portfolio archive | IT & Support | Technical support and dependable delivery | ' . home_url( '/services/tech-support/' ),
+			)
+		);
+		$foundation_rows = implode(
+			"\n",
+			array(
+				'Featured Work | Work that performs under pressure | Designed for disabled users and organisations that care about quality | ' . home_url( '/foundation/' ),
+				'Featured Work | Web Development | Accessible, scalable websites built to last | ' . home_url( '/services/web-accessibility/' ),
+				'Featured Work | IT & Technical Support | Calm, reliable systems and support | ' . home_url( '/services/tech-support/' ),
+				'Featured Work | Branding & Identity | Clear brands rooted in lived experience | ' . home_url( '/services/creative-marketing/' ),
+			)
+		);
+
 		return array(
 			array(
+				'panel_key'        => 'about_us',
 				'title'            => 'About Us',
 				'subtitle'         => 'Who we are, our people, our impact',
 				'open_by_default'  => '',
@@ -1320,19 +1436,11 @@ class Mobile_Header_Widget extends Base_Widget {
 				'featured_cta_text' => 'Read the manifesto',
 				'featured_cta_url' => array( 'url' => home_url( '/about-us/' ) ),
 				'utility_rows'     => '',
-				'section_rows'     => implode(
-					"\n",
-					array(
-						'Who we are | Our Story | How Inkfire came to be | ' . home_url( '/about-us/' ),
-						'Who we are | Our Values | Culture, care and high standards | ' . home_url( '/about-us/' ),
-						'Our People | Meet the Team | The strategists, creatives and developers behind the scenes | ' . home_url( '/about-us/' ),
-						'Our People | Careers | Remote-first, inclusive roles that matter | ' . home_url( '/about-us/' ),
-						'Our Impact | Client Stories | Real-world outcomes for organisations | ' . home_url( '/portfolio/' ),
-						'Our Impact | Awards & Recognition | Recognition for inclusive design and tech | ' . home_url( '/about-us/' ),
-					)
-				),
+				'section_links'    => $this->parse_section_row_items( $about_rows ),
+				'section_rows'     => $about_rows,
 			),
 			array(
+				'panel_key'        => 'our_services',
 				'title'            => 'Our Services',
 				'subtitle'         => 'Tech, web, creative and business support',
 				'open_by_default'  => 'yes',
@@ -1343,29 +1451,11 @@ class Mobile_Header_Widget extends Base_Widget {
 				'featured_cta_text' => 'Explore services',
 				'featured_cta_url' => array( 'url' => home_url( '/services/' ) ),
 				'utility_rows'     => '',
-				'section_rows'     => implode(
-					"\n",
-					array(
-						'Tech & Support | IT Support | Ongoing IT, Microsoft 365, security | ' . home_url( '/services/tech-support/it-support/' ),
-						'Tech & Support | Customer Helpdesk & Support | Helpdesk setup and support systems | ' . home_url( '/services/tech-support/customer-helpdesk-support/' ),
-						'Tech & Support | Project-Based IT Support | Migrations, systems and security improvements | ' . home_url( '/services/tech-support/project-based-it-support/' ),
-						'Tech & Support | Virtual Assistance | Admin, inbox and scheduling support | ' . home_url( '/services/tech-support/virtual-assistance/' ),
-						'Web & Accessibility | Web Development | High-performing, scalable websites | ' . home_url( '/services/web-accessibility/web-development/' ),
-						'Web & Accessibility | Maintenance & Hosting | Managed hosting and proactive support | ' . home_url( '/services/web-accessibility/maintenance-hosting-performance/' ),
-						'Web & Accessibility | Copywriting & Messaging | Clear, accessible content and messaging | ' . home_url( '/services/web-accessibility/copywriting-messaging/' ),
-						'Web & Accessibility | Accessibility & Inclusive Design | Audits, guidance and inclusive UX | ' . home_url( '/services/web-accessibility/accessibility-inclusive-design/' ),
-						'Creative & Marketing | Branding | Distinctive logos and identity systems | ' . home_url( '/services/creative-marketing/branding/' ),
-						'Creative & Marketing | Marketing & PR | Campaigns, outreach and visibility | ' . home_url( '/services/creative-marketing/marketing-pr/' ),
-						'Creative & Marketing | Social Media Management | Content planning and inclusive socials | ' . home_url( '/services/creative-marketing/social-media-management/' ),
-						'Creative & Marketing | Print & Packaging | Custom labels, packaging and print design | ' . home_url( '/services/creative-marketing/print-packaging/' ),
-						'Business Support | Virtual Business Support | Flexible remote support for admin, digital systems and day-to-day tasks | ' . home_url( '/services/business-support/virtual-business-support/' ),
-						'Business Support | Digital & Business Planning | Strategic planning for digital projects, services and sustainable growth | ' . home_url( '/services/business-support/digital-business-planning/' ),
-						'Business Support | Access to Work Support | Guidance and support for Access to Work applications and workplace adjustments | ' . home_url( '/services/business-support/access-to-work-support/' ),
-						'Business Support | Training & Handover Support | Training sessions and documentation to help teams manage tools and systems | ' . home_url( '/services/business-support/training-handover-support/' ),
-					)
-				),
+				'section_links'    => $this->parse_section_row_items( $services_rows ),
+				'section_rows'     => $services_rows,
 			),
 			array(
+				'panel_key'       => 'resource_hub',
 				'title'           => 'Resource Hub',
 				'subtitle'        => 'Guides, case studies and latest updates',
 				'open_by_default' => '',
@@ -1378,18 +1468,11 @@ class Mobile_Header_Widget extends Base_Widget {
 						'Case Studies | ' . home_url( '/portfolio/' ),
 					)
 				),
-				'section_rows'    => implode(
-					"\n",
-					array(
-						'Browse | Knowledge Base | Step-by-step guides and troubleshooting help | https://help.inkfire.co.uk/',
-						'Browse | Press, Media & Community Highlights | Announcements and interviews | ' . home_url( '/category/press-and-media/' ),
-						'Browse | What’s New at Inkfire | Latest projects, tips and behind-the-scenes updates | ' . home_url( '/category/news/' ),
-						'Browse | Mali TV | Short practical videos on tech, design and Inkfire life | https://www.youtube.com/@mali.and.m.e',
-						'Browse | Case Studies | Examples of accessible digital work in action | ' . home_url( '/portfolio/' ),
-					)
-				),
+				'section_links'   => $this->parse_section_row_items( $resource_rows ),
+				'section_rows'    => $resource_rows,
 			),
 			array(
+				'panel_key'       => 'portfolio',
 				'title'           => 'Portfolio',
 				'subtitle'        => 'Browse work by category',
 				'open_by_default' => '',
@@ -1403,31 +1486,18 @@ class Mobile_Header_Widget extends Base_Widget {
 						'IT & Support | ' . home_url( '/services/tech-support/' ),
 					)
 				),
-				'section_rows'    => implode(
-					"\n",
-					array(
-						'Portfolio archive | All Work | Open the full archive and browse everything in one place | ' . home_url( '/portfolio/' ),
-						'Portfolio archive | Web Projects | Sites, platforms, UX and digital builds | ' . home_url( '/services/web-accessibility/' ),
-						'Portfolio archive | Marketing Work | Branding, campaigns and creative delivery | ' . home_url( '/services/creative-marketing/' ),
-						'Portfolio archive | IT & Support | Technical support and dependable delivery | ' . home_url( '/services/tech-support/' ),
-					)
-				),
+				'section_links'   => $this->parse_section_row_items( $portfolio_rows ),
+				'section_rows'    => $portfolio_rows,
 			),
 			array(
+				'panel_key'       => 'foundation',
 				'title'           => 'Foundation',
 				'subtitle'        => 'Mission-led work and featured projects',
 				'open_by_default' => '',
 				'show_featured'   => '',
 				'utility_rows'    => '',
-				'section_rows'    => implode(
-					"\n",
-					array(
-						'Featured Work | Work that performs under pressure | Designed for disabled users and organisations that care about quality | ' . home_url( '/foundation/' ),
-						'Featured Work | Web Development | Accessible, scalable websites built to last | ' . home_url( '/services/web-accessibility/' ),
-						'Featured Work | IT & Technical Support | Calm, reliable systems and support | ' . home_url( '/services/tech-support/' ),
-						'Featured Work | Branding & Identity | Clear brands rooted in lived experience | ' . home_url( '/services/creative-marketing/' ),
-					)
-				),
+				'section_links'   => $this->parse_section_row_items( $foundation_rows ),
+				'section_rows'    => $foundation_rows,
 			),
 		);
 	}

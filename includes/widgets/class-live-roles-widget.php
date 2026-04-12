@@ -8,19 +8,19 @@ use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
 use Elementor\Icons_Manager;
 use Elementor\Repeater;
-use FoundationElementorPlus\Widgets\Base_Widget;
+use Elementor\Widget_Base;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Live_Roles_Widget extends Base_Widget {
+class Live_Roles_Widget extends Widget_Base {
 	public function get_name() {
 		return 'foundation-live-roles';
 	}
 
 	public function get_title() {
-		return esc_html__( 'Live Roles', 'foundation-elementor-plus' );
+		return esc_html__( 'Foundation Live Roles', 'foundation-elementor-plus' );
 	}
 
 	public function get_icon() {
@@ -36,7 +36,7 @@ class Live_Roles_Widget extends Base_Widget {
 	}
 
 	public function get_style_depends(): array {
-		return $this->get_foundation_style_depends( array( 'foundation-elementor-plus-live-roles' ) );
+		return array( 'foundation-elementor-plus-live-roles' );
 	}
 
 	public function get_script_depends(): array {
@@ -48,7 +48,6 @@ class Live_Roles_Widget extends Base_Widget {
 		$this->register_layout_controls();
 		$this->register_shell_style_controls();
 		$this->register_role_style_controls();
-		$this->register_accessibility_controls();
 	}
 
 	protected function render() {
@@ -79,7 +78,11 @@ class Live_Roles_Widget extends Base_Widget {
 		$closed_copy = ! empty( $settings['closed_summary_copy'] ) ? $settings['closed_summary_copy'] : esc_html__( 'Now closed', 'foundation-elementor-plus' );
 		?>
 		<section
-			<?php echo $this->get_widget_root_attributes( $settings, array( 'id' => $widget_id, 'class' => 'foundation-live-roles', 'data-foundation-live-roles' => true, 'data-default-filter' => $default_filter, 'data-default-open' => $default_open ? 'yes' : 'no' ) ); ?>
+			id="<?php echo esc_attr( $widget_id ); ?>"
+			class="foundation-live-roles"
+			data-foundation-live-roles
+			data-default-filter="<?php echo esc_attr( $default_filter ); ?>"
+			data-default-open="<?php echo $default_open ? 'yes' : 'no'; ?>"
 		>
 			<div class="foundation-live-roles__shell">
 				<div class="foundation-live-roles__hero">
@@ -607,7 +610,7 @@ class Live_Roles_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Section Padding', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%', 'em', 'rem', 'vw', 'vh', 'custom' ),
+				'size_units' => array( 'px', '%', 'em', 'rem' ),
 				'default'    => array(
 					'top'      => 0,
 					'right'    => 0,
@@ -666,7 +669,7 @@ class Live_Roles_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Shell Padding', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%', 'em', 'rem', 'vw', 'vh', 'custom' ),
+				'size_units' => array( 'px', '%', 'em', 'rem' ),
 				'default'    => array(
 					'top'      => 32,
 					'right'    => 32,
@@ -763,7 +766,7 @@ class Live_Roles_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Role Row Padding', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%', 'em', 'rem', 'vw', 'vh', 'custom' ),
+				'size_units' => array( 'px', '%', 'em', 'rem' ),
 				'default'    => array(
 					'top'      => 18,
 					'right'    => 20,

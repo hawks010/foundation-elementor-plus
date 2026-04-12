@@ -7,7 +7,7 @@ use Elementor\Group_Control_Background;
 use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
-use FoundationElementorPlus\Widgets\Base_Widget;
+use Elementor\Widget_Base;
 use WP_Post;
 use WP_Query;
 
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Team_Loop_Widget extends Base_Widget {
+class Team_Loop_Widget extends Widget_Base {
 	private const TEAM_POST_TYPE           = 'ink_team_member';
 	private const TEAM_TYPE_TAXONOMY       = 'ink_team_type';
 	private const TEAM_DEPARTMENT_TAXONOMY = 'ink_team_department';
@@ -27,7 +27,7 @@ class Team_Loop_Widget extends Base_Widget {
 	}
 
 	public function get_title() {
-		return esc_html__( 'Team Grid', 'foundation-elementor-plus' );
+		return esc_html__( 'Foundation Team Loop', 'foundation-elementor-plus' );
 	}
 
 	public function get_icon() {
@@ -43,7 +43,7 @@ class Team_Loop_Widget extends Base_Widget {
 	}
 
 	public function get_style_depends(): array {
-		return $this->get_foundation_style_depends( array( 'foundation-elementor-plus-team-loop' ) );
+		return array( 'foundation-elementor-plus-team-loop' );
 	}
 
 	public function get_script_depends(): array {
@@ -60,7 +60,6 @@ class Team_Loop_Widget extends Base_Widget {
 		$this->register_badge_style_controls();
 		$this->register_button_style_controls();
 		$this->register_feature_card_style_controls();
-		$this->register_accessibility_controls();
 	}
 
 	protected function render() {
@@ -82,7 +81,11 @@ class Team_Loop_Widget extends Base_Widget {
 		$visible_member_count = 0;
 		?>
 		<section
-			<?php echo $this->get_widget_root_attributes( $settings, array( 'id' => $widget_id, 'class' => 'foundation-team-loop', 'data-foundation-team-loop' => true, 'data-default-department' => $default_department, 'data-default-group' => $default_group ) ); ?>
+			id="<?php echo esc_attr( $widget_id ); ?>"
+			class="foundation-team-loop"
+			data-foundation-team-loop
+			data-default-department="<?php echo esc_attr( $default_department ); ?>"
+			data-default-group="<?php echo esc_attr( $default_group ); ?>"
 		>
 			<?php if ( $show_department_filter || $show_group_filter ) : ?>
 				<div class="foundation-team-loop__filters">
@@ -623,7 +626,7 @@ class Team_Loop_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Grid Gap', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vw', '%' ),
+				'size_units' => array( 'px', 'rem' ),
 				'range'      => array(
 					'px' => array(
 						'min' => 0,
@@ -645,7 +648,7 @@ class Team_Loop_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Card Padding', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%', 'em', 'rem', 'vw', 'vh', 'custom' ),
+				'size_units' => array( 'px', '%' ),
 				'default'    => array(
 					'top'    => 32,
 					'right'  => 32,
@@ -664,7 +667,7 @@ class Team_Loop_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Card Radius', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', '%' ),
+				'size_units' => array( 'px' ),
 				'range'      => array(
 					'px' => array(
 						'min' => 0,
@@ -835,7 +838,7 @@ class Team_Loop_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Hover Lift', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vh' ),
+				'size_units' => array( 'px' ),
 				'range'      => array(
 					'px' => array(
 						'min' => 0,
@@ -869,7 +872,7 @@ class Team_Loop_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Image Radius', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', '%' ),
+				'size_units' => array( 'px' ),
 				'range'      => array(
 					'px' => array(
 						'min' => 0,

@@ -4,7 +4,7 @@ namespace FoundationElementorPlus\Widgets;
 
 use Elementor\Controls_Manager;
 use Elementor\Group_Control_Typography;
-use FoundationElementorPlus\Widgets\Base_Widget;
+use Elementor\Widget_Base;
 use FoundationElementorPlus\Dark_Animated_Hero_Renderer;
 use FoundationElementorPlus\Team_Inline_Images;
 
@@ -12,13 +12,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Dark_Animated_Hero_Widget extends Base_Widget {
+class Dark_Animated_Hero_Widget extends Widget_Base {
 	public function get_name() {
 		return 'foundation-dark-animated-hero';
 	}
 
 	public function get_title() {
-		return esc_html__( 'Dark Animated Hero', 'foundation-elementor-plus' );
+		return esc_html__( 'Foundation Dark Animated Hero', 'foundation-elementor-plus' );
 	}
 
 	public function get_icon() {
@@ -34,14 +34,11 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 	}
 
 	public function get_style_depends(): array {
-		return $this->get_foundation_style_depends( array( 'foundation-elementor-plus-dark-animated-hero' ) );
+		return array( 'foundation-elementor-plus-dark-animated-hero' );
 	}
 
 	public function get_script_depends(): array {
-		return array(
-			'foundation-elementor-plus-fluid-core',
-			'foundation-elementor-plus-dark-animated-hero',
-		);
+		return array( 'foundation-elementor-plus-dark-animated-hero' );
 	}
 
 	protected function register_controls() {
@@ -50,7 +47,7 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 		$this->start_controls_section(
 			'section_preset',
 			array(
-				'label' => esc_html__( 'Preset & Inheritance', 'foundation-elementor-plus' ),
+				'label' => esc_html__( 'Preset', 'foundation-elementor-plus' ),
 			)
 		);
 
@@ -79,16 +76,7 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 		$this->start_controls_section(
 			'section_content',
 			array(
-				'label' => esc_html__( 'Copy Overrides', 'foundation-elementor-plus' ),
-			)
-		);
-
-		$this->add_control(
-			'override_intro_notice',
-			array(
-				'type'            => Controls_Manager::RAW_HTML,
-				'raw'             => esc_html__( 'Only fill these fields when you want this widget instance to override the selected preset. Leaving a field empty keeps the preset value.', 'foundation-elementor-plus' ),
-				'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+				'label' => esc_html__( 'Content', 'foundation-elementor-plus' ),
 			)
 		);
 
@@ -162,15 +150,6 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 				'rows'        => 4,
 				'label_block' => true,
 				'description' => esc_html__( 'One feature per line. Leave blank to use the preset features.', 'foundation-elementor-plus' ),
-			)
-		);
-
-		$this->add_control(
-			'content_display_heading',
-			array(
-				'label'     => esc_html__( 'Display Overrides', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::HEADING,
-				'separator' => 'before',
 			)
 		);
 
@@ -263,6 +242,150 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 		);
 
 		$this->add_control(
+			'blog_post_meta_notice',
+			array(
+				'type'            => Controls_Manager::RAW_HTML,
+				'raw'             => esc_html__( 'Blog post hero meta pulls from the current post by default. Leave fields blank to use dynamic defaults like category, reading time, word count, author name, and author avatar.', 'foundation-elementor-plus' ),
+				'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+				'condition'       => array(
+					'preset' => 'blog_post',
+				),
+			)
+		);
+
+		$this->add_control(
+			'blog_post_meta_visibility',
+			array(
+				'label'     => esc_html__( 'Post Meta Row', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::SELECT,
+				'default'   => '',
+				'options'   => array(
+					''     => esc_html__( 'Use preset', 'foundation-elementor-plus' ),
+					'show' => esc_html__( 'Show', 'foundation-elementor-plus' ),
+					'hide' => esc_html__( 'Hide', 'foundation-elementor-plus' ),
+				),
+				'condition' => array(
+					'preset' => 'blog_post',
+				),
+			)
+		);
+
+		$this->add_control(
+			'blog_post_meta_label',
+			array(
+				'label'       => esc_html__( 'Meta Label', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::TEXT,
+				'label_block' => true,
+				'dynamic'     => array( 'active' => true ),
+				'description' => esc_html__( 'Leave blank to use the current post category.', 'foundation-elementor-plus' ),
+				'condition'   => array(
+					'preset' => 'blog_post',
+				),
+			)
+		);
+
+		$this->add_control(
+			'blog_post_meta_pill_primary',
+			array(
+				'label'       => esc_html__( 'Primary Meta Pill', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::TEXT,
+				'label_block' => true,
+				'dynamic'     => array( 'active' => true ),
+				'description' => esc_html__( 'Leave blank to use the current reading time.', 'foundation-elementor-plus' ),
+				'condition'   => array(
+					'preset' => 'blog_post',
+				),
+			)
+		);
+
+		$this->add_control(
+			'blog_post_meta_pill_secondary',
+			array(
+				'label'       => esc_html__( 'Secondary Meta Pill', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::TEXT,
+				'label_block' => true,
+				'dynamic'     => array( 'active' => true ),
+				'description' => esc_html__( 'Leave blank to use the current word count.', 'foundation-elementor-plus' ),
+				'condition'   => array(
+					'preset' => 'blog_post',
+				),
+			)
+		);
+
+		$this->add_control(
+			'blog_post_author_visibility',
+			array(
+				'label'     => esc_html__( 'Author Strip', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::SELECT,
+				'default'   => '',
+				'options'   => array(
+					''     => esc_html__( 'Use preset', 'foundation-elementor-plus' ),
+					'show' => esc_html__( 'Show', 'foundation-elementor-plus' ),
+					'hide' => esc_html__( 'Hide', 'foundation-elementor-plus' ),
+				),
+				'condition' => array(
+					'preset' => 'blog_post',
+				),
+			)
+		);
+
+		$this->add_control(
+			'blog_post_author_prefix',
+			array(
+				'label'       => esc_html__( 'Author Prefix', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::TEXT,
+				'label_block' => true,
+				'dynamic'     => array( 'active' => true ),
+				'description' => esc_html__( 'Leave blank to use “Written by”.', 'foundation-elementor-plus' ),
+				'condition'   => array(
+					'preset' => 'blog_post',
+				),
+			)
+		);
+
+		$this->add_control(
+			'blog_post_author_name',
+			array(
+				'label'       => esc_html__( 'Author Name Override', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::TEXT,
+				'label_block' => true,
+				'dynamic'     => array( 'active' => true ),
+				'description' => esc_html__( 'Leave blank to use the current post author name.', 'foundation-elementor-plus' ),
+				'condition'   => array(
+					'preset' => 'blog_post',
+				),
+			)
+		);
+
+		$this->add_control(
+			'blog_post_author_avatar_url',
+			array(
+				'label'       => esc_html__( 'Author Avatar Override URL', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::TEXT,
+				'label_block' => true,
+				'dynamic'     => array( 'active' => true ),
+				'description' => esc_html__( 'Leave blank to use the author profile image from WordPress users.', 'foundation-elementor-plus' ),
+				'condition'   => array(
+					'preset' => 'blog_post',
+				),
+			)
+		);
+
+		$this->add_control(
+			'blog_post_author_link_url',
+			array(
+				'label'       => esc_html__( 'Author Link URL', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::TEXT,
+				'label_block' => true,
+				'dynamic'     => array( 'active' => true ),
+				'description' => esc_html__( 'Leave blank to use the current author archive. Add # to disable linking.', 'foundation-elementor-plus' ),
+				'condition'   => array(
+					'preset' => 'blog_post',
+				),
+			)
+		);
+
+		$this->add_control(
 			'show_trust',
 			array(
 				'label'   => esc_html__( 'Trust Logos', 'foundation-elementor-plus' ),
@@ -272,6 +395,37 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 					''  => esc_html__( 'Use preset', 'foundation-elementor-plus' ),
 					'1' => esc_html__( 'Show', 'foundation-elementor-plus' ),
 					'0' => esc_html__( 'Hide', 'foundation-elementor-plus' ),
+				),
+			)
+		);
+
+		$this->add_control(
+			'breadcrumb_position_notice',
+			array(
+				'type'            => Controls_Manager::RAW_HTML,
+				'raw'             => esc_html__( 'Blog archive and blog post presets can render the glass breadcrumb shortcode above the content or below the buttons.', 'foundation-elementor-plus' ),
+				'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+				'condition'       => array(
+					'preset' => array( 'blog_archive', 'blog_post' ),
+				),
+			)
+		);
+
+		$this->add_control(
+			'breadcrumb_position',
+			array(
+				'label'       => esc_html__( 'Breadcrumb Bar Position', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::SELECT,
+				'default'     => '',
+				'options'     => array(
+					''       => esc_html__( 'Use preset', 'foundation-elementor-plus' ),
+					'top'    => esc_html__( 'Above content', 'foundation-elementor-plus' ),
+					'bottom' => esc_html__( 'Below buttons', 'foundation-elementor-plus' ),
+					'hidden' => esc_html__( 'Hidden', 'foundation-elementor-plus' ),
+				),
+				'description' => esc_html__( 'Only applies when the ink_glass_breadcrumb shortcode is available.', 'foundation-elementor-plus' ),
+				'condition'   => array(
+					'preset' => array( 'blog_archive', 'blog_post' ),
 				),
 			)
 		);
@@ -310,7 +464,7 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 		$this->start_controls_section(
 			'section_buttons',
 			array(
-				'label' => esc_html__( 'CTA / Actions', 'foundation-elementor-plus' ),
+				'label' => esc_html__( 'Buttons', 'foundation-elementor-plus' ),
 			)
 		);
 
@@ -391,7 +545,7 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 		$this->start_controls_section(
 			'section_layout',
 			array(
-				'label' => esc_html__( 'Layout & Sizing', 'foundation-elementor-plus' ),
+				'label' => esc_html__( 'Layout', 'foundation-elementor-plus' ),
 			)
 		);
 
@@ -444,8 +598,8 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 				'label'       => esc_html__( 'Minimum Height', 'foundation-elementor-plus' ),
 				'type'        => Controls_Manager::TEXT,
 				'label_block' => true,
-				'placeholder' => '72svh',
-				'description' => esc_html__( 'Leave blank to use the preset minimum height. This is used by the preset/custom height strategy and accepts CSS values like 72svh or 100dvh.', 'foundation-elementor-plus' ),
+				'placeholder' => '72vh',
+				'description' => esc_html__( 'Leave blank to use the preset minimum height. This is used by the preset/custom height strategy and accepts CSS values like 72vh or 100svh.', 'foundation-elementor-plus' ),
 			)
 		);
 
@@ -470,11 +624,15 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Responsive Min Height', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'svh', 'dvh' ),
+				'size_units' => array( 'px', 'vh', 'svh', 'dvh' ),
 				'range'      => array(
 					'px'  => array(
 						'min' => 320,
 						'max' => 1800,
+					),
+					'vh'  => array(
+						'min' => 30,
+						'max' => 140,
 					),
 					'svh' => array(
 						'min' => 30,
@@ -497,7 +655,7 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Header Offset', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'svh', 'dvh' ),
+				'size_units' => array( 'px', 'rem', 'vh' ),
 				'range'      => array(
 					'px'  => array(
 						'min' => 0,
@@ -507,11 +665,7 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 						'min' => 0,
 						'max' => 20,
 					),
-					'svh' => array(
-						'min' => 0,
-						'max' => 40,
-					),
-					'dvh' => array(
+					'vh'  => array(
 						'min' => 0,
 						'max' => 40,
 					),
@@ -531,7 +685,7 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Top Content Space', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'svh', 'dvh' ),
+				'size_units' => array( 'px', 'rem', 'vh' ),
 				'range'      => array(
 					'px'  => array(
 						'min' => 0,
@@ -541,11 +695,7 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 						'min' => 0,
 						'max' => 20,
 					),
-					'svh' => array(
-						'min' => 0,
-						'max' => 40,
-					),
-					'dvh' => array(
+					'vh'  => array(
 						'min' => 0,
 						'max' => 40,
 					),
@@ -562,7 +712,7 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Bottom Content Space', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'svh', 'dvh' ),
+				'size_units' => array( 'px', 'rem', 'vh' ),
 				'range'      => array(
 					'px'  => array(
 						'min' => 0,
@@ -572,11 +722,7 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 						'min' => 0,
 						'max' => 24,
 					),
-					'svh' => array(
-						'min' => 0,
-						'max' => 50,
-					),
-					'dvh' => array(
+					'vh'  => array(
 						'min' => 0,
 						'max' => 50,
 					),
@@ -611,86 +757,6 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 				'description' => esc_html__( 'Choose % for responsive layouts. Pixel widths are available for fixed-width layouts and legacy edits.', 'foundation-elementor-plus' ),
 				'selectors'  => array(
 					'{{WRAPPER}} .foundation-inkfire-hero__inner' => 'width: {{SIZE}}{{UNIT}}; max-width: none !important;',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'headline_max_width',
-			array(
-				'label'      => esc_html__( 'Headline Max Width', 'foundation-elementor-plus' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( '%', 'px', 'vw', 'rem' ),
-				'range'      => array(
-					'%' => array(
-						'min' => 40,
-						'max' => 100,
-					),
-					'px' => array(
-						'min' => 320,
-						'max' => 1400,
-					),
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} .foundation-inkfire-headline' => 'max-width: {{SIZE}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'subhead_max_width',
-			array(
-				'label'      => esc_html__( 'Subhead Max Width', 'foundation-elementor-plus' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( '%', 'px', 'vw', 'rem' ),
-				'range'      => array(
-					'%' => array(
-						'min' => 40,
-						'max' => 100,
-					),
-					'px' => array(
-						'min' => 280,
-						'max' => 1200,
-					),
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} .foundation-inkfire-subhead' => 'max-width: {{SIZE}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'button_row_gap',
-			array(
-				'label'      => esc_html__( 'Button Gap', 'foundation-elementor-plus' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'em', 'vw' ),
-				'range'      => array(
-					'px' => array(
-						'min' => 0,
-						'max' => 48,
-					),
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} .foundation-inkfire-button-row' => 'gap: {{SIZE}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'trust_top_space',
-			array(
-				'label'      => esc_html__( 'Trust Strip Top Space', 'foundation-elementor-plus' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'svh', 'dvh' ),
-				'range'      => array(
-					'px' => array(
-						'min' => 0,
-						'max' => 120,
-					),
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} .foundation-inkfire-trust-bar' => 'margin-top: {{SIZE}}{{UNIT}};',
 				),
 			)
 		);
@@ -731,7 +797,7 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 		$this->start_controls_section(
 			'section_style_layout',
 			array(
-				'label' => esc_html__( 'Shell & Spacing', 'foundation-elementor-plus' ),
+				'label' => esc_html__( 'Layout', 'foundation-elementor-plus' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
 			)
 		);
@@ -753,7 +819,7 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Top Padding', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'svh', 'dvh' ),
+				'size_units' => array( 'px', 'rem', 'vh' ),
 				'selectors'  => array(
 					'{{WRAPPER}} .foundation-inkfire-splash' => '--foundation-inkfire-hero-padding-top: {{SIZE}}{{UNIT}};',
 				),
@@ -765,7 +831,7 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Bottom Padding', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'svh', 'dvh' ),
+				'size_units' => array( 'px', 'rem', 'vh' ),
 				'selectors'  => array(
 					'{{WRAPPER}} .foundation-inkfire-splash' => '--foundation-inkfire-hero-padding-bottom: {{SIZE}}{{UNIT}};',
 				),
@@ -780,23 +846,6 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 				'size_units' => array( 'px', 'rem' ),
 				'selectors'  => array(
 					'{{WRAPPER}} .foundation-inkfire-eyebrow, {{WRAPPER}} .foundation-inkfire-eyebrow--green-glass, {{WRAPPER}} .foundation-inkfire-eyebrow--orange-glass, {{WRAPPER}} .foundation-inkfire-eyebrow--white-glass' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'hero_overlay_opacity',
-			array(
-				'label'   => esc_html__( 'Overlay Opacity', 'foundation-elementor-plus' ),
-				'type'    => Controls_Manager::SLIDER,
-				'range'   => array(
-					'px' => array(
-						'min' => 0,
-						'max' => 100,
-					),
-				),
-				'selectors' => array(
-					'{{WRAPPER}} .foundation-inkfire-splash__mask' => 'opacity: calc({{SIZE}} / 100);',
 				),
 			)
 		);
@@ -819,17 +868,6 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 			)
 		);
 
-		$this->add_control(
-			'kicker_color',
-			array(
-				'label'     => esc_html__( 'Color', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .foundation-inkfire-kicker' => 'color: {{VALUE}};',
-				),
-			)
-		);
-
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -848,17 +886,6 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 			)
 		);
 
-		$this->add_control(
-			'headline_color',
-			array(
-				'label'     => esc_html__( 'Color', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .foundation-inkfire-headline' => 'color: {{VALUE}};',
-				),
-			)
-		);
-
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -874,17 +901,6 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 			array(
 				'name'     => 'eyebrow_typography',
 				'selector' => '{{WRAPPER}} .foundation-inkfire-eyebrow, {{WRAPPER}} .foundation-inkfire-eyebrow--green-glass, {{WRAPPER}} .foundation-inkfire-eyebrow--orange-glass, {{WRAPPER}} .foundation-inkfire-eyebrow--white-glass',
-			)
-		);
-
-		$this->add_control(
-			'eyebrow_color',
-			array(
-				'label'     => esc_html__( 'Color', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .foundation-inkfire-eyebrow, {{WRAPPER}} .foundation-inkfire-eyebrow--green-glass, {{WRAPPER}} .foundation-inkfire-eyebrow--orange-glass, {{WRAPPER}} .foundation-inkfire-eyebrow--white-glass' => 'color: {{VALUE}};',
-				),
 			)
 		);
 
@@ -911,104 +927,6 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 			array(
 				'name'     => 'trust_typography',
 				'selector' => '{{WRAPPER}} .foundation-inkfire-trust-label, {{WRAPPER}} .foundation-inkfire-logo-label',
-			)
-		);
-
-		$this->add_control(
-			'subhead_color',
-			array(
-				'label'     => esc_html__( 'Body Color', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .foundation-inkfire-subhead' => 'color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'trust_text_color',
-			array(
-				'label'     => esc_html__( 'Trust Text Color', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .foundation-inkfire-trust-label' => 'color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->end_controls_section();
-
-		$this->start_controls_section(
-			'section_style_buttons',
-			array(
-				'label' => esc_html__( 'Buttons', 'foundation-elementor-plus' ),
-				'tab'   => Controls_Manager::TAB_STYLE,
-			)
-		);
-
-		$this->add_control(
-			'primary_button_text_color',
-			array(
-				'label'     => esc_html__( 'Primary Text', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .foundation-inkfire-main-btn, {{WRAPPER}} .foundation-inkfire-main-btn:hover' => 'color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'primary_button_background',
-			array(
-				'label'     => esc_html__( 'Primary Background', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .foundation-inkfire-main-btn' => 'background: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'primary_button_hover_background',
-			array(
-				'label'     => esc_html__( 'Primary Hover Background', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .foundation-inkfire-main-btn:hover' => 'background: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'secondary_button_text_color',
-			array(
-				'label'     => esc_html__( 'Secondary Text', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .foundation-inkfire-secondary-btn, {{WRAPPER}} .foundation-inkfire-secondary-btn:hover' => 'color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'secondary_button_background',
-			array(
-				'label'     => esc_html__( 'Secondary Background', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .foundation-inkfire-secondary-btn' => 'background: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'secondary_button_hover_background',
-			array(
-				'label'     => esc_html__( 'Secondary Hover Background', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .foundation-inkfire-secondary-btn:hover' => 'background: {{VALUE}};',
-				),
 			)
 		);
 
@@ -1071,10 +989,20 @@ class Dark_Animated_Hero_Widget extends Base_Widget {
 			'palette',
 			'features',
 			'feature_position',
+			'breadcrumb_position',
 			'class',
 			'trust_label',
 			'project_team_visibility',
 			'project_team_department',
+			'blog_post_meta_visibility',
+			'blog_post_meta_label',
+			'blog_post_meta_pill_primary',
+			'blog_post_meta_pill_secondary',
+			'blog_post_author_visibility',
+			'blog_post_author_prefix',
+			'blog_post_author_name',
+			'blog_post_author_avatar_url',
+			'blog_post_author_link_url',
 		);
 
 		foreach ( $optional_keys as $key ) {

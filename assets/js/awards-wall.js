@@ -1,16 +1,13 @@
 (function () {
-	const READY_ATTR = 'data-foundation-awards-ready';
+	const walls = document.querySelectorAll('[data-foundation-awards-hover]');
+	const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const hoverCapable = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-	function initCard(card) {
-		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-		const hoverCapable = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+	if (!walls.length || reduceMotion || !hoverCapable) {
+		return;
+	}
 
-		if (!card || card.getAttribute(READY_ATTR) === 'true' || reduceMotion || !hoverCapable) {
-			return;
-		}
-
-		card.setAttribute(READY_ATTR, 'true');
-
+	walls.forEach((card) => {
 		card.addEventListener('mousemove', (event) => {
 			const rect = card.getBoundingClientRect();
 			const x = ((event.clientX - rect.left) / rect.width) * 100;
@@ -36,50 +33,5 @@
 			},
 			true
 		);
-	}
-
-	function initAll(scope) {
-		const root = scope || document;
-		const cards = [];
-
-		if (root.matches && root.matches('[data-foundation-awards-hover]')) {
-			cards.push(root);
-		}
-
-		if (root.querySelectorAll) {
-			root.querySelectorAll('[data-foundation-awards-hover]').forEach((card) => {
-				cards.push(card);
-			});
-		}
-
-		cards.forEach(initCard);
-	}
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
-			initAll(document);
-		});
-	} else {
-		initAll(document);
-	}
-
-	window.addEventListener('load', function () {
-		initAll(document);
 	});
-
-	function bindElementorHooks() {
-		if (!window.elementorFrontend || !window.elementorFrontend.hooks) {
-			return;
-		}
-
-		window.elementorFrontend.hooks.addAction('frontend/element_ready/foundation-awards-recognition-wall.default', function ($scope) {
-			initAll($scope[0] || $scope);
-		});
-	}
-
-	if (window.elementorFrontend && window.elementorFrontend.hooks) {
-		bindElementorHooks();
-	} else {
-		window.addEventListener('elementor/frontend/init', bindElementorHooks, { once: true });
-	}
 })();

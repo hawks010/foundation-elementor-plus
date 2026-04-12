@@ -9,19 +9,19 @@ use Elementor\Group_Control_Typography;
 use Elementor\Icons_Manager;
 use Elementor\Repeater;
 use Elementor\Utils;
-use FoundationElementorPlus\Widgets\Base_Widget;
+use Elementor\Widget_Base;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Bounce_Rail_Widget extends Base_Widget {
+class Bounce_Rail_Widget extends Widget_Base {
 	public function get_name() {
 		return 'foundation-bounce-rail';
 	}
 
 	public function get_title() {
-		return esc_html__( 'Social Wall', 'foundation-elementor-plus' );
+		return esc_html__( 'Foundation Social Wall', 'foundation-elementor-plus' );
 	}
 
 	public function get_icon() {
@@ -37,7 +37,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 	}
 
 	public function get_style_depends(): array {
-		return $this->get_foundation_style_depends( array( 'foundation-elementor-plus-bounce-rail' ) );
+		return array( 'foundation-elementor-plus-bounce-rail' );
 	}
 
 	public function get_script_depends(): array {
@@ -50,7 +50,6 @@ class Bounce_Rail_Widget extends Base_Widget {
 		$this->register_header_style_controls();
 		$this->register_card_style_controls();
 		$this->register_control_style_controls();
-		$this->register_accessibility_controls();
 	}
 
 	protected function render() {
@@ -70,7 +69,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			$this->add_link_attributes( 'all_posts_link', $settings['all_posts_link'] );
 		}
 		?>
-		<section <?php echo $this->get_widget_root_attributes( $settings, array( 'id' => $widget_id, 'class' => 'foundation-bounce-rail', 'data-foundation-bounce-rail' => true, 'data-scroll-step' => ! empty( $settings['scroll_step'] ) ? (string) (int) $settings['scroll_step'] : '302' ) ); ?>>
+		<section id="<?php echo esc_attr( $widget_id ); ?>" class="foundation-bounce-rail" data-foundation-bounce-rail data-scroll-step="<?php echo esc_attr( ! empty( $settings['scroll_step'] ) ? (string) (int) $settings['scroll_step'] : '302' ); ?>">
 			<div class="foundation-bounce-rail__header">
 				<div class="foundation-bounce-rail__copy">
 					<?php $this->render_header_field( $settings['eyebrow'] ?? '', 'foundation-bounce-rail__eyebrow', 'p' ); ?>
@@ -1540,7 +1539,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Header Bottom Space', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'em', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 40,
@@ -1562,7 +1561,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Header Copy Width', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( '%', 'px', 'vw', 'rem' ),
+				'size_units' => array( '%', 'px' ),
 				'default'    => array(
 					'unit' => '%',
 					'size' => 65,
@@ -1596,7 +1595,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Rail Gap', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'em', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 22,
@@ -1678,7 +1677,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Column Width', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 280,
@@ -1700,7 +1699,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Column Height', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vh', 'vw' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 540,
@@ -1722,7 +1721,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Stack Gap', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'em', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 22,
@@ -1744,7 +1743,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Card Radius', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 26,
@@ -1944,7 +1943,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Overlay Padding', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%', 'em', 'rem', 'vw', 'vh', 'custom' ),
+				'size_units' => array( 'px', '%' ),
 				'default'    => array(
 					'top'      => 14,
 					'right'    => 16,
@@ -1972,7 +1971,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Overlay Backdrop Blur', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem' ),
+				'size_units' => array( 'px' ),
 				'range'      => array(
 					'px' => array(
 						'min' => 0,
@@ -2097,7 +2096,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Reel Chip Backdrop Blur', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem' ),
+				'size_units' => array( 'px' ),
 				'range'      => array(
 					'px' => array(
 						'min' => 0,
@@ -2155,7 +2154,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Arrow Button Size', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vw' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 52,
@@ -2177,7 +2176,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Arrow Radius', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 16,
@@ -2199,7 +2198,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Arrow Icon Size', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'em', 'vw' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 20,
@@ -2257,7 +2256,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Arrow Backdrop Blur', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem' ),
+				'size_units' => array( 'px' ),
 				'range'      => array(
 					'px' => array(
 						'min' => 0,
@@ -2312,7 +2311,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Button Height', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vw' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 52,
@@ -2334,7 +2333,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Button Padding', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', 'em', 'rem', '%', 'vw', 'custom' ),
+				'size_units' => array( 'px', 'em', 'rem' ),
 				'default'    => array(
 					'top'      => 14,
 					'right'    => 26,
@@ -2354,7 +2353,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Button Radius', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 999,
@@ -2376,7 +2375,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Text / Icon Gap', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'em' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 10,
@@ -2398,7 +2397,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Button Icon Size', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'em', 'vw' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 20,
@@ -2420,7 +2419,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'All Posts Backdrop Blur', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem' ),
+				'size_units' => array( 'px' ),
 				'range'      => array(
 					'px' => array(
 						'min' => 0,
@@ -2459,7 +2458,7 @@ class Bounce_Rail_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Read Time Icon Size', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'em' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 14,

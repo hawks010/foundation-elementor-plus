@@ -8,19 +8,19 @@ use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
 use Elementor\Repeater;
 use Elementor\Utils;
-use FoundationElementorPlus\Widgets\Base_Widget;
+use Elementor\Widget_Base;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Selector_Stack_Widget extends Base_Widget {
+class Selector_Stack_Widget extends Widget_Base {
 	public function get_name() {
 		return 'foundation-selector-stack';
 	}
 
 	public function get_title() {
-		return esc_html__( 'Selector Stack', 'foundation-elementor-plus' );
+		return esc_html__( 'Foundation Selector Stack', 'foundation-elementor-plus' );
 	}
 
 	public function get_icon() {
@@ -36,7 +36,7 @@ class Selector_Stack_Widget extends Base_Widget {
 	}
 
 	public function get_style_depends(): array {
-		return $this->get_foundation_style_depends( array( 'foundation-elementor-plus-selector-stack' ) );
+		return array( 'foundation-elementor-plus-selector-stack' );
 	}
 
 	public function get_script_depends(): array {
@@ -50,20 +50,17 @@ class Selector_Stack_Widget extends Base_Widget {
 		$this->register_card_style_controls();
 		$this->register_content_style_controls();
 		$this->register_image_style_controls();
-		$this->register_accessibility_controls();
 	}
 
 	protected function render() {
-		$settings         = $this->get_settings_for_display();
-		$cards            = ! empty( $settings['cards'] ) && is_array( $settings['cards'] ) ? array_values( $settings['cards'] ) : array();
-		$widget_id        = 'foundation-selector-' . $this->get_id();
-		$layer_step_value = isset( $settings['layer_step']['size'] ) ? (float) $settings['layer_step']['size'] : 18;
-		$layer_step_unit  = isset( $settings['layer_step']['unit'] ) && '' !== (string) $settings['layer_step']['unit'] ? (string) $settings['layer_step']['unit'] : 'px';
-		$total            = count( $cards );
-		$root_style       = sprintf(
-			'--inkfire-selector-layer-step:%1$s%2$s;--inkfire-selector-card-count:%3$d;',
-			rtrim( rtrim( sprintf( '%.4F', $layer_step_value ), '0' ), '.' ),
-			esc_attr( $layer_step_unit ),
+		$settings   = $this->get_settings_for_display();
+		$cards      = ! empty( $settings['cards'] ) && is_array( $settings['cards'] ) ? array_values( $settings['cards'] ) : array();
+		$widget_id  = 'foundation-selector-' . $this->get_id();
+		$layer_step = isset( $settings['layer_step']['size'] ) ? (int) $settings['layer_step']['size'] : 18;
+		$total      = count( $cards );
+		$root_style = sprintf(
+			'--inkfire-selector-layer-step:%1$dpx;--inkfire-selector-card-count:%2$d;',
+			$layer_step,
 			$total
 		);
 
@@ -71,7 +68,7 @@ class Selector_Stack_Widget extends Base_Widget {
 			return;
 		}
 		?>
-		<section <?php echo $this->get_widget_root_attributes( $settings, array( 'id' => $widget_id, 'class' => 'inkfire-selector', 'data-inkfire-selector' => true, 'style' => $root_style ) ); ?>>
+		<section id="<?php echo esc_attr( $widget_id ); ?>" class="inkfire-selector" data-inkfire-selector style="<?php echo esc_attr( $root_style ); ?>">
 			<div class="inkfire-selector__layout">
 				<div class="inkfire-selector__nav-rail">
 					<nav class="inkfire-selector__nav" aria-label="<?php esc_attr_e( 'Selector navigation', 'foundation-elementor-plus' ); ?>">
@@ -273,7 +270,7 @@ class Selector_Stack_Widget extends Base_Widget {
 				'label'       => esc_html__( 'Stack Start Position', 'foundation-elementor-plus' ),
 				'description' => esc_html__( 'How far from the top the active card should lock into place.', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vh', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 120,
@@ -296,7 +293,7 @@ class Selector_Stack_Widget extends Base_Widget {
 				'label'       => esc_html__( 'Anchor Menu Position', 'foundation-elementor-plus' ),
 				'description' => esc_html__( 'How far from the top the left anchor menu should stick.', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vh', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 120,
@@ -319,7 +316,7 @@ class Selector_Stack_Widget extends Base_Widget {
 				'label'       => esc_html__( 'Visible Peek of Next Card', 'foundation-elementor-plus' ),
 				'description' => esc_html__( 'How much of the next card should be visible before it stacks into place.', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vh', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 132,
@@ -342,7 +339,7 @@ class Selector_Stack_Widget extends Base_Widget {
 				'label'       => esc_html__( 'Gap Between Stacked Cards', 'foundation-elementor-plus' ),
 				'description' => esc_html__( 'Adds breathing room between each stacked card edge.', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'em', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 20,
@@ -365,7 +362,7 @@ class Selector_Stack_Widget extends Base_Widget {
 				'label'       => esc_html__( 'Vertical Offset Per Card', 'foundation-elementor-plus' ),
 				'description' => esc_html__( 'Creates the stepped card-stack look as cards layer upward.', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'em' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 18,
@@ -385,7 +382,7 @@ class Selector_Stack_Widget extends Base_Widget {
 				'label'       => esc_html__( 'Space After Final Card', 'foundation-elementor-plus' ),
 				'description' => esc_html__( 'Extra scroll room after the final card has stacked.', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vh', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 260,
@@ -418,7 +415,7 @@ class Selector_Stack_Widget extends Base_Widget {
 				'label'       => esc_html__( 'Anchor Menu Width', 'foundation-elementor-plus' ),
 				'description' => esc_html__( 'Controls how much space the left menu column uses.', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 210,
@@ -441,7 +438,7 @@ class Selector_Stack_Widget extends Base_Widget {
 				'label'       => esc_html__( 'Gap Between Menu and Cards', 'foundation-elementor-plus' ),
 				'description' => esc_html__( 'Horizontal space between the anchor menu and the card stack.', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 48,
@@ -464,7 +461,7 @@ class Selector_Stack_Widget extends Base_Widget {
 				'label'       => esc_html__( 'Card Height', 'foundation-elementor-plus' ),
 				'description' => esc_html__( 'Sets a fixed card height. You can set different values for desktop, tablet, and mobile.', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vh', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 620,
@@ -510,7 +507,7 @@ class Selector_Stack_Widget extends Base_Widget {
 				'label'       => esc_html__( 'Card Corner Radius', 'foundation-elementor-plus' ),
 				'description' => esc_html__( 'Rounds the outside corners of each card.', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 100,
@@ -533,7 +530,7 @@ class Selector_Stack_Widget extends Base_Widget {
 				'label'       => esc_html__( 'Card Content Padding', 'foundation-elementor-plus' ),
 				'description' => esc_html__( 'Inner spacing around the title and description area.', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%', 'em', 'rem', 'vw', 'vh', 'custom' ),
+				'size_units' => array( 'px', '%', 'em', 'rem' ),
 				'default'    => array(
 					'top'      => 70,
 					'right'    => 70,
@@ -564,7 +561,7 @@ class Selector_Stack_Widget extends Base_Widget {
 				'label'       => esc_html__( 'Stacked Image Height', 'foundation-elementor-plus' ),
 				'description' => esc_html__( 'Height of the image when the layout collapses into a single column.', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vh', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 260,
@@ -646,7 +643,7 @@ class Selector_Stack_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Nav Item Gap', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'em', 'vw' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 18,
@@ -806,7 +803,7 @@ class Selector_Stack_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Title Spacing', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'em', 'vw' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 20,
@@ -874,7 +871,7 @@ class Selector_Stack_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Description Width', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'ch', '%', 'vw', 'rem' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 620,

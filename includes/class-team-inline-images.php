@@ -168,11 +168,11 @@ final class Team_Inline_Images {
 		$output  = '';
 
 		if ( ! $did_print_styles ) {
-			$output         .= '<style id="foundation-team-inline-styles">.foundation-team-inline{display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:center;max-width:100%;vertical-align:middle;margin:0 5px;line-height:0;row-gap:12px;--foundation-team-inline-current-size:var(--foundation-team-inline-size,var(--foundation-team-inline-base-size,45px));--foundation-team-inline-current-border-width:3px}.foundation-team-inline__avatar{display:block;width:var(--foundation-team-inline-current-size)!important;height:var(--foundation-team-inline-current-size)!important;min-width:var(--foundation-team-inline-current-size);min-height:var(--foundation-team-inline-current-size);border-radius:50%!important;object-fit:cover;border:var(--foundation-team-inline-current-border-width) solid var(--foundation-team-inline-border,#0b0c15);box-sizing:content-box;background:#222;overflow:hidden;box-shadow:0 0 5px 1px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.01)}.foundation-team-inline--stacked{gap:0}.foundation-team-inline--stacked .foundation-team-inline__avatar{margin-left:-8px}.foundation-team-inline--stacked .foundation-team-inline__avatar:first-child{margin-left:0}.foundation-team-inline--hero{justify-content:flex-start;gap:10px 0;padding-left:15px}.foundation-team-inline--hero .foundation-team-inline__avatar{margin-left:-15px}.foundation-team-inline--hero .foundation-team-inline__avatar:first-child{margin-left:0}@media (max-width: 900px){.foundation-team-inline--hero{justify-content:center;gap:10px;padding-left:0}.foundation-team-inline--hero .foundation-team-inline__avatar{margin-left:0}}@media (max-width:768px){.foundation-team-inline{margin:0 0px 10px;row-gap:8px;--foundation-team-inline-current-size:37px;--foundation-team-inline-current-border-width:2px}.foundation-team-inline--stacked .foundation-team-inline__avatar{margin-left:-8px;margin-bottom:-6px}.foundation-team-inline--hero .foundation-team-inline__avatar{margin-bottom:-4px}}</style>';
+			$output         .= '<style id="foundation-team-inline-styles">.foundation-team-inline{display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:center;max-width:100%;vertical-align:middle;margin:0 5px;line-height:0;row-gap:12px}.foundation-team-inline__avatar{display:block;width:var(--foundation-team-inline-size,45px)!important;height:var(--foundation-team-inline-size,45px)!important;min-width:var(--foundation-team-inline-size,45px);min-height:var(--foundation-team-inline-size,45px);border-radius:50%!important;object-fit:cover;border:3px solid var(--foundation-team-inline-border,#0b0c15);box-sizing:content-box;background:#222;overflow:hidden;box-shadow:0 0 5px 1px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.01)}.foundation-team-inline--stacked{gap:0}.foundation-team-inline--stacked .foundation-team-inline__avatar{margin-left:-8px}.foundation-team-inline--stacked .foundation-team-inline__avatar:first-child{margin-left:0}.foundation-team-inline--hero{justify-content:flex-start;gap:10px 0;padding-left:15px}.foundation-team-inline--hero .foundation-team-inline__avatar{margin-left:-15px}.foundation-team-inline--hero .foundation-team-inline__avatar:first-child{margin-left:0}@media (max-width: 900px){.foundation-team-inline--hero{justify-content:center;gap:10px;padding-left:0}.foundation-team-inline--hero .foundation-team-inline__avatar{margin-left:0}}@media (max-width:768px){.foundation-team-inline--stacked .foundation-team-inline__avatar{margin-left:-10px;margin-bottom:-10px}}</style>';
 			$did_print_styles = true;
 		}
 
-		$output .= '<span class="' . esc_attr( $wrapper_class ) . '" role="img" aria-label="' . esc_attr( $label ) . '" style="--foundation-team-inline-base-size:' . esc_attr( $size ) . ';--foundation-team-inline-border:' . esc_attr( $border_color ) . ';">';
+		$output .= '<span class="' . esc_attr( $wrapper_class ) . '" role="img" aria-label="' . esc_attr( $label ) . '" style="--foundation-team-inline-size:' . esc_attr( $size ) . ';--foundation-team-inline-border:' . esc_attr( $border_color ) . ';">';
 		$z_index = count( $image_ids ) + 10;
 
 		foreach ( $image_ids as $index => $image_id ) {
@@ -668,10 +668,10 @@ final class Team_Inline_Images {
 
 						const html = rows.map((row, index) => {
 							const src = row.querySelector('img').getAttribute('src');
-							return '<img class="foundation-team-inline__avatar" src="' + src + '" alt="" aria-hidden="true" style="margin-left:' + (index === 0 ? '0' : '-15px') + ';position:relative;z-index:' + (rows.length + 10 - index) + ';">';
+							return '<img src="' + src + '" alt="" aria-hidden="true" style="width:45px;height:45px;border-radius:50%;object-fit:cover;border:3px solid #0b0c15;margin-left:' + (index === 0 ? '0' : '-15px') + ';position:relative;z-index:' + (rows.length + 10 - index) + ';box-sizing:content-box;">';
 						}).join('');
 
-						preview.innerHTML = '<span class="foundation-team-inline foundation-team-inline--stacked" role="img" aria-label="' + previewLabel.replace(/"/g, '&quot;') + '">' + html + '</span>';
+						preview.innerHTML = '<span role="img" aria-label="' + previewLabel.replace(/"/g, '&quot;') + '" style="display:inline-flex;vertical-align:middle;align-items:center;margin:0 5px;">' + html + '</span>';
 					};
 
 					const escapeHtml = (value) => {
@@ -877,10 +877,6 @@ final class Team_Inline_Images {
 		$options = $this->get_option();
 		$images  = isset( $options[ $department ] ) ? $options[ $department ] : array();
 
-		if ( empty( $images ) && 'homepage' === $department ) {
-			$images = isset( $options['management'] ) ? $options['management'] : array();
-		}
-
 		if ( empty( $images ) && 'all' !== $department ) {
 			$images = isset( $options['all'] ) ? $options['all'] : array();
 		}
@@ -904,13 +900,12 @@ final class Team_Inline_Images {
 	 */
 	public static function get_department_options() {
 		return array(
-			'all'        => __( 'All Team', 'foundation-elementor-plus' ),
-			'homepage'   => __( 'Homepage Hero', 'foundation-elementor-plus' ),
+			'all'       => __( 'All Team', 'foundation-elementor-plus' ),
 			'management' => __( 'Management', 'foundation-elementor-plus' ),
-			'it'         => __( 'IT', 'foundation-elementor-plus' ),
-			'web'        => __( 'Web', 'foundation-elementor-plus' ),
-			'marketing'  => __( 'Marketing', 'foundation-elementor-plus' ),
-			'branding'   => __( 'Branding', 'foundation-elementor-plus' ),
+			'it'        => __( 'IT', 'foundation-elementor-plus' ),
+			'web'       => __( 'Web', 'foundation-elementor-plus' ),
+			'marketing' => __( 'Marketing', 'foundation-elementor-plus' ),
+			'branding'  => __( 'Branding', 'foundation-elementor-plus' ),
 		);
 	}
 

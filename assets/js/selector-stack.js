@@ -1,12 +1,4 @@
 (function () {
-  function isElementorEditMode() {
-    return !!(
-      window.elementorFrontend &&
-      typeof window.elementorFrontend.isEditMode === "function" &&
-      window.elementorFrontend.isEditMode()
-    );
-  }
-
   function toNumber(value, fallback) {
     var parsed = parseFloat(value);
     return Number.isFinite(parsed) ? parsed : fallback;
@@ -45,7 +37,6 @@
     var desktopBreakpoint = 1024;
     var ticking = false;
     var mobileActiveIndex = 0;
-    var isEditorPreview = isElementorEditMode();
 
     if (!cards.length || !layout || !stage || !nav) {
       return;
@@ -190,7 +181,7 @@
     }
 
     function update() {
-      if (isEditorPreview || window.innerWidth <= desktopBreakpoint) {
+      if (window.innerWidth <= desktopBreakpoint) {
         renderMobile();
       } else {
         renderDesktop();
@@ -217,7 +208,7 @@
 
         event.preventDefault();
 
-        if (isEditorPreview || window.innerWidth <= desktopBreakpoint) {
+        if (window.innerWidth <= desktopBreakpoint) {
           var targetCard = cards[index];
 
           if (!targetCard) {
@@ -236,33 +227,12 @@
       });
     });
 
-    if (!isEditorPreview) {
-      window.addEventListener("scroll", requestUpdate, { passive: true });
-    }
+    window.addEventListener("scroll", requestUpdate, { passive: true });
     window.addEventListener("resize", requestUpdate);
     window.addEventListener("load", requestUpdate);
 
+    unlockParents(root);
     requestUpdate();
-
-    if ("ResizeObserver" in window) {
-      var observer = new ResizeObserver(function () {
-        requestUpdate();
-      });
-
-      observer.observe(root);
-      observer.observe(layout);
-      observer.observe(stage);
-
-      cards.forEach(function (card) {
-        observer.observe(card);
-      });
-    }
-
-    if (!isEditorPreview) {
-      unlockParents(root);
-    } else {
-      window.setTimeout(requestUpdate, 120);
-    }
   }
 
   function initAll(scope) {

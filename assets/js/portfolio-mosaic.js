@@ -1,7 +1,11 @@
 (function() {
 	const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 	const hoverCapable = window.matchMedia('(hover: hover) and (pointer: fine)');
-	const READY_ATTR = 'data-foundation-portfolio-mosaic-ready';
+	const widgets = document.querySelectorAll('[data-foundation-portfolio-mosaic]');
+
+	if (!widgets.length) {
+		return;
+	}
 
 	const getMetaStackThreshold = (widget) => {
 		const styles = window.getComputedStyle(widget);
@@ -227,12 +231,7 @@
 		}, true);
 	};
 
-	const initWidget = (widget) => {
-		if (!widget || widget.getAttribute(READY_ATTR) === 'true') {
-			return;
-		}
-
-		widget.setAttribute(READY_ATTR, 'true');
+	widgets.forEach((widget) => {
 		ensureLoadMoreButton(widget);
 		bindLoadMore(widget);
 		bindFilters(widget);
@@ -249,67 +248,23 @@
 		}
 
 		widget.querySelectorAll('[data-foundation-portfolio-mosaic-card]').forEach(bindTilt);
-
-		if ('ResizeObserver' in window) {
-			const observer = new ResizeObserver((entries) => {
-				entries.forEach((entry) => {
-					updateFeatureState(entry.target);
-					updateMetaStacking(entry.target);
-				});
-			});
-
-			observer.observe(widget);
-			return;
-		}
-
-		window.addEventListener('resize', () => {
-			updateFeatureState(widget);
-			updateMetaStacking(widget);
-		});
-	};
-
-	const initAll = (scope) => {
-		const root = scope || document;
-		const widgets = [];
-
-		if (root.matches && root.matches('[data-foundation-portfolio-mosaic]')) {
-			widgets.push(root);
-		}
-
-		if (root.querySelectorAll) {
-			root.querySelectorAll('[data-foundation-portfolio-mosaic]').forEach((widget) => {
-				widgets.push(widget);
-			});
-		}
-
-		widgets.forEach(initWidget);
-	};
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () {
-			initAll(document);
-		});
-	} else {
-		initAll(document);
-	}
-
-	window.addEventListener('load', function () {
-		initAll(document);
 	});
 
-	function bindElementorHooks() {
-		if (!window.elementorFrontend || !window.elementorFrontend.hooks) {
-			return;
-		}
-
-		window.elementorFrontend.hooks.addAction('frontend/element_ready/foundation-portfolio-mosaic.default', function ($scope) {
-			initAll($scope[0] || $scope);
+	if ('ResizeObserver' in window) {
+		const observer = new ResizeObserver((entries) => {
+			entries.forEach((entry) => {
+				updateFeatureState(entry.target);
+				updateMetaStacking(entry.target);
+			});
 		});
-	}
 
-	if (window.elementorFrontend && window.elementorFrontend.hooks) {
-		bindElementorHooks();
+		widgets.forEach((widget) => observer.observe(widget));
 	} else {
-		window.addEventListener('elementor/frontend/init', bindElementorHooks, { once: true });
+		window.addEventListener('resize', () => {
+			widgets.forEach((widget) => {
+				updateFeatureState(widget);
+				updateMetaStacking(widget);
+			});
+		});
 	}
 })();

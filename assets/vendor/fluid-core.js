@@ -21,7 +21,6 @@ function foundationInkfireGenerateCanvas(canvas, overrideConfig) {
     COLOR_UPDATE_SPEED: 10,
     PAUSED: false,
     MAX_PIXEL_RATIO: 1.25,
-    ALLOW_TOUCH_INPUT: true,
     BRAND_PALETTE: ['#13141F', '#1C1D2D', '#CE3D27', '#E27200', '#0E6055', '#07A079', '#FBCCBF', '#F2F2F2'],
     // DARK MODE BACKGROUND: #1C1D2D -> RGB(28, 29, 45)
     BACK_COLOR: { r: 28, g: 29, b: 45 },
@@ -532,29 +531,6 @@ function foundationInkfireGenerateCanvas(canvas, overrideConfig) {
     target.texelSizeY = 1.0 / h
     return target
   }
-  function clearFBO(target) {
-    if (!target || !target.fbo) return
-    gl.bindFramebuffer(gl.FRAMEBUFFER, target.fbo)
-    gl.viewport(0, 0, target.width, target.height)
-    gl.clearColor(0.0, 0.0, 0.0, 0.0)
-    gl.clear(gl.COLOR_BUFFER_BIT)
-  }
-  function clearDoubleFBO(target) {
-    if (!target) return
-    clearFBO(target.read)
-    clearFBO(target.write)
-  }
-  function clearSimulation() {
-    clearDoubleFBO(dye)
-    clearDoubleFBO(velocity)
-    clearFBO(divergence)
-    clearFBO(curl)
-    clearDoubleFBO(pressure)
-    clearFBO(bloom)
-    bloomFramebuffers.forEach(clearFBO)
-    clearFBO(sunrays)
-    clearFBO(sunraysTemp)
-  }
   function createTextureAsync(url) {
     var texture = gl.createTexture()
     gl.bindTexture(gl.TEXTURE_2D, texture)
@@ -600,6 +576,7 @@ function foundationInkfireGenerateCanvas(canvas, overrideConfig) {
   multipleSplats(0) // Reduce this number to limit initial splats
 
   var lastUpdateTime = performance.now()
+  var lastPausedRenderTime = 0
   var colorUpdateTimer = 0
   update()
 
@@ -608,11 +585,24 @@ function foundationInkfireGenerateCanvas(canvas, overrideConfig) {
     var now = performance.now()
     var dt = Math.min((now - lastUpdateTime) / 1000, 0.016666)
     lastUpdateTime = now
-    if (resizeCanvas()) initFramebuffers()
+    var resized = resizeCanvas()
+    var hasPendingInput = splatStack.length > 0 || pointers.some(function (p) { return p.moved })
+    if (resized) initFramebuffers()
+
+    if (config.PAUSED && !hasPendingInput) {
+      if (resized || now - lastPausedRenderTime > 1000) {
+        render(null)
+        lastPausedRenderTime = now
+      }
+      requestAnimationFrame(update)
+      return
+    }
+
     updateColors(dt)
     applyInputs()
     if (!config.PAUSED) step(dt)
     render(null)
+    lastPausedRenderTime = now
     requestAnimationFrame(update)
   }
   function resizeCanvas() {
@@ -869,44 +859,42 @@ function foundationInkfireGenerateCanvas(canvas, overrideConfig) {
     var pointer = pointers[0]
     if (pointer) updatePointerUpData(pointer)
   })
-  if (config.ALLOW_TOUCH_INPUT !== false) {
-    canvas.addEventListener(
-      'touchstart',
-      function (e) {
-        var touches = e.targetTouches
-        while (touches.length >= pointers.length) pointers.push(new Pointer())
-        for (var i = 0; i < touches.length; i++) {
-          var posX = scaleByPixelRatio(touches[i].pageX)
-          var posY = scaleByPixelRatio(touches[i].pageY)
-          updatePointerDownData(pointers[i + 1], touches[i].identifier, posX, posY)
-        }
-      },
-      { passive: true }
-    )
-    canvas.addEventListener(
-      'touchmove',
-      function (e) {
-        var touches = e.targetTouches
-        for (var i = 0; i < touches.length; i++) {
-          var pointer = pointers[i + 1]
-          if (!pointer || !pointer.down) continue
-          var posX = scaleByPixelRatio(touches[i].pageX)
-          var posY = scaleByPixelRatio(touches[i].pageY)
-          updatePointerMoveData(pointer, posX, posY)
-        }
-      },
-      { passive: true }
-    )
-    window.addEventListener('touchend', function (e) {
-      var touches = e.changedTouches
+  canvas.addEventListener(
+    'touchstart',
+    function (e) {
+      var touches = e.targetTouches
+      while (touches.length >= pointers.length) pointers.push(new Pointer())
       for (var i = 0; i < touches.length; i++) {
-        var pointer = pointers.find(function (p) {
-          return p.id === touches[i].identifier
-        })
-        if (pointer) updatePointerUpData(pointer)
+        var posX = scaleByPixelRatio(touches[i].pageX)
+        var posY = scaleByPixelRatio(touches[i].pageY)
+        updatePointerDownData(pointers[i + 1], touches[i].identifier, posX, posY)
       }
-    })
-  }
+    },
+    { passive: true }
+  )
+  canvas.addEventListener(
+    'touchmove',
+    function (e) {
+      var touches = e.targetTouches
+      for (var i = 0; i < touches.length; i++) {
+        var pointer = pointers[i + 1]
+        if (!pointer || !pointer.down) continue
+        var posX = scaleByPixelRatio(touches[i].pageX)
+        var posY = scaleByPixelRatio(touches[i].pageY)
+        updatePointerMoveData(pointer, posX, posY)
+      }
+    },
+    { passive: true }
+  )
+  window.addEventListener('touchend', function (e) {
+    var touches = e.changedTouches
+    for (var i = 0; i < touches.length; i++) {
+      var pointer = pointers.find(function (p) {
+        return p.id === touches[i].identifier
+      })
+      if (pointer) updatePointerUpData(pointer)
+    }
+  })
   window.addEventListener('mouseup', function () {
     var pointer = pointers[0]
     if (pointer) updatePointerUpData(pointer)
@@ -1036,9 +1024,6 @@ function foundationInkfireGenerateCanvas(canvas, overrideConfig) {
       if (typeof velocity === 'number') {
         config.VELOCITY_DISSIPATION = velocity;
       }
-    },
-    clear: function () {
-      clearSimulation();
     },
     triggerSplat: function (x, y, dx, dy, r, g, b, radius) {
       if (arguments.length > 1) {

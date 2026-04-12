@@ -26,10 +26,6 @@ final class Plugin {
 	const FOUNDATION_PARENT_SLUG = 'foundation-by-inkfire';
 	const MENU_SLUG = 'foundation-elementor-plus';
 	const OPTION_KEY = 'foundation_elementor_plus_settings';
-	const MINIMUM_ELEMENTOR_VERSION = '3.20.0';
-	const MINIMUM_PHP_VERSION = '7.4';
-	const VERSION_OPTION = 'foundation_elementor_plus_version';
-	const CLEAR_CACHE_ACTION = 'foundation_elementor_plus_clear_cache';
 
 	/**
 	 * Get singleton instance.
@@ -53,20 +49,15 @@ final class Plugin {
 
 	/**
 	 * Bootstrap the plugin.
-	 *
-	 * @return void
 	 */
 	public function bootstrap() {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_menu', array( $this, 'register_admin_menu' ), 20 );
-		add_action( 'admin_post_' . self::CLEAR_CACHE_ACTION, array( $this, 'handle_clear_cache' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 
-		if ( ! $this->is_compatible() ) {
+		if ( ! did_action( 'elementor/loaded' ) ) {
+			add_action( 'admin_notices', array( $this, 'render_missing_elementor_notice' ) );
 			return;
 		}
-
-		$this->maybe_run_upgrade();
 
 		add_action( 'elementor/frontend/after_register_styles', array( $this, 'register_style_assets' ) );
 		add_action( 'elementor/frontend/after_register_scripts', array( $this, 'register_script_assets' ) );
@@ -77,75 +68,16 @@ final class Plugin {
 	}
 
 	/**
-	 * Handle one-time upgrade tasks.
-	 *
-	 * @return void
-	 */
-	private function maybe_run_upgrade() {
-		$installed_version = get_option( self::VERSION_OPTION, '' );
-
-		if ( FOUNDATION_ELEMENTOR_PLUS_VERSION === $installed_version ) {
-			return;
-		}
-
-		update_option( self::VERSION_OPTION, FOUNDATION_ELEMENTOR_PLUS_VERSION, false );
-		$this->clear_elementor_cache();
-	}
-
-	/**
-	 * Clear Elementor generated assets/cache when available.
-	 *
-	 * @return void
-	 */
-	private function clear_elementor_cache() {
-		if ( class_exists( '\\Elementor\\Plugin' ) && isset( \Elementor\Plugin::$instance->files_manager ) && is_object( \Elementor\Plugin::$instance->files_manager ) && method_exists( \Elementor\Plugin::$instance->files_manager, 'clear_cache' ) ) {
-			\Elementor\Plugin::$instance->files_manager->clear_cache();
-		}
-	}
-
-	/**
-	 * Check whether the current site environment is compatible with the addon.
-	 *
-	 * @return bool
-	 */
-	private function is_compatible() {
-		if ( ! did_action( 'elementor/loaded' ) ) {
-			add_action( 'admin_notices', array( $this, 'render_missing_elementor_notice' ) );
-			return false;
-		}
-
-		if ( defined( 'ELEMENTOR_VERSION' ) && version_compare( ELEMENTOR_VERSION, self::MINIMUM_ELEMENTOR_VERSION, '<' ) ) {
-			add_action( 'admin_notices', array( $this, 'render_minimum_elementor_version_notice' ) );
-			return false;
-		}
-
-		if ( version_compare( PHP_VERSION, self::MINIMUM_PHP_VERSION, '<' ) ) {
-			add_action( 'admin_notices', array( $this, 'render_minimum_php_version_notice' ) );
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
 	 * Register widget styles.
-	 *
-	 * @return void
 	 */
 	public function register_style_assets() {
-		$assets        = Widget_Registry::get_asset_map();
-		$asset_handles = Widget_Registry::get_asset_handles_for_widgets( $this->get_enabled_widget_ids() );
+		$assets = Widget_Registry::get_asset_map();
 
-		foreach ( $asset_handles['styles'] as $handle ) {
-			if ( empty( $assets['styles'][ $handle ] ) ) {
-				continue;
-			}
-
+		foreach ( $assets['styles'] as $handle => $relative_path ) {
 			if ( wp_style_is( $handle, 'registered' ) ) {
 				continue;
 			}
 
-			$relative_path = $assets['styles'][ $handle ];
 			$file_path = FOUNDATION_ELEMENTOR_PLUS_PATH . ltrim( $relative_path, '/' );
 			$file_url  = FOUNDATION_ELEMENTOR_PLUS_URL . ltrim( $relative_path, '/' );
 
@@ -160,25 +92,15 @@ final class Plugin {
 
 	/**
 	 * Register widget scripts.
-	 *
-	 * @return void
 	 */
 	public function register_script_assets() {
-		$assets               = Widget_Registry::get_asset_map();
-		$settings             = $this->get_settings();
-		$should_defer_scripts = 'yes' === $settings['defer_widget_scripts'];
-		$asset_handles        = Widget_Registry::get_asset_handles_for_widgets( $this->get_enabled_widget_ids() );
+		$assets = Widget_Registry::get_asset_map();
 
-		foreach ( $asset_handles['scripts'] as $handle ) {
-			if ( empty( $assets['scripts'][ $handle ] ) ) {
-				continue;
-			}
-
+		foreach ( $assets['scripts'] as $handle => $relative_path ) {
 			if ( wp_script_is( $handle, 'registered' ) ) {
 				continue;
 			}
 
-			$relative_path = $assets['scripts'][ $handle ];
 			$script_path = is_array( $relative_path ) ? ( $relative_path['path'] ?? '' ) : $relative_path;
 			$script_deps = is_array( $relative_path ) ? ( $relative_path['deps'] ?? array() ) : array();
 			$file_path   = FOUNDATION_ELEMENTOR_PLUS_PATH . ltrim( $script_path, '/' );
@@ -191,15 +113,11 @@ final class Plugin {
 				file_exists( $file_path ) ? (string) filemtime( $file_path ) : FOUNDATION_ELEMENTOR_PLUS_VERSION,
 				true
 			);
-
-			if ( $should_defer_scripts ) {
-				wp_script_add_data( $handle, 'strategy', 'defer' );
-			}
 		}
 	}
 
 	/**
-	 * Normalize legacy beta-hosted upload URLs without mutating builder data.
+	 * Normalize legacy beta-hosted upload URLs on the live homepage without mutating builder data.
 	 *
 	 * @param string $content Rendered content.
 	 * @return string
@@ -209,19 +127,11 @@ final class Plugin {
 			return $content;
 		}
 
-		$settings = $this->get_settings();
-
-		if ( 'yes' !== $settings['enable_legacy_upload_normalization'] ) {
+		if ( is_admin() ) {
 			return $content;
 		}
 
-		$is_elementor_preview = $this->is_elementor_editor_or_preview();
-
-		if ( is_admin() && ! $is_elementor_preview ) {
-			return $content;
-		}
-
-		if ( ! $is_elementor_preview && ! is_front_page() && ! is_home() && ! is_page( 30 ) ) {
+		if ( ! is_front_page() && ! is_home() && ! is_page( 30 ) ) {
 			return $content;
 		}
 
@@ -238,33 +148,9 @@ final class Plugin {
 	}
 
 	/**
-	 * Determine whether Elementor is rendering an editor or preview request.
-	 *
-	 * @return bool
-	 */
-	private function is_elementor_editor_or_preview() {
-		if ( ! class_exists( '\\Elementor\\Plugin' ) ) {
-			return false;
-		}
-
-		$plugin = \Elementor\Plugin::$instance;
-
-		if ( isset( $plugin->editor ) && method_exists( $plugin->editor, 'is_edit_mode' ) && $plugin->editor->is_edit_mode() ) {
-			return true;
-		}
-
-		if ( isset( $plugin->preview ) && method_exists( $plugin->preview, 'is_preview_mode' ) && $plugin->preview->is_preview_mode() ) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Register Inkfire widget category.
 	 *
 	 * @param Elements_Manager $elements_manager Elementor elements manager.
-	 * @return void
 	 */
 	public function register_category( Elements_Manager $elements_manager ) {
 		$settings = $this->get_settings();
@@ -279,38 +165,18 @@ final class Plugin {
 	}
 
 	/**
-	 * Register all enabled plugin widgets.
+	 * Register all plugin widgets.
 	 *
 	 * @param Widgets_Manager $widgets_manager Elementor widgets manager.
-	 * @return void
 	 */
 	public function register_widgets( Widgets_Manager $widgets_manager ) {
-		$manifest           = Widget_Registry::get_widget_manifest();
-		$enabled_widget_ids = $this->get_enabled_widget_ids();
-
-		if ( empty( $enabled_widget_ids ) ) {
-			return;
-		}
-
-		Widget_Registry::load_widget_class_files( $enabled_widget_ids );
-
-		foreach ( $enabled_widget_ids as $widget_id ) {
-			if ( empty( $manifest[ $widget_id ]['class'] ) ) {
-				continue;
-			}
-
-			$widget_class = $manifest[ $widget_id ]['class'];
-
-			if ( class_exists( $widget_class ) ) {
-				$widgets_manager->register( new $widget_class() );
-			}
+		foreach ( Widget_Registry::get_widget_classes() as $widget_class ) {
+			$widgets_manager->register( new $widget_class() );
 		}
 	}
 
 	/**
 	 * Render admin notice when Elementor is unavailable.
-	 *
-	 * @return void
 	 */
 	public function render_missing_elementor_notice() {
 		if ( ! current_user_can( 'activate_plugins' ) ) {
@@ -324,53 +190,7 @@ final class Plugin {
 	}
 
 	/**
-	 * Render admin notice when Elementor is below the supported minimum version.
-	 *
-	 * @return void
-	 */
-	public function render_minimum_elementor_version_notice() {
-		if ( ! current_user_can( 'activate_plugins' ) ) {
-			return;
-		}
-
-		printf(
-			'<div class="notice notice-warning"><p>%s</p></div>',
-			esc_html(
-				sprintf(
-					/* translators: %s: minimum Elementor version */
-					__( 'Foundation Elementor Plus requires Elementor version %s or greater.', 'foundation-elementor-plus' ),
-					self::MINIMUM_ELEMENTOR_VERSION
-				)
-			)
-		);
-	}
-
-	/**
-	 * Render admin notice when PHP is below the supported minimum version.
-	 *
-	 * @return void
-	 */
-	public function render_minimum_php_version_notice() {
-		if ( ! current_user_can( 'activate_plugins' ) ) {
-			return;
-		}
-
-		printf(
-			'<div class="notice notice-warning"><p>%s</p></div>',
-			esc_html(
-				sprintf(
-					/* translators: %s: minimum PHP version */
-					__( 'Foundation Elementor Plus requires PHP version %s or greater.', 'foundation-elementor-plus' ),
-					self::MINIMUM_PHP_VERSION
-				)
-			)
-		);
-	}
-
-	/**
 	 * Register plugin settings.
-	 *
-	 * @return void
 	 */
 	public function register_settings() {
 		register_setting(
@@ -413,51 +233,6 @@ final class Plugin {
 				'key'         => 'widget_category_icon',
 				'placeholder' => 'fa fa-plug',
 				'description' => esc_html__( 'Elementor panel icon class for the Foundation Plus category.', 'foundation-elementor-plus' ),
-			)
-		);
-
-		add_settings_section(
-			'foundation_elementor_plus_performance',
-			esc_html__( 'Performance & Loading', 'foundation-elementor-plus' ),
-			array( $this, 'render_performance_section_intro' ),
-			'foundation-elementor-plus'
-		);
-
-		add_settings_field(
-			'defer_widget_scripts',
-			esc_html__( 'Defer Widget Scripts', 'foundation-elementor-plus' ),
-			array( $this, 'render_toggle_setting_field' ),
-			'foundation-elementor-plus',
-			'foundation_elementor_plus_performance',
-			array(
-				'key'         => 'defer_widget_scripts',
-				'label'       => esc_html__( 'Load frontend widget JavaScript with defer when possible', 'foundation-elementor-plus' ),
-				'description' => esc_html__( 'Keeps scripts out of the critical path. Disable only if a specific widget script proves timing-sensitive on your site.', 'foundation-elementor-plus' ),
-			)
-		);
-
-		add_settings_field(
-			'enable_legacy_upload_normalization',
-			esc_html__( 'Legacy Upload URL Fix', 'foundation-elementor-plus' ),
-			array( $this, 'render_toggle_setting_field' ),
-			'foundation-elementor-plus',
-			'foundation_elementor_plus_performance',
-			array(
-				'key'         => 'enable_legacy_upload_normalization',
-				'label'       => esc_html__( 'Rewrite old beta upload URLs in Foundation content', 'foundation-elementor-plus' ),
-				'description' => esc_html__( 'Useful while older builder data still references beta.inkfire.co.uk uploads. Turn off once all content is clean.', 'foundation-elementor-plus' ),
-			)
-		);
-
-		add_settings_field(
-			'enabled_widgets',
-			esc_html__( 'Enabled Widgets', 'foundation-elementor-plus' ),
-			array( $this, 'render_widget_toggle_field' ),
-			'foundation-elementor-plus',
-			'foundation_elementor_plus_performance',
-			array(
-				'key'         => 'enabled_widgets',
-				'description' => esc_html__( 'Disable widgets you are not using so they do not register in Elementor or load their assets on the front end. Existing pages that use a disabled widget will need it re-enabled to render again.', 'foundation-elementor-plus' ),
 			)
 		);
 
@@ -523,8 +298,6 @@ final class Plugin {
 
 	/**
 	 * Register the Foundation submenu.
-	 *
-	 * @return void
 	 */
 	public function register_admin_menu() {
 		global $admin_page_hooks;
@@ -561,23 +334,11 @@ final class Plugin {
 	 * Sanitize settings input.
 	 *
 	 * @param mixed $input Settings input.
-	 * @return array<string, mixed>
+	 * @return array<string, string>
 	 */
 	public function sanitize_settings( $input ) {
-		$defaults       = $this->get_default_settings();
-		$input          = is_array( $input ) ? $input : array();
-		$manifest            = Widget_Registry::get_widget_manifest();
-		$valid_widget_ids    = array_keys( $manifest );
-		$widgets_were_posted = isset( $input['enabled_widgets_present'] );
-		$enabled_widgets     = isset( $input['enabled_widgets'] ) && is_array( $input['enabled_widgets'] )
-			? array_values( array_intersect( $valid_widget_ids, array_map( 'sanitize_key', wp_unslash( $input['enabled_widgets'] ) ) ) )
-			: ( $widgets_were_posted ? array() : $defaults['enabled_widgets'] );
-
-		if ( empty( $enabled_widgets ) ) {
-			$enabled_widgets = array();
-		}
-
-		$this->clear_elementor_cache();
+		$defaults = $this->get_default_settings();
+		$input    = is_array( $input ) ? $input : array();
 
 		return array(
 			'widget_category_label' => isset( $input['widget_category_label'] ) && '' !== trim( (string) $input['widget_category_label'] )
@@ -586,13 +347,6 @@ final class Plugin {
 			'widget_category_icon'  => isset( $input['widget_category_icon'] ) && '' !== trim( (string) $input['widget_category_icon'] )
 				? preg_replace( '/[^a-z0-9\-\s_]/i', '', (string) wp_unslash( $input['widget_category_icon'] ) )
 				: $defaults['widget_category_icon'],
-			'defer_widget_scripts' => isset( $input['defer_widget_scripts'] ) && 'yes' === wp_unslash( (string) $input['defer_widget_scripts'] )
-				? 'yes'
-				: 'no',
-			'enable_legacy_upload_normalization' => isset( $input['enable_legacy_upload_normalization'] ) && 'yes' === wp_unslash( (string) $input['enable_legacy_upload_normalization'] )
-				? 'yes'
-				: 'no',
-			'enabled_widgets' => $enabled_widgets,
 			'youtube_api_key' => isset( $input['youtube_api_key'] )
 				? sanitize_text_field( wp_unslash( (string) $input['youtube_api_key'] ) )
 				: $defaults['youtube_api_key'],
@@ -610,26 +364,13 @@ final class Plugin {
 
 	/**
 	 * Render settings section description.
-	 *
-	 * @return void
 	 */
 	public function render_settings_section_intro() {
 		echo '<p>' . esc_html__( 'These settings control how Foundation Elementor Plus appears inside the Elementor editor. Widget content remains editable per widget instance in Elementor.', 'foundation-elementor-plus' ) . '</p>';
 	}
 
 	/**
-	 * Render performance section description.
-	 *
-	 * @return void
-	 */
-	public function render_performance_section_intro() {
-		echo '<p>' . esc_html__( 'The plugin already loads widget CSS and JavaScript only when a widget is used. Use the switches below to keep the suite leaner in production and to disable widgets your site never uses.', 'foundation-elementor-plus' ) . '</p>';
-	}
-
-	/**
 	 * Render integrations section description.
-	 *
-	 * @return void
 	 */
 	public function render_integrations_section_intro() {
 		echo '<p>' . esc_html__( 'Optional API and account settings used by widgets such as Bounce Rail for YouTube and Instagram feeds. Widget-level values can still override these defaults when needed.', 'foundation-elementor-plus' ) . '</p>';
@@ -639,7 +380,6 @@ final class Plugin {
 	 * Render a text setting field.
 	 *
 	 * @param array<string, string> $args Field arguments.
-	 * @return void
 	 */
 	public function render_text_setting_field( $args ) {
 		$settings    = $this->get_settings();
@@ -651,7 +391,7 @@ final class Plugin {
 		<input
 			type="text"
 			name="<?php echo esc_attr( self::OPTION_KEY . '[' . $key . ']' ); ?>"
-			value="<?php echo esc_attr( is_array( $value ) ? '' : (string) $value ); ?>"
+			value="<?php echo esc_attr( $value ); ?>"
 			placeholder="<?php echo esc_attr( $placeholder ); ?>"
 			class="regular-text"
 		/>
@@ -662,226 +402,183 @@ final class Plugin {
 	}
 
 	/**
-	 * Render a yes/no checkbox style field.
-	 *
-	 * @param array<string, string> $args Field arguments.
-	 * @return void
-	 */
-	public function render_toggle_setting_field( $args ) {
-		$settings    = $this->get_settings();
-		$key         = $args['key'];
-		$label       = isset( $args['label'] ) ? $args['label'] : '';
-		$description = isset( $args['description'] ) ? $args['description'] : '';
-		$is_checked  = isset( $settings[ $key ] ) && 'yes' === $settings[ $key ];
-		?>
-		<label>
-			<input
-				type="checkbox"
-				name="<?php echo esc_attr( self::OPTION_KEY . '[' . $key . ']' ); ?>"
-				value="yes"
-				<?php checked( $is_checked ); ?>
-			/>
-			<?php echo esc_html( $label ); ?>
-		</label>
-		<?php if ( $description ) : ?>
-			<p class="description"><?php echo esc_html( $description ); ?></p>
-		<?php endif; ?>
-		<?php
-	}
-
-	/**
-	 * Render widget enable/disable controls.
-	 *
-	 * @param array<string, string> $args Field arguments.
-	 * @return void
-	 */
-	public function render_widget_toggle_field( $args ) {
-		$settings       = $this->get_settings();
-		$enabled        = isset( $settings['enabled_widgets'] ) && is_array( $settings['enabled_widgets'] ) ? $settings['enabled_widgets'] : array();
-		$manifest       = Widget_Registry::get_widget_manifest();
-		$description    = isset( $args['description'] ) ? $args['description'] : '';
-		$enabled_count  = count( $enabled );
-		$total_count    = count( $manifest );
-		?>
-		<div style="display:grid;gap:12px;max-width:720px;">
-			<div style="font-weight:600;">
-				<?php echo esc_html( sprintf( __( '%1$d of %2$d widgets enabled', 'foundation-elementor-plus' ), $enabled_count, $total_count ) ); ?>
-			</div>
-			<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
-				<?php foreach ( $manifest as $widget_id => $widget ) : ?>
-					<label style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1px solid #d9deeb;border-radius:14px;background:#fff;">
-						<input
-							type="checkbox"
-							name="<?php echo esc_attr( self::OPTION_KEY . '[enabled_widgets][]' ); ?>"
-							value="<?php echo esc_attr( $widget_id ); ?>"
-							<?php checked( in_array( $widget_id, $enabled, true ) ); ?>
-						/>
-						<span>
-							<strong style="display:block;margin-bottom:4px;"><?php echo esc_html( $widget['title'] ); ?></strong>
-							<span style="display:block;color:#5c647a;"><?php echo esc_html( $widget['description'] ); ?></span>
-							<code style="display:block;margin-top:6px;"><?php echo esc_html( $widget_id ); ?></code>
-						</span>
-					</label>
-				<?php endforeach; ?>
-			</div>
-		</div>
-		<?php if ( $description ) : ?>
-			<p class="description"><?php echo esc_html( $description ); ?></p>
-		<?php endif; ?>
-		<?php
-	}
-
-	/**
-	 * Handle manual Elementor cache clearing.
-	 *
-	 * @return void
-	 */
-	public function handle_clear_cache() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'You do not have permission to perform this action.', 'foundation-elementor-plus' ) );
-		}
-
-		check_admin_referer( self::CLEAR_CACHE_ACTION );
-
-		$this->clear_elementor_cache();
-
-		wp_safe_redirect(
-			add_query_arg(
-				array(
-					'page'                  => self::MENU_SLUG,
-					'foundation_cache_cleared' => '1',
-				),
-				admin_url( 'admin.php' )
-			)
-		);
-		exit;
-	}
-
-	/**
-	 * Enqueue admin app assets for the Foundation settings screen.
-	 *
-	 * @param string $hook_suffix Current admin page hook suffix.
-	 * @return void
-	 */
-	public function enqueue_admin_assets( $hook_suffix ) {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-
-		if ( self::MENU_SLUG !== $page && false === strpos( (string) $hook_suffix, self::MENU_SLUG ) ) {
-			return;
-		}
-
-		$css_relative = 'assets/admin/foundation-admin.css';
-		$js_relative  = 'assets/admin/foundation-admin-app.js';
-		$css_path     = FOUNDATION_ELEMENTOR_PLUS_PATH . $css_relative;
-		$js_path      = FOUNDATION_ELEMENTOR_PLUS_PATH . $js_relative;
-
-		wp_enqueue_style(
-			'foundation-elementor-plus-admin',
-			FOUNDATION_ELEMENTOR_PLUS_URL . $css_relative,
-			array(),
-			file_exists( $css_path ) ? (string) filemtime( $css_path ) : FOUNDATION_ELEMENTOR_PLUS_VERSION
-		);
-
-		wp_enqueue_script(
-			'foundation-elementor-plus-admin',
-			FOUNDATION_ELEMENTOR_PLUS_URL . $js_relative,
-			array( 'wp-element' ),
-			file_exists( $js_path ) ? (string) filemtime( $js_path ) : FOUNDATION_ELEMENTOR_PLUS_VERSION,
-			true
-		);
-
-		wp_localize_script(
-			'foundation-elementor-plus-admin',
-			'foundationElementorPlusAdmin',
-			$this->get_admin_app_data()
-		);
-	}
-
-	/**
-	 * Build admin bootstrapping data for the React settings screen.
-	 *
-	 * @return array<string, mixed>
-	 */
-	private function get_admin_app_data() {
-		$settings            = $this->get_settings();
-		$widget_manifest     = Widget_Registry::get_widget_manifest();
-		$enabled_widget_ids  = $this->get_enabled_widget_ids();
-		$widget_count        = count( $widget_manifest );
-		$enabled_widget_count = count( $enabled_widget_ids );
-		$elementor_ready     = did_action( 'elementor/loaded' );
-		$plugin_file         = plugin_basename( FOUNDATION_ELEMENTOR_PLUS_FILE );
-
-		if ( ! function_exists( 'is_plugin_active' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
-		}
-
-		$widgets = array();
-
-		foreach ( $widget_manifest as $widget_id => $widget ) {
-			$widgets[] = array(
-				'id'          => $widget_id,
-				'title'       => $widget['title'],
-				'description' => $widget['description'],
-				'enabled'     => in_array( $widget_id, $enabled_widget_ids, true ),
-			);
-		}
-
-		return array(
-			'version'          => FOUNDATION_ELEMENTOR_PLUS_VERSION,
-			'isActive'         => is_plugin_active( $plugin_file ),
-			'elementorReady'   => $elementor_ready,
-			'widgetCount'      => $widget_count,
-			'enabledCount'     => $enabled_widget_count,
-			'clearCacheUrl'    => wp_nonce_url( admin_url( 'admin-post.php?action=' . self::CLEAR_CACHE_ACTION ), self::CLEAR_CACHE_ACTION ),
-			'settingsPageUrl'  => admin_url( 'admin.php?page=' . self::MENU_SLUG ),
-			'libraryUrl'       => admin_url( 'edit.php?post_type=elementor_library' ),
-			'cacheCleared'     => isset( $_GET['foundation_cache_cleared'] ) ? '1' === sanitize_text_field( wp_unslash( $_GET['foundation_cache_cleared'] ) ) : false, // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			'settings'         => $settings,
-			'widgets'          => $widgets,
-			'copy'             => array(
-				'heroTitle'       => __( 'Foundation Elementor Plus', 'foundation-elementor-plus' ),
-				'heroBody'        => __( 'SaaS-style control centre for your Inkfire widget suite. Keep only the widgets you use, trim asset loading, and manage integrations without spelunking through plugin files.', 'foundation-elementor-plus' ),
-				'saveLabel'       => __( 'Save settings', 'foundation-elementor-plus' ),
-				'enableAll'       => __( 'Enable all', 'foundation-elementor-plus' ),
-				'disableAll'      => __( 'Disable all', 'foundation-elementor-plus' ),
-				'openLibrary'     => __( 'Open Elementor Library', 'foundation-elementor-plus' ),
-				'clearCache'      => __( 'Clear Elementor cache', 'foundation-elementor-plus' ),
-				'refresh'         => __( 'Refresh', 'foundation-elementor-plus' ),
-				'widgetSearch'    => __( 'Search widgets', 'foundation-elementor-plus' ),
-				'widgetSearchHint'=> __( 'Filter by widget name or description', 'foundation-elementor-plus' ),
-				'enabledLabel'    => __( 'Enabled', 'foundation-elementor-plus' ),
-				'disabledLabel'   => __( 'Disabled', 'foundation-elementor-plus' ),
-				'changesNotice'   => __( 'Changes save through WordPress options, so you still get the safe, native settings flow under the shiny paint.', 'foundation-elementor-plus' ),
-				'cacheClearedNotice' => __( 'Elementor cache cleared.', 'foundation-elementor-plus' ),
-			),
-		);
-	}
-
-	/**
 	 * Render the plugin admin page.
-	 *
-	 * @return void
 	 */
 	public function render_admin_page() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'You do not have permission to access this page.', 'foundation-elementor-plus' ) );
 		}
+
+		$settings          = $this->get_settings();
+		$widget_manifest   = Widget_Registry::get_widget_manifest();
+		$elementor_ready   = did_action( 'elementor/loaded' );
+		$plugin_file       = plugin_basename( FOUNDATION_ELEMENTOR_PLUS_FILE );
+		$widget_count      = count( $widget_manifest );
+		$settings_page_url = admin_url( 'admin.php?page=' . self::MENU_SLUG );
+
+		if ( ! function_exists( 'is_plugin_active' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		$is_active = is_plugin_active( $plugin_file );
 		?>
-		<div class="wrap">
-			<form id="foundation-elementor-plus-admin-form" class="foundation-admin-shell" action="options.php" method="post">
-				<?php settings_fields( 'foundation_elementor_plus' ); ?>
-				<input type="hidden" name="<?php echo esc_attr( self::OPTION_KEY . '[enabled_widgets_present]' ); ?>" value="1" />
-				<div id="foundation-elementor-plus-admin-root"></div>
-				<noscript>
-					<div class="notice notice-warning inline"><p><?php esc_html_e( 'The new Foundation admin screen needs JavaScript. The fallback settings form is shown below.', 'foundation-elementor-plus' ); ?></p></div>
-					<?php do_settings_sections( 'foundation-elementor-plus' ); ?>
-					<?php submit_button( __( 'Save Settings', 'foundation-elementor-plus' ) ); ?>
-				</noscript>
-			</form>
+		<div class="wrap foundation-elementor-plus-admin">
+			<style>
+				.foundation-elementor-plus-admin {
+					max-width: 1120px;
+				}
+				.foundation-elementor-plus-admin__hero {
+					margin-top: 24px;
+					padding: 28px 32px;
+					border-radius: 24px;
+					background: linear-gradient(135deg, #13141F 0%, #1C1D2D 55%, #0E6055 100%);
+					color: #F2F2F2;
+					box-shadow: 0 18px 48px rgba(19, 20, 31, 0.22);
+				}
+				.foundation-elementor-plus-admin__hero h1 {
+					margin: 0 0 8px;
+					color: #F2F2F2;
+					font-size: 28px;
+				}
+				.foundation-elementor-plus-admin__hero p {
+					margin: 0;
+					max-width: 720px;
+					color: rgba(242, 242, 242, 0.82);
+					font-size: 15px;
+					line-height: 1.6;
+				}
+				.foundation-elementor-plus-admin__grid {
+					display: grid;
+					grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+					gap: 16px;
+					margin: 24px 0;
+				}
+				.foundation-elementor-plus-admin__card,
+				.foundation-elementor-plus-admin__panel {
+					background: #fff;
+					border: 1px solid #e7e9f2;
+					border-radius: 20px;
+					padding: 22px 24px;
+					box-shadow: 0 10px 30px rgba(28, 29, 45, 0.06);
+				}
+				.foundation-elementor-plus-admin__eyebrow {
+					display: inline-block;
+					margin-bottom: 10px;
+					font-size: 12px;
+					font-weight: 700;
+					letter-spacing: 0.08em;
+					text-transform: uppercase;
+					color: #0E6055;
+				}
+				.foundation-elementor-plus-admin__metric {
+					margin: 0;
+					font-size: 28px;
+					font-weight: 700;
+					color: #13141F;
+				}
+				.foundation-elementor-plus-admin__subtle {
+					margin: 8px 0 0;
+					color: #5c647a;
+				}
+				.foundation-elementor-plus-admin__layout {
+					display: grid;
+					grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
+					gap: 20px;
+					align-items: start;
+				}
+				.foundation-elementor-plus-admin__widget-list {
+					margin: 0;
+					padding-left: 18px;
+				}
+				.foundation-elementor-plus-admin__widget-list li + li {
+					margin-top: 12px;
+				}
+				.foundation-elementor-plus-admin__widget-list strong {
+					display: block;
+					margin-bottom: 4px;
+					color: #13141F;
+				}
+				.foundation-elementor-plus-admin__actions {
+					display: flex;
+					flex-wrap: wrap;
+					gap: 12px;
+					margin-top: 18px;
+				}
+				.foundation-elementor-plus-admin .button.button-primary {
+					background: #0E6055;
+					border-color: #0E6055;
+				}
+				@media (max-width: 960px) {
+					.foundation-elementor-plus-admin__layout {
+						grid-template-columns: 1fr;
+					}
+				}
+			</style>
+
+			<div class="foundation-elementor-plus-admin__hero">
+				<span class="foundation-elementor-plus-admin__eyebrow"><?php esc_html_e( 'Foundation Suite', 'foundation-elementor-plus' ); ?></span>
+				<h1><?php esc_html_e( 'Foundation Elementor Plus', 'foundation-elementor-plus' ); ?></h1>
+				<p><?php esc_html_e( 'A modular widget suite for Inkfire Foundation builds. Add custom Elementor widgets here over time while keeping their markup, styles, scripts, and editor controls safely managed in code.', 'foundation-elementor-plus' ); ?></p>
+			</div>
+
+			<div class="foundation-elementor-plus-admin__grid">
+				<div class="foundation-elementor-plus-admin__card">
+					<span class="foundation-elementor-plus-admin__eyebrow"><?php esc_html_e( 'Plugin Status', 'foundation-elementor-plus' ); ?></span>
+					<p class="foundation-elementor-plus-admin__metric"><?php echo esc_html( $is_active ? __( 'Active', 'foundation-elementor-plus' ) : __( 'Inactive', 'foundation-elementor-plus' ) ); ?></p>
+					<p class="foundation-elementor-plus-admin__subtle"><?php echo esc_html( 'v' . FOUNDATION_ELEMENTOR_PLUS_VERSION ); ?></p>
+				</div>
+				<div class="foundation-elementor-plus-admin__card">
+					<span class="foundation-elementor-plus-admin__eyebrow"><?php esc_html_e( 'Elementor', 'foundation-elementor-plus' ); ?></span>
+					<p class="foundation-elementor-plus-admin__metric"><?php echo esc_html( $elementor_ready ? __( 'Connected', 'foundation-elementor-plus' ) : __( 'Missing', 'foundation-elementor-plus' ) ); ?></p>
+					<p class="foundation-elementor-plus-admin__subtle"><?php esc_html_e( 'Widget registration depends on Elementor being active.', 'foundation-elementor-plus' ); ?></p>
+				</div>
+				<div class="foundation-elementor-plus-admin__card">
+					<span class="foundation-elementor-plus-admin__eyebrow"><?php esc_html_e( 'Available Widgets', 'foundation-elementor-plus' ); ?></span>
+					<p class="foundation-elementor-plus-admin__metric"><?php echo esc_html( (string) $widget_count ); ?></p>
+					<p class="foundation-elementor-plus-admin__subtle"><?php esc_html_e( 'This count grows as we add more custom Foundation layouts.', 'foundation-elementor-plus' ); ?></p>
+				</div>
+			</div>
+
+			<div class="foundation-elementor-plus-admin__layout">
+				<div class="foundation-elementor-plus-admin__panel">
+					<h2><?php esc_html_e( 'Widget Suite', 'foundation-elementor-plus' ); ?></h2>
+					<p><?php esc_html_e( 'Editors can find these widgets in Elementor under the custom Foundation Plus category.', 'foundation-elementor-plus' ); ?></p>
+					<ul class="foundation-elementor-plus-admin__widget-list">
+						<?php foreach ( $widget_manifest as $widget_id => $widget ) : ?>
+							<li>
+								<strong><?php echo esc_html( $widget['title'] ); ?></strong>
+								<span><?php echo esc_html( $widget['description'] ); ?></span><br />
+								<code><?php echo esc_html( $widget_id ); ?></code>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+					<div class="foundation-elementor-plus-admin__actions">
+						<a class="button button-primary" href="<?php echo esc_url( admin_url( 'edit.php?post_type=elementor_library' ) ); ?>"><?php esc_html_e( 'Open Elementor Library', 'foundation-elementor-plus' ); ?></a>
+						<a class="button" href="<?php echo esc_url( $settings_page_url ); ?>"><?php esc_html_e( 'Refresh Status', 'foundation-elementor-plus' ); ?></a>
+					</div>
+				</div>
+
+				<div class="foundation-elementor-plus-admin__panel">
+					<h2><?php esc_html_e( 'Editor Settings', 'foundation-elementor-plus' ); ?></h2>
+					<form action="options.php" method="post">
+						<?php
+						settings_fields( 'foundation_elementor_plus' );
+						do_settings_sections( 'foundation-elementor-plus' );
+						submit_button( __( 'Save Settings', 'foundation-elementor-plus' ) );
+						?>
+					</form>
+					<p class="foundation-elementor-plus-admin__subtle">
+						<?php
+						printf(
+							/* translators: 1: widget category label, 2: widget category icon class */
+							esc_html__( 'Current editor category: %1$s (%2$s)', 'foundation-elementor-plus' ),
+							esc_html( $settings['widget_category_label'] ),
+							esc_html( $settings['widget_category_icon'] )
+						);
+						?>
+					</p>
+				</div>
+			</div>
 		</div>
 		<?php
 	}
@@ -889,26 +586,23 @@ final class Plugin {
 	/**
 	 * Get plugin default settings.
 	 *
-	 * @return array<string, mixed>
+	 * @return array<string, string>
 	 */
 	private function get_default_settings() {
 		return array(
-			'widget_category_label'                => 'Foundation Plus',
-			'widget_category_icon'                 => 'fa fa-plug',
-			'defer_widget_scripts'                 => 'yes',
-			'enable_legacy_upload_normalization'   => 'yes',
-			'enabled_widgets'                      => array_keys( Widget_Registry::get_widget_manifest() ),
-			'youtube_api_key'                      => '',
-			'youtube_channel_source_default'       => '',
-			'instagram_access_token'               => '',
-			'instagram_business_account_id'        => '',
+			'widget_category_label'          => 'Foundation Plus',
+			'widget_category_icon'           => 'fa fa-plug',
+			'youtube_api_key'                => '',
+			'youtube_channel_source_default' => '',
+			'instagram_access_token'         => '',
+			'instagram_business_account_id'  => '',
 		);
 	}
 
 	/**
 	 * Get merged plugin settings.
 	 *
-	 * @return array<string, mixed>
+	 * @return array<string, string>
 	 */
 	private function get_settings() {
 		$defaults = $this->get_default_settings();
@@ -918,32 +612,6 @@ final class Plugin {
 			return $defaults;
 		}
 
-		$settings = wp_parse_args( $stored, $defaults );
-
-		if ( empty( $settings['enabled_widgets'] ) || ! is_array( $settings['enabled_widgets'] ) ) {
-			$settings['enabled_widgets'] = $defaults['enabled_widgets'];
-		}
-
-		return $settings;
-	}
-
-	/**
-	 * Get the list of enabled widget ids in manifest order.
-	 *
-	 * @return array<int, string>
-	 */
-	private function get_enabled_widget_ids() {
-		$manifest = Widget_Registry::get_widget_manifest();
-		$settings = $this->get_settings();
-		$enabled  = isset( $settings['enabled_widgets'] ) && is_array( $settings['enabled_widgets'] ) ? $settings['enabled_widgets'] : array_keys( $manifest );
-
-		return array_values(
-			array_filter(
-				array_keys( $manifest ),
-				static function( $widget_id ) use ( $enabled ) {
-					return in_array( $widget_id, $enabled, true );
-				}
-			)
-		);
+		return wp_parse_args( $stored, $defaults );
 	}
 }

@@ -1,12 +1,4 @@
 (function () {
-  function isElementorEditMode() {
-    return !!(
-      window.elementorFrontend &&
-      typeof window.elementorFrontend.isEditMode === "function" &&
-      window.elementorFrontend.isEditMode()
-    );
-  }
-
   function toNumber(value, fallback) {
     var parsed = parseFloat(value);
     return Number.isFinite(parsed) ? parsed : fallback;
@@ -23,8 +15,6 @@
     var down = root.querySelector("[data-yhero-next]");
     var cards = stack ? Array.prototype.slice.call(stack.children) : [];
     var index = 0;
-    var pendingFrame = 0;
-    var isEditorPreview = isElementorEditMode();
 
     if (!stack || !cards.length) {
       return;
@@ -83,17 +73,6 @@
       updateButtonState(down, index === maxIndex);
     }
 
-    function scheduleUpdate() {
-      if (pendingFrame) {
-        window.cancelAnimationFrame(pendingFrame);
-      }
-
-      pendingFrame = window.requestAnimationFrame(function () {
-        pendingFrame = 0;
-        updateSlider();
-      });
-    }
-
     if (up) {
       up.addEventListener("click", function () {
         if (isMobile()) {
@@ -116,28 +95,10 @@
       });
     }
 
-    window.addEventListener("resize", scheduleUpdate);
-    window.addEventListener("load", scheduleUpdate);
-
-    if ("ResizeObserver" in window) {
-      var observer = new ResizeObserver(function () {
-        scheduleUpdate();
-      });
-
-      observer.observe(root);
-      observer.observe(stack);
-
-      cards.forEach(function (card) {
-        observer.observe(card);
-      });
-    }
+    window.addEventListener("resize", updateSlider);
+    window.addEventListener("load", updateSlider);
 
     updateSlider();
-    scheduleUpdate();
-
-    if (isEditorPreview) {
-      window.setTimeout(scheduleUpdate, 120);
-    }
   }
 
   function initAll(scope) {

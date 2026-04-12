@@ -8,7 +8,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Dark_Animated_Hero_Renderer {
 	const OPTION_KEY = 'foundation_dark_animated_hero_settings';
-	private static $autoplay_toggle_rendered = false;
+
+	public static function allow_hero_inline_style_properties( $styles ) {
+		$allowed = array(
+			'background-clip',
+			'-webkit-background-clip',
+			'-webkit-text-fill-color',
+			'text-fill-color',
+		);
+
+		foreach ( $allowed as $property ) {
+			if ( ! in_array( $property, $styles, true ) ) {
+				$styles[] = $property;
+			}
+		}
+
+		return $styles;
+	}
+
+	private static function kses_hero_html( $html ) {
+		add_filter( 'safe_style_css', array( __CLASS__, 'allow_hero_inline_style_properties' ) );
+		$filtered = wp_kses_post( $html );
+		remove_filter( 'safe_style_css', array( __CLASS__, 'allow_hero_inline_style_properties' ) );
+
+		return $filtered;
+	}
 
 	private static function get_palette_presets() {
 		return array(
@@ -73,7 +97,7 @@ final class Dark_Animated_Hero_Renderer {
 					'size'             => 'full',
 					'align'            => 'center',
 					'content_vertical_align' => 'center',
-					'min_height'       => '100svh',
+					'min_height'       => '100vh',
 					'eyebrow'          => '🏆 Multi-award winning. Disabled-led team.',
 					'title'            => '<span class="foundation-inkfire-brand"><img src="' . self::build_upload_url( '/2025/11/IMG_1089.png' ) . '" alt="Inkfire logo" style="height:1.5em; width:auto; display:inline-block; vertical-align:middle; margin-right:-4px; transform:translateY(-3px);"><span class="foundation-inkfire-brand-name">Inkfire</span></span> Building <br><span class="foundation-inkfire-gradient-wrap"><span class="foundation-inkfire-gradient-text">inclusive systems</span></span> that just work.',
 					'subhead'          => 'We design, build and co-create inclusive digital systems, and support them long-term, when you need things done properly, at scale. Trusted by charities, public sector teams and growing organisations across the UK.',
@@ -92,7 +116,8 @@ final class Dark_Animated_Hero_Renderer {
 					'size'             => 'compact',
 					'align'            => 'left',
 					'content_vertical_align' => 'center',
-					'min_height'       => '72svh',
+					'height_strategy'  => 'viewport',
+					'min_height'       => '72vh',
 					'eyebrow'          => '<span class="foundation-inkfire-pill foundation-inkfire-pill--crumb">{current_breadcrumb}</span><span class="foundation-inkfire-pill foundation-inkfire-pill--brand"><img src="' . self::build_upload_url( '/2025/11/IMG_1089.png' ) . '" alt="Inkfire logo"><span>Award winning</span></span><span class="foundation-inkfire-pill foundation-inkfire-pill--rating" aria-label="5 star rated"><span class="foundation-inkfire-rating-number">5</span><span class="foundation-inkfire-stars" aria-hidden="true">★</span><span class="foundation-inkfire-rating-label">rated</span></span>',
 					'kicker'           => '{current_title_plain}',
 					'title'            => 'Seen something you like? Partner with our disabled-led team ready to support your next project.',
@@ -112,7 +137,8 @@ final class Dark_Animated_Hero_Renderer {
 					'size'             => 'compact',
 					'align'            => 'left',
 					'content_vertical_align' => 'center',
-					'min_height'       => '76svh',
+					'height_strategy'  => 'viewport',
+					'min_height'       => '76vh',
 					'eyebrow'          => '<span class="foundation-inkfire-pill foundation-inkfire-pill--crumb">{current_breadcrumb}</span><span class="foundation-inkfire-pill foundation-inkfire-pill--brand"><img src="' . self::build_upload_url( '/2025/11/IMG_1089.png' ) . '" alt="Inkfire logo"><span>Award winning</span></span><span class="foundation-inkfire-pill foundation-inkfire-pill--rating" aria-label="5 star rated"><span class="foundation-inkfire-rating-number">5</span><span class="foundation-inkfire-stars" aria-hidden="true">★</span><span class="foundation-inkfire-rating-label">rated</span></span>',
 					'kicker'           => '{current_title_plain}',
 					'title'            => '{current_title}',
@@ -126,13 +152,67 @@ final class Dark_Animated_Hero_Renderer {
 					'show_team'        => 0,
 					'show_trust'       => 0,
 				),
+				'blog_archive'      => array(
+					'label'            => 'Blog Archive / Search',
+					'palette_key'      => 'inkfire_gradient',
+					'size'             => 'compact',
+					'align'            => 'left',
+					'content_vertical_align' => 'center',
+					'height_strategy'  => 'viewport',
+					'min_height'       => '72vh',
+					'eyebrow'          => '<span class="foundation-inkfire-pill foundation-inkfire-pill--brand"><img src="' . self::build_upload_url( '/2025/11/IMG_1089.png' ) . '" alt="Inkfire logo"><span>Resource Hub</span></span><span class="foundation-inkfire-pill foundation-inkfire-pill--rating">Accessible insights</span>',
+					'kicker'           => '{current_title_plain}',
+					'title'            => 'Ideas, guidance, and behind-the-work updates from the Inkfire team.',
+					'subhead'          => '{current_archive_description}',
+					'primary_text'     => 'Start a project',
+					'primary_url'      => '/contact-us/',
+					'secondary_text'   => 'Explore services',
+					'secondary_url'    => '/services/',
+					'features'         => '',
+					'feature_position' => 'hidden',
+					'breadcrumb_position' => 'top',
+					'show_team'        => 0,
+					'show_trust'       => 0,
+				),
+				'blog_post'         => array(
+					'label'            => 'Blog Post',
+					'palette_key'      => 'inkfire_gradient',
+					'size'             => 'compact',
+					'align'            => 'left',
+					'content_vertical_align' => 'center',
+					'height_strategy'  => 'viewport',
+					'min_height'       => '74vh',
+					'eyebrow'          => '',
+					'kicker'           => '{current_breadcrumb_links}',
+					'title'            => '{current_title}',
+					'subhead'          => '{current_excerpt}',
+					'primary_text'     => 'Start a project',
+					'primary_url'      => '/contact-us/',
+					'secondary_text'   => 'Browse all articles',
+					'secondary_url'    => '/blog/',
+					'features'         => '',
+					'feature_position' => 'hidden',
+					'breadcrumb_position' => 'top',
+					'show_team'        => 0,
+					'show_trust'       => 0,
+					'blog_post_meta_visibility' => 'show',
+					'blog_post_meta_label' => '{current_category}',
+					'blog_post_meta_pill_primary' => '{current_read_time}',
+					'blog_post_meta_pill_secondary' => '{current_word_count}',
+					'blog_post_author_visibility' => 'show',
+					'blog_post_author_prefix' => 'Written by',
+					'blog_post_author_name' => '{current_author_name}',
+					'blog_post_author_avatar_url' => '{current_author_avatar_url}',
+					'blog_post_author_link_url' => '{current_author_url}',
+				),
 				'seo'                => array(
 					'label'            => 'SEO Service',
 					'palette_key'      => 'inkfire_gradient',
 					'size'             => 'compact',
 					'align'            => 'left',
 					'content_vertical_align' => 'center',
-					'min_height'       => '72svh',
+					'height_strategy'  => 'viewport',
+					'min_height'       => '72vh',
 					'eyebrow'          => 'SEO services',
 					'title'            => 'SEO systems that compound over time',
 					'subhead'          => 'Technical SEO, content strategy, and accessible search experiences designed to bring the right people to you and keep momentum building.',
@@ -151,7 +231,8 @@ final class Dark_Animated_Hero_Renderer {
 					'size'             => 'compact',
 					'align'            => 'left',
 					'content_vertical_align' => 'center',
-					'min_height'       => '72svh',
+					'height_strategy'  => 'viewport',
+					'min_height'       => '72vh',
 					'eyebrow'          => 'IT support',
 					'title'            => 'Reliable tech support without the usual friction',
 					'subhead'          => 'Managed IT, Microsoft 365, cybersecurity, and day-to-day support for organisations that need things handled properly.',
@@ -170,7 +251,8 @@ final class Dark_Animated_Hero_Renderer {
 					'size'             => 'compact',
 					'align'            => 'left',
 					'content_vertical_align' => 'center',
-					'min_height'       => '72svh',
+					'height_strategy'  => 'viewport',
+					'min_height'       => '72vh',
 					'eyebrow'          => 'Web development',
 					'title'            => 'Websites that are inclusive, fast, and built to grow',
 					'subhead'          => 'Custom web design and development for ambitious organisations that need performance, accessibility, and a strong technical foundation.',
@@ -189,7 +271,8 @@ final class Dark_Animated_Hero_Renderer {
 					'size'             => 'compact',
 					'align'            => 'left',
 					'content_vertical_align' => 'center',
-					'min_height'       => '72svh',
+					'height_strategy'  => 'viewport',
+					'min_height'       => '72vh',
 					'eyebrow'          => 'Branding and marketing',
 					'title'            => 'Brands and campaigns people remember for the right reasons',
 					'subhead'          => 'Strategy, storytelling, and inclusive creative marketing that helps people find you, trust you, and choose you.',
@@ -208,7 +291,8 @@ final class Dark_Animated_Hero_Renderer {
 					'size'             => 'compact',
 					'align'            => 'left',
 					'content_vertical_align' => 'center',
-					'min_height'       => '72svh',
+					'height_strategy'  => 'viewport',
+					'min_height'       => '72vh',
 					'eyebrow'          => 'Specialist support',
 					'title'            => 'Complex projects, shaped around what you actually need',
 					'subhead'          => 'For work that spans strategy, delivery, accessibility, and support, we shape a service around the outcome you need.',
@@ -238,7 +322,6 @@ final class Dark_Animated_Hero_Renderer {
 				isset( $settings['presets'][ $preset_key ] ) && is_array( $settings['presets'][ $preset_key ] ) ? $settings['presets'][ $preset_key ] : array(),
 				$preset_defaults
 			);
-			$settings['presets'][ $preset_key ]['min_height'] = self::normalize_viewport_unit( $settings['presets'][ $preset_key ]['min_height'] );
 		}
 
 		return $settings;
@@ -256,7 +339,6 @@ final class Dark_Animated_Hero_Renderer {
 	}
 
 	public static function enqueue_assets( $palette = '', $needs_icon_fonts = false ) {
-		wp_enqueue_style( 'foundation-elementor-plus-core' );
 		wp_enqueue_style( 'foundation-elementor-plus-dark-animated-hero' );
 		wp_enqueue_script( 'foundation-elementor-plus-fluid-core' );
 		wp_enqueue_script( 'foundation-elementor-plus-dark-animated-hero' );
@@ -280,6 +362,7 @@ final class Dark_Animated_Hero_Renderer {
 	public static function render( $atts = array() ) {
 		$settings       = self::get_settings();
 		$preset_key     = isset( $atts['preset'] ) ? sanitize_key( (string) $atts['preset'] ) : 'home';
+		$has_kicker_override = isset( $atts['kicker_html'] ) && '' !== trim( (string) $atts['kicker_html'] );
 		$default_preset = self::get_preset_config( $preset_key );
 
 		$defaults = array(
@@ -290,7 +373,7 @@ final class Dark_Animated_Hero_Renderer {
 			'align'            => $default_preset['align'],
 			'content_vertical_align' => isset( $default_preset['content_vertical_align'] ) ? $default_preset['content_vertical_align'] : 'center',
 			'min_height'       => $default_preset['min_height'],
-			'height_strategy'  => 'preset',
+			'height_strategy'  => isset( $default_preset['height_strategy'] ) ? $default_preset['height_strategy'] : 'preset',
 			'eyebrow'          => $default_preset['eyebrow'],
 			'eyebrow_style'    => 'green_glass',
 			'kicker_html'      => isset( $default_preset['kicker'] ) ? $default_preset['kicker'] : '',
@@ -307,8 +390,18 @@ final class Dark_Animated_Hero_Renderer {
 			'trust_logos'      => array(),
 			'features'         => $default_preset['features'],
 			'feature_position' => $default_preset['feature_position'],
+			'breadcrumb_position' => isset( $default_preset['breadcrumb_position'] ) ? (string) $default_preset['breadcrumb_position'] : '',
 			'show_team'        => (string) $default_preset['show_team'],
 			'show_trust'       => (string) $default_preset['show_trust'],
+			'blog_post_meta_visibility' => isset( $default_preset['blog_post_meta_visibility'] ) ? (string) $default_preset['blog_post_meta_visibility'] : '',
+			'blog_post_meta_label' => isset( $default_preset['blog_post_meta_label'] ) ? (string) $default_preset['blog_post_meta_label'] : '',
+			'blog_post_meta_pill_primary' => isset( $default_preset['blog_post_meta_pill_primary'] ) ? (string) $default_preset['blog_post_meta_pill_primary'] : '',
+			'blog_post_meta_pill_secondary' => isset( $default_preset['blog_post_meta_pill_secondary'] ) ? (string) $default_preset['blog_post_meta_pill_secondary'] : '',
+			'blog_post_author_visibility' => isset( $default_preset['blog_post_author_visibility'] ) ? (string) $default_preset['blog_post_author_visibility'] : '',
+			'blog_post_author_prefix' => isset( $default_preset['blog_post_author_prefix'] ) ? (string) $default_preset['blog_post_author_prefix'] : '',
+			'blog_post_author_name' => isset( $default_preset['blog_post_author_name'] ) ? (string) $default_preset['blog_post_author_name'] : '',
+			'blog_post_author_avatar_url' => isset( $default_preset['blog_post_author_avatar_url'] ) ? (string) $default_preset['blog_post_author_avatar_url'] : '',
+			'blog_post_author_link_url' => isset( $default_preset['blog_post_author_link_url'] ) ? (string) $default_preset['blog_post_author_link_url'] : '',
 			'class'            => '',
 		);
 
@@ -321,12 +414,19 @@ final class Dark_Animated_Hero_Renderer {
 		$size             = in_array( (string) $a['size'], array( 'full', 'compact' ), true ) ? (string) $a['size'] : $default_preset['size'];
 		$align            = in_array( (string) $a['align'], array( 'center', 'left' ), true ) ? (string) $a['align'] : $default_preset['align'];
 		$content_vertical_align = in_array( (string) $a['content_vertical_align'], array( 'flex-start', 'center', 'flex-end' ), true ) ? (string) $a['content_vertical_align'] : ( isset( $default_preset['content_vertical_align'] ) ? (string) $default_preset['content_vertical_align'] : 'center' );
-		$height_strategy  = in_array( (string) $a['height_strategy'], array( 'preset', 'viewport', 'viewport_offset', 'content' ), true ) ? (string) $a['height_strategy'] : 'preset';
-		$a['min_height']  = self::normalize_viewport_unit( $a['min_height'] );
+		$height_strategy  = in_array( (string) $a['height_strategy'], array( 'preset', 'viewport', 'viewport_offset', 'content' ), true ) ? (string) $a['height_strategy'] : ( isset( $default_preset['height_strategy'] ) ? (string) $default_preset['height_strategy'] : 'preset' );
 		$headline_html    = self::normalize_icon_markup( self::replace_tokens( $a['h1_html'], $token_context ) );
 		$kicker_html      = self::normalize_icon_markup( self::replace_tokens( $a['kicker_html'], $token_context ) );
 		$subhead_html     = self::normalize_icon_markup( self::replace_tokens( $a['subhead'], $token_context ) );
 		$eyebrow_html     = self::normalize_icon_markup( self::replace_tokens( $a['eyebrow'], $token_context ) );
+		$raw_glass_breadcrumb_html = self::render_glass_breadcrumb( $preset_key );
+		$breadcrumb_position = self::resolve_breadcrumb_position( $preset_key, isset( $a['breadcrumb_position'] ) ? (string) $a['breadcrumb_position'] : '', $default_preset );
+		$glass_breadcrumb_html = 'hidden' === $breadcrumb_position ? '' : $raw_glass_breadcrumb_html;
+
+		if ( 'blog_post' === $preset_key && ! $has_kicker_override && '' !== $glass_breadcrumb_html ) {
+			$kicker_html = '';
+		}
+
 		$eyebrow_style    = in_array( (string) $a['eyebrow_style'], array( 'green_glass', 'orange_glass', 'white_glass' ), true ) ? (string) $a['eyebrow_style'] : 'green_glass';
 		$feature_items    = self::parse_features( self::replace_tokens( $a['features'], $token_context ) );
 		$feature_position = in_array( (string) $a['feature_position'], array( 'after_title', 'after_subhead', 'before_buttons', 'hidden' ), true ) ? (string) $a['feature_position'] : $default_preset['feature_position'];
@@ -337,6 +437,8 @@ final class Dark_Animated_Hero_Renderer {
 		$preset_palette   = isset( $default_preset['palette_key'] ) ? (string) $default_preset['palette_key'] : 'inkfire_green';
 		$palette_key      = isset( $a['palette_key'] ) ? sanitize_key( (string) $a['palette_key'] ) : '';
 		$resolved_palette = self::resolve_palette_string( $a['palette'], $palette_key, $preset_palette );
+		$blog_post_meta_markup = self::render_blog_post_meta_row( $preset_key, $a, $token_context );
+		$blog_post_author_markup = self::render_blog_post_author_strip( $preset_key, $a, $token_context );
 		$project_team_markup = self::render_project_team_hero(
 			$preset_key,
 			array(
@@ -344,8 +446,6 @@ final class Dark_Animated_Hero_Renderer {
 				'department' => isset( $a['project_team_department'] ) ? (string) $a['project_team_department'] : '',
 			)
 		);
-
-		$is_editor_preview = self::is_elementor_editor_preview();
 
 		$class_names = array(
 			'foundation-inkfire-splash',
@@ -357,10 +457,6 @@ final class Dark_Animated_Hero_Renderer {
 			'foundation-inkfire-splash--palette-' . sanitize_html_class( str_replace( '_', '-', '' !== $palette_key ? $palette_key : $preset_palette ) ),
 		);
 
-		if ( $is_editor_preview ) {
-			$class_names[] = 'foundation-inkfire-splash--editor-preview';
-		}
-
 		if ( $show_team ) {
 			$class_names[] = 'foundation-inkfire-splash--has-team';
 		}
@@ -371,6 +467,10 @@ final class Dark_Animated_Hero_Renderer {
 
 		if ( ! empty( $feature_items ) && 'hidden' !== $feature_position ) {
 			$class_names[] = 'foundation-inkfire-splash--has-features';
+		}
+
+		if ( '' !== $glass_breadcrumb_html ) {
+			$class_names[] = 'foundation-inkfire-splash--breadcrumb-' . sanitize_html_class( $breadcrumb_position );
 		}
 
 		if ( '' !== trim( (string) $a['class'] ) ) {
@@ -385,6 +485,9 @@ final class Dark_Animated_Hero_Renderer {
 
 		$has_eyebrow      = '' !== trim( wp_strip_all_tags( $eyebrow_html ) );
 		$has_kicker       = '' !== trim( wp_strip_all_tags( $kicker_html ) );
+		$has_glass_breadcrumb = '' !== trim( $glass_breadcrumb_html );
+		$has_blog_post_meta = '' !== trim( wp_strip_all_tags( $blog_post_meta_markup ) );
+		$has_blog_post_author = '' !== trim( wp_strip_all_tags( $blog_post_author_markup ) );
 		$needs_icon_fonts = self::markup_uses_fontawesome( $eyebrow_html . ' ' . $kicker_html . ' ' . $headline_html . ' ' . $subhead_html );
 		self::enqueue_assets( $resolved_palette, $needs_icon_fonts );
 
@@ -406,20 +509,30 @@ final class Dark_Animated_Hero_Renderer {
 
 			<div class="<?php echo esc_attr( $hero_classes ); ?>">
 				<div class="foundation-inkfire-hero__inner">
+					<?php if ( $has_glass_breadcrumb && 'top' === $breadcrumb_position ) : ?>
+						<div class="foundation-inkfire-shortcode-breadcrumb foundation-inkfire-shortcode-breadcrumb--top">
+							<?php echo $glass_breadcrumb_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						</div>
+					<?php endif; ?>
+
+					<?php if ( $has_blog_post_meta ) : ?>
+						<?php echo wp_kses_post( $blog_post_meta_markup ); ?>
+					<?php endif; ?>
+
 					<?php if ( $has_eyebrow || $has_kicker ) : ?>
 						<div class="foundation-inkfire-meta-row">
 							<?php if ( $has_kicker ) : ?>
-								<p class="foundation-inkfire-kicker"><?php echo wp_kses_post( $kicker_html ); ?></p>
+								<p class="foundation-inkfire-kicker"><?php echo self::kses_hero_html( $kicker_html ); ?></p>
 							<?php endif; ?>
 
 							<?php if ( $has_eyebrow ) : ?>
-								<p class="foundation-inkfire-eyebrow foundation-inkfire-eyebrow--<?php echo esc_attr( sanitize_html_class( str_replace( '_', '-', $eyebrow_style ) ) ); ?>"><?php echo wp_kses_post( $eyebrow_html ); ?></p>
+								<p class="foundation-inkfire-eyebrow foundation-inkfire-eyebrow--<?php echo esc_attr( sanitize_html_class( str_replace( '_', '-', $eyebrow_style ) ) ); ?>"><?php echo self::kses_hero_html( $eyebrow_html ); ?></p>
 							<?php endif; ?>
 						</div>
 					<?php endif; ?>
 
 					<h1 id="<?php echo esc_attr( $section_id . '-heading' ); ?>" class="foundation-inkfire-headline">
-						<?php echo wp_kses_post( $headline_html ); ?>
+						<?php echo self::kses_hero_html( $headline_html ); ?>
 					</h1>
 
 					<?php if ( 'after_title' === $feature_position ) : ?>
@@ -427,9 +540,13 @@ final class Dark_Animated_Hero_Renderer {
 					<?php endif; ?>
 
 					<?php if ( '' !== trim( wp_strip_all_tags( $subhead_html ) ) ) : ?>
-						<p id="<?php echo esc_attr( $section_id . '-subhead' ); ?>" class="foundation-inkfire-subhead">
-							<?php echo wp_kses_post( $subhead_html ); ?>
-						</p>
+						<div id="<?php echo esc_attr( $section_id . '-subhead' ); ?>" class="foundation-inkfire-subhead">
+							<?php echo self::kses_hero_html( $subhead_html ); ?>
+						</div>
+					<?php endif; ?>
+
+					<?php if ( $has_blog_post_author ) : ?>
+						<?php echo wp_kses_post( $blog_post_author_markup ); ?>
 					<?php endif; ?>
 
 					<?php if ( 'after_subhead' === $feature_position ) : ?>
@@ -470,47 +587,21 @@ final class Dark_Animated_Hero_Renderer {
 						<?php endif; ?>
 					</div>
 
+					<?php if ( $has_glass_breadcrumb && 'bottom' === $breadcrumb_position ) : ?>
+						<div class="foundation-inkfire-shortcode-breadcrumb foundation-inkfire-shortcode-breadcrumb--bottom">
+							<?php echo $glass_breadcrumb_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						</div>
+					<?php endif; ?>
+
 					<?php if ( $show_trust ) : ?>
 						<?php echo wp_kses_post( self::render_trust_bar( $a['trust_html'], $a['trust_label'], $a['trust_logos'] ) ); ?>
 					<?php endif; ?>
 				</div>
 			</div>
-
-			<?php echo self::render_autoplay_toggle(); ?>
 		</section>
 		<?php
 
 		return ob_get_clean();
-	}
-
-	private static function render_autoplay_toggle() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return '';
-		}
-
-		if ( self::$autoplay_toggle_rendered ) {
-			return '';
-		}
-
-		self::$autoplay_toggle_rendered = true;
-
-		ob_start();
-		?>
-		<button
-			id="foundation-inkfire-autoplay-toggle"
-			class="foundation-inkfire-autoplay-toggle is-on"
-			type="button"
-			data-foundation-inkfire-autoplay-toggle
-			aria-pressed="true"
-			aria-label="<?php echo esc_attr__( 'Toggle hero animation autoplay mode', 'foundation-elementor-plus' ); ?>"
-		>
-			<span class="foundation-inkfire-autoplay-toggle__dot" aria-hidden="true"></span>
-			<span class="foundation-inkfire-autoplay-toggle__prefix"><?php echo esc_html__( 'Animation', 'foundation-elementor-plus' ); ?></span>
-			<span class="foundation-inkfire-autoplay-toggle__label" data-foundation-inkfire-toggle-label><?php echo esc_html__( 'AUTO', 'foundation-elementor-plus' ); ?></span>
-		</button>
-		<?php
-
-		return trim( ob_get_clean() );
 	}
 
 	private static function get_preset_config( $preset_key ) {
@@ -531,21 +622,31 @@ final class Dark_Animated_Hero_Renderer {
 			$preset['subhead']          = '{current_excerpt}';
 			$preset['features']         = '';
 			$preset['feature_position'] = 'hidden';
+		} elseif ( 'blog_post' === $preset_key && $context_post_id && 'post' === get_post_type( $context_post_id ) ) {
+			$preset['kicker']           = '{current_breadcrumb_links}';
+			$preset['eyebrow']          = '';
+			$preset['title']            = '{current_title}';
+			$preset['subhead']          = '{current_excerpt}';
+			$preset['features']         = '';
+			$preset['feature_position'] = 'hidden';
+			$preset['blog_post_meta_visibility'] = 'show';
+			$preset['blog_post_meta_label'] = '{current_category}';
+			$preset['blog_post_meta_pill_primary'] = '{current_read_time}';
+			$preset['blog_post_meta_pill_secondary'] = '{current_word_count}';
+			$preset['blog_post_author_visibility'] = 'show';
+			$preset['blog_post_author_prefix'] = 'Written by';
+			$preset['blog_post_author_name'] = '{current_author_name}';
+			$preset['blog_post_author_avatar_url'] = '{current_author_avatar_url}';
+			$preset['blog_post_author_link_url'] = '{current_author_url}';
+		} elseif ( 'blog_archive' === $preset_key && is_search() ) {
+			$preset['kicker']         = 'Search results';
+			$preset['title']          = 'Results for "{current_search_query}"';
+			$preset['subhead']        = '{current_results_summary}';
+			$preset['secondary_text'] = 'Browse all articles';
+			$preset['secondary_url']  = self::get_posts_archive_url();
 		}
-
-		$preset['min_height'] = self::normalize_viewport_unit( $preset['min_height'] );
 
 		return $preset;
-	}
-
-	private static function normalize_viewport_unit( $value ) {
-		$value = trim( (string) $value );
-
-		if ( '' === $value ) {
-			return $value;
-		}
-
-		return preg_replace( '/(?<![a-z])vh\b/i', 'svh', $value );
 	}
 
 	private static function get_palette_values( $palette = '' ) {
@@ -561,6 +662,37 @@ final class Dark_Animated_Hero_Renderer {
 				)
 			)
 		);
+	}
+
+	private static function resolve_breadcrumb_position( $preset_key, $position, array $default_preset = array() ) {
+		if ( ! self::should_render_glass_breadcrumb( $preset_key ) ) {
+			return 'hidden';
+		}
+
+		$allowed  = array( 'top', 'bottom', 'hidden' );
+		$position = sanitize_key( (string) $position );
+
+		if ( in_array( $position, $allowed, true ) ) {
+			return $position;
+		}
+
+		$default_position = isset( $default_preset['breadcrumb_position'] ) ? sanitize_key( (string) $default_preset['breadcrumb_position'] ) : 'top';
+
+		return in_array( $default_position, $allowed, true ) ? $default_position : 'top';
+	}
+
+	private static function should_render_glass_breadcrumb( $preset_key ) {
+		return in_array( (string) $preset_key, array( 'blog_archive', 'blog_post' ), true );
+	}
+
+	private static function render_glass_breadcrumb( $preset_key ) {
+		if ( ! self::should_render_glass_breadcrumb( $preset_key ) || ! shortcode_exists( 'ink_glass_breadcrumb' ) ) {
+			return '';
+		}
+
+		$markup = do_shortcode( '[ink_glass_breadcrumb]' );
+
+		return is_string( $markup ) ? trim( $markup ) : '';
 	}
 
 	private static function get_lines( $value ) {
@@ -582,11 +714,20 @@ final class Dark_Animated_Hero_Renderer {
 		$current_title      = '';
 		$current_title_plain = '';
 		$current_excerpt    = '';
+		$current_archive_description = '';
 		$current_breadcrumb = '';
 		$current_breadcrumb_links = '';
 		$current_category   = '';
 		$current_date       = '';
 		$current_meta_pills = '';
+		$current_blog_meta_pills = '';
+		$current_read_time = '';
+		$current_word_count = '';
+		$current_author_name = '';
+		$current_author_avatar_url = '';
+		$current_author_url = '';
+		$current_search_query = '';
+		$current_results_summary = '';
 		$context_post_id    = isset( $context['post_id'] ) ? (int) $context['post_id'] : 0;
 
 		if ( $context_post_id > 0 ) {
@@ -598,13 +739,38 @@ final class Dark_Animated_Hero_Renderer {
 			$current_category    = self::get_current_primary_term_label( $context_post_id );
 			$current_date        = get_the_date( 'j M Y', $context_post_id );
 			$current_meta_pills  = self::get_current_portfolio_meta_pills( $context_post_id );
+			$current_blog_meta_pills = self::get_current_blog_meta_pills( $context_post_id );
+			$current_read_time   = self::get_current_read_time_label( $context_post_id );
+			$current_word_count  = self::get_current_word_count_label( $context_post_id );
+			$current_author_name = self::get_current_author_name( $context_post_id );
+			$current_author_avatar_url = self::get_current_author_avatar_url( $context_post_id );
+			$current_author_url  = self::get_current_author_url( $context_post_id );
+		} elseif ( is_search() ) {
+			$current_search_query    = get_search_query();
+			$current_results_summary = self::get_current_search_results_summary();
+			$current_title           = 'Search results';
+			$current_title_plain     = 'Search';
+			$current_excerpt         = $current_results_summary;
+			$current_archive_description = $current_results_summary;
+		} elseif ( is_home() ) {
+			$current_title           = self::get_posts_archive_label();
+			$current_title_plain     = $current_title;
+			$current_archive_description = self::get_current_archive_description();
+			$current_excerpt         = $current_archive_description;
 		} elseif ( is_archive() || is_post_type_archive() ) {
 			$current_title = wp_strip_all_tags( get_the_archive_title() );
 			if ( is_post_type_archive() ) {
-				$current_title_plain = wp_strip_all_tags( post_type_archive_title( '', false ) );
+				$current_title_plain = is_post_type_archive( 'post' )
+					? self::get_posts_archive_label()
+					: wp_strip_all_tags( post_type_archive_title( '', false ) );
 			} elseif ( is_tax() || is_category() || is_tag() ) {
 				$current_title_plain = single_term_title( '', false );
+			} elseif ( is_author() ) {
+				$author = get_queried_object();
+				$current_title_plain = ( $author && isset( $author->display_name ) ) ? wp_strip_all_tags( (string) $author->display_name ) : '';
 			}
+			$current_archive_description = self::get_current_archive_description();
+			$current_excerpt             = $current_archive_description;
 		} elseif ( is_singular() ) {
 			$post_id            = get_the_ID();
 			$current_title      = get_the_title();
@@ -615,7 +781,13 @@ final class Dark_Animated_Hero_Renderer {
 			$current_category   = self::get_current_primary_term_label( $post_id );
 			$current_date       = $post_id ? get_the_date( 'j M Y', $post_id ) : '';
 			$current_meta_pills = self::get_current_portfolio_meta_pills( $post_id );
-		} elseif ( is_home() || is_front_page() ) {
+			$current_blog_meta_pills = self::get_current_blog_meta_pills( $post_id );
+			$current_read_time  = self::get_current_read_time_label( $post_id );
+			$current_word_count = self::get_current_word_count_label( $post_id );
+			$current_author_name = self::get_current_author_name( $post_id );
+			$current_author_avatar_url = self::get_current_author_avatar_url( $post_id );
+			$current_author_url = self::get_current_author_url( $post_id );
+		} elseif ( is_front_page() ) {
 			$current_title = get_bloginfo( 'name' );
 			$current_title_plain = $current_title;
 		} else {
@@ -628,7 +800,21 @@ final class Dark_Animated_Hero_Renderer {
 		}
 
 		if ( '' === $current_excerpt ) {
-			$current_excerpt = 'Selected project work from Inkfire, designed to perform, scale, and stand out for the right reasons.';
+			if ( '' !== $current_archive_description ) {
+				$current_excerpt = $current_archive_description;
+			} elseif ( is_post_type_archive( 'ink_portfolio' ) || 'ink_portfolio' === get_post_type( $context_post_id ) ) {
+				$current_excerpt = 'Selected project work from Inkfire, designed to perform, scale, and stand out for the right reasons.';
+			} elseif ( is_home() || is_search() || is_category() || is_tag() || is_author() || is_post_type_archive( 'post' ) || 'post' === get_post_type( $context_post_id ) ) {
+				$current_excerpt = 'Practical guides, honest updates, and accessible thinking from the Inkfire team.';
+			}
+		}
+
+		if ( '' === $current_results_summary ) {
+			$current_results_summary = self::get_current_search_results_summary();
+		}
+
+		if ( '' === $current_search_query ) {
+			$current_search_query = get_search_query();
 		}
 
 		$replaced = strtr(
@@ -637,11 +823,20 @@ final class Dark_Animated_Hero_Renderer {
 				'{current_title}'   => $current_title,
 				'{current_title_plain}' => $current_title_plain,
 				'{current_excerpt}' => $current_excerpt,
+				'{current_archive_description}' => $current_archive_description,
 				'{current_breadcrumb}' => $current_breadcrumb,
 				'{current_breadcrumb_links}' => $current_breadcrumb_links,
 				'{current_category}' => $current_category,
 				'{current_date}'    => $current_date,
 				'{current_portfolio_meta_pills}' => $current_meta_pills,
+				'{current_blog_meta_pills}' => $current_blog_meta_pills,
+				'{current_read_time}' => $current_read_time,
+				'{current_word_count}' => $current_word_count,
+				'{current_author_name}' => $current_author_name,
+				'{current_author_avatar_url}' => $current_author_avatar_url,
+				'{current_author_url}' => $current_author_url,
+				'{current_search_query}' => $current_search_query,
+				'{current_results_summary}' => $current_results_summary,
 				'{service_name}'    => $current_title,
 				'{site_name}'       => get_bloginfo( 'name' ),
 				'{year}'            => gmdate( 'Y' ),
@@ -671,7 +866,9 @@ final class Dark_Animated_Hero_Renderer {
 		}
 
 		$post_type_object = get_post_type_object( $post_type );
-		$archive_label    = ( $post_type_object && ! empty( $post_type_object->labels->name ) ) ? $post_type_object->labels->name : ucfirst( $post_type );
+		$archive_label    = 'post' === $post_type
+			? self::get_posts_archive_label()
+			: ( ( $post_type_object && ! empty( $post_type_object->labels->name ) ) ? $post_type_object->labels->name : ucfirst( $post_type ) );
 		$archive_label    = wp_strip_all_tags( (string) $archive_label );
 
 		$term = self::get_current_primary_term( $post_id );
@@ -695,9 +892,11 @@ final class Dark_Animated_Hero_Renderer {
 		}
 
 		$post_type_object = get_post_type_object( $post_type );
-		$archive_label    = ( $post_type_object && ! empty( $post_type_object->labels->name ) ) ? $post_type_object->labels->name : ucfirst( $post_type );
+		$archive_label    = 'post' === $post_type
+			? self::get_posts_archive_label()
+			: ( ( $post_type_object && ! empty( $post_type_object->labels->name ) ) ? $post_type_object->labels->name : ucfirst( $post_type ) );
 		$archive_label    = wp_strip_all_tags( (string) $archive_label );
-		$archive_url      = get_post_type_archive_link( $post_type );
+		$archive_url      = 'post' === $post_type ? self::get_posts_archive_url() : get_post_type_archive_link( $post_type );
 
 		if ( ! $archive_url && 'ink_portfolio' === $post_type ) {
 			$archive_url = home_url( '/portfolio/' );
@@ -759,6 +958,64 @@ final class Dark_Animated_Hero_Renderer {
 		}
 
 		return '';
+	}
+
+	private static function get_current_archive_description() {
+		if ( is_search() ) {
+			return self::get_current_search_results_summary();
+		}
+
+		if ( is_home() ) {
+			$posts_page_id = (int) get_option( 'page_for_posts' );
+
+			if ( $posts_page_id > 0 ) {
+				$excerpt = self::get_current_context_excerpt( $posts_page_id );
+				if ( '' !== trim( $excerpt ) ) {
+					return $excerpt;
+				}
+			}
+
+			return 'Practical guides, case studies, and honest updates from the Inkfire team.';
+		}
+
+		if ( is_archive() || is_post_type_archive() ) {
+			$description = (string) get_the_archive_description();
+			if ( '' !== trim( wp_strip_all_tags( $description ) ) ) {
+				return $description;
+			}
+
+			if ( is_post_type_archive( 'ink_portfolio' ) ) {
+				return 'Selected project work from Inkfire, designed to perform, scale, and stand out for the right reasons.';
+			}
+
+			if ( is_post_type_archive( 'post' ) || is_category() || is_tag() || is_author() ) {
+				return 'Practical guides, case studies, and honest updates from the Inkfire team.';
+			}
+		}
+
+		return '';
+	}
+
+	private static function get_current_search_results_summary() {
+		if ( ! is_search() ) {
+			return '';
+		}
+
+		global $wp_query;
+
+		$search_query = trim( (string) get_search_query() );
+		$result_count = ( $wp_query instanceof \WP_Query ) ? (int) $wp_query->found_posts : 0;
+		$result_label = 1 === $result_count ? '1 result' : sprintf( '%d results', $result_count );
+
+		if ( '' === $search_query ) {
+			return 'Browse the latest articles, case studies, and practical resources from Inkfire.';
+		}
+
+		return sprintf(
+			'We found %1$s for "%2$s". Browse the matches below or explore the latest insights from Inkfire.',
+			$result_label,
+			$search_query
+		);
 	}
 
 	private static function get_current_primary_term_label( $post_id = 0 ) {
@@ -836,6 +1093,221 @@ final class Dark_Animated_Hero_Renderer {
 		return implode( '', $pills );
 	}
 
+	private static function get_current_blog_meta_pills( $post_id = 0 ) {
+		$post_id = $post_id ? (int) $post_id : (int) get_the_ID();
+
+		if ( ! $post_id || 'post' !== get_post_type( $post_id ) ) {
+			return '';
+		}
+
+		$pills    = array();
+		$category = self::get_current_primary_term_label( $post_id );
+		$date     = get_the_date( 'j M Y', $post_id );
+
+		if ( '' !== trim( $category ) ) {
+			$pills[] = sprintf(
+				'<span class="foundation-inkfire-pill foundation-inkfire-pill--crumb">%s</span>',
+				esc_html( $category )
+			);
+		}
+
+		if ( '' !== trim( (string) $date ) ) {
+			$pills[] = sprintf(
+				'<span class="foundation-inkfire-pill foundation-inkfire-pill--rating">%s</span>',
+				esc_html( (string) $date )
+			);
+		}
+
+		return implode( '', $pills );
+	}
+
+	private static function get_post_word_count( $post_id = 0 ) {
+		$post_id = $post_id ? (int) $post_id : (int) get_the_ID();
+
+		if ( ! $post_id ) {
+			return 0;
+		}
+
+		$content = get_post_field( 'post_content', $post_id );
+
+		if ( ! is_string( $content ) || '' === trim( $content ) ) {
+			return 0;
+		}
+
+		$clean_content = strip_shortcodes( $content );
+		return max( 0, str_word_count( wp_strip_all_tags( $clean_content ) ) );
+	}
+
+	private static function get_current_read_time_label( $post_id = 0 ) {
+		$words = self::get_post_word_count( $post_id );
+
+		if ( $words < 1 ) {
+			return '';
+		}
+
+		$minutes = max( 1, (int) ceil( $words / 200 ) );
+		/* translators: %d: reading time in minutes */
+		return sprintf( _n( '%d min read', '%d mins read', $minutes, 'foundation-elementor-plus' ), $minutes );
+	}
+
+	private static function get_current_word_count_label( $post_id = 0 ) {
+		$words = self::get_post_word_count( $post_id );
+
+		if ( $words < 1 ) {
+			return '';
+		}
+
+		/* translators: %s: word count */
+		return sprintf( __( '%s words', 'foundation-elementor-plus' ), number_format_i18n( $words ) );
+	}
+
+	private static function get_current_author_name( $post_id = 0 ) {
+		$post_id = $post_id ? (int) $post_id : (int) get_the_ID();
+
+		if ( ! $post_id ) {
+			return '';
+		}
+
+		$author_id = (int) get_post_field( 'post_author', $post_id );
+
+		if ( $author_id < 1 ) {
+			return '';
+		}
+
+		return wp_strip_all_tags( get_the_author_meta( 'display_name', $author_id ) );
+	}
+
+	private static function get_current_author_avatar_url( $post_id = 0 ) {
+		$post_id = $post_id ? (int) $post_id : (int) get_the_ID();
+
+		if ( ! $post_id ) {
+			return '';
+		}
+
+		$author_id = (int) get_post_field( 'post_author', $post_id );
+
+		if ( $author_id < 1 ) {
+			return '';
+		}
+
+		return (string) get_avatar_url(
+			$author_id,
+			array(
+				'size' => 96,
+			)
+		);
+	}
+
+	private static function get_current_author_url( $post_id = 0 ) {
+		$post_id = $post_id ? (int) $post_id : (int) get_the_ID();
+
+		if ( ! $post_id ) {
+			return '';
+		}
+
+		$author_id = (int) get_post_field( 'post_author', $post_id );
+
+		if ( $author_id < 1 ) {
+			return '';
+		}
+
+		return (string) get_author_posts_url( $author_id );
+	}
+
+	private static function render_blog_post_meta_row( $preset_key, array $settings, array $token_context = array() ) {
+		if ( 'blog_post' !== $preset_key ) {
+			return '';
+		}
+
+		$visibility = isset( $settings['blog_post_meta_visibility'] ) ? (string) $settings['blog_post_meta_visibility'] : 'show';
+
+		if ( 'hide' === $visibility || '0' === $visibility ) {
+			return '';
+		}
+
+		$label = trim( wp_strip_all_tags( self::replace_tokens( (string) ( $settings['blog_post_meta_label'] ?? '{current_category}' ), $token_context ) ) );
+		$primary_pill = trim( wp_strip_all_tags( self::replace_tokens( (string) ( $settings['blog_post_meta_pill_primary'] ?? '{current_read_time}' ), $token_context ) ) );
+		$secondary_pill = trim( wp_strip_all_tags( self::replace_tokens( (string) ( $settings['blog_post_meta_pill_secondary'] ?? '{current_word_count}' ), $token_context ) ) );
+
+		if ( '' === $label && '' === $primary_pill && '' === $secondary_pill ) {
+			return '';
+		}
+
+		$output  = '<div class="foundation-inkfire-post-meta-strip">';
+
+		if ( '' !== $label ) {
+			$output .= '<p class="foundation-inkfire-post-meta-label">' . esc_html( $label ) . '</p>';
+		}
+
+		if ( '' !== $primary_pill || '' !== $secondary_pill ) {
+			$output .= '<div class="foundation-inkfire-post-meta-pills">';
+
+			if ( '' !== $primary_pill ) {
+				$output .= '<span class="foundation-inkfire-pill foundation-inkfire-pill--blog-stat">' . esc_html( $primary_pill ) . '</span>';
+			}
+
+			if ( '' !== $secondary_pill ) {
+				$output .= '<span class="foundation-inkfire-pill foundation-inkfire-pill--blog-stat">' . esc_html( $secondary_pill ) . '</span>';
+			}
+
+			$output .= '</div>';
+		}
+
+		$output .= '</div>';
+
+		return $output;
+	}
+
+	private static function render_blog_post_author_strip( $preset_key, array $settings, array $token_context = array() ) {
+		if ( 'blog_post' !== $preset_key ) {
+			return '';
+		}
+
+		$visibility = isset( $settings['blog_post_author_visibility'] ) ? (string) $settings['blog_post_author_visibility'] : 'show';
+
+		if ( 'hide' === $visibility || '0' === $visibility ) {
+			return '';
+		}
+
+		$prefix = trim( wp_strip_all_tags( self::replace_tokens( (string) ( $settings['blog_post_author_prefix'] ?? 'Written by' ), $token_context ) ) );
+		$name = trim( wp_strip_all_tags( self::replace_tokens( (string) ( $settings['blog_post_author_name'] ?? '{current_author_name}' ), $token_context ) ) );
+		$avatar_url = trim( self::replace_tokens( (string) ( $settings['blog_post_author_avatar_url'] ?? '{current_author_avatar_url}' ), $token_context ) );
+		$link_url = trim( self::replace_tokens( (string) ( $settings['blog_post_author_link_url'] ?? '{current_author_url}' ), $token_context ) );
+
+		if ( '' === $name ) {
+			return '';
+		}
+
+		$avatar_markup = '';
+
+		if ( '' !== $avatar_url ) {
+			$avatar_markup = sprintf(
+				'<img class="foundation-inkfire-author-avatar" src="%1$s" alt="%2$s" loading="lazy">',
+				esc_url( $avatar_url ),
+				esc_attr( $name )
+			);
+		}
+
+		$copy_markup  = '<div class="foundation-inkfire-author-copy">';
+		if ( '' !== $prefix ) {
+			$copy_markup .= '<span class="foundation-inkfire-author-prefix">' . esc_html( $prefix ) . '</span>';
+		}
+		$copy_markup .= '<span class="foundation-inkfire-author-name">' . esc_html( $name ) . '</span>';
+		$copy_markup .= '</div>';
+
+		$inner_markup = $avatar_markup . $copy_markup;
+
+		if ( '' !== $link_url && '#' !== $link_url ) {
+			return sprintf(
+				'<div class="foundation-inkfire-author-strip"><a class="foundation-inkfire-author-link" href="%1$s">%2$s</a></div>',
+				esc_url( $link_url ),
+				$inner_markup
+			);
+		}
+
+		return '<div class="foundation-inkfire-author-strip"><div class="foundation-inkfire-author-link foundation-inkfire-author-link--static">' . $inner_markup . '</div></div>';
+	}
+
 	private static function normalize_icon_markup( $html ) {
 		return strtr(
 			(string) $html,
@@ -862,37 +1334,20 @@ final class Dark_Animated_Hero_Renderer {
 		$settings      = self::get_settings();
 		$team_images   = self::get_lines( $settings['team_images'] );
 		$team_link_url = ! empty( $settings['team_link_url'] ) ? $settings['team_link_url'] : '/about-us/meet-the-team/';
-		$avatars_markup = '';
 
-		if ( shortcode_exists( 'ink_team_homepage' ) ) {
-			$avatars_markup = trim( do_shortcode( '[ink_team_homepage class="foundation-team-inline--hero"]' ) );
-		} elseif ( shortcode_exists( 'ink_team' ) ) {
-			$avatars_markup = trim( do_shortcode( '[ink_team department="homepage" class="foundation-team-inline--hero"]' ) );
+		if ( empty( $team_images ) ) {
+			return '';
 		}
 
-		if ( '' === $avatars_markup && shortcode_exists( 'ink_team_management' ) ) {
-			$avatars_markup = trim( do_shortcode( '[ink_team_management class="foundation-team-inline--hero"]' ) );
+		$output  = '<div class="foundation-inkfire-avatar-group" role="img" aria-label="Inkfire team: disabled-led creative and tech experts">';
+		$output .= '<div class="foundation-inkfire-avatars" aria-hidden="true">';
+
+		foreach ( $team_images as $index => $url ) {
+			$margin  = 0 === $index ? '0' : '-15px';
+			$output .= '<img src="' . esc_url( $url ) . '" alt="" aria-hidden="true" loading="lazy" style="width:45px;height:45px;border-radius:50%;object-fit:cover;border:3px solid #11121b;margin-left:' . esc_attr( $margin ) . ';position:relative;z-index:' . ( 10 - (int) $index ) . ';box-sizing:content-box;display:block;">';
 		}
 
-		if ( '' === $avatars_markup && shortcode_exists( 'ink_team' ) ) {
-			$avatars_markup = trim( do_shortcode( '[ink_team department="management" class="foundation-team-inline--hero"]' ) );
-		}
-
-		if ( '' === $avatars_markup ) {
-			if ( empty( $team_images ) ) {
-				return '';
-			}
-
-			$avatars_markup  = '<span class="foundation-team-inline foundation-team-inline--hero" role="img" aria-label="Inkfire team: disabled-led creative and tech experts">';
-			foreach ( $team_images as $index => $url ) {
-				$margin         = 0 === $index ? '0' : '-15px';
-				$avatars_markup .= '<img class="foundation-team-inline__avatar foundation-inkfire-avatar" src="' . esc_url( $url ) . '" alt="" aria-hidden="true" loading="lazy" style="margin-left:' . esc_attr( $margin ) . ';position:relative;z-index:' . ( 10 - (int) $index ) . ';">';
-			}
-			$avatars_markup .= '</span>';
-		}
-
-		$output  = '<div class="foundation-inkfire-avatar-group">';
-		$output .= $avatars_markup;
+		$output .= '</div>';
 		$output .= '<a href="' . esc_url( $team_link_url ) . '" class="foundation-inkfire-meet-team-link" aria-label="Meet the Inkfire team">';
 		$output .= '<span class="foundation-inkfire-meet-text">' . esc_html( $settings['team_link_text'] ) . '</span>';
 		$output .= '<span class="foundation-inkfire-meet-arrow"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>';
@@ -1001,17 +1456,51 @@ final class Dark_Animated_Hero_Renderer {
 			return (int) get_the_ID();
 		}
 
-		if ( 'portfolio_post' !== $preset_key || ! self::is_elementor_editor_preview() ) {
+		$preview_post_type = '';
+
+		if ( 'portfolio_post' === $preset_key ) {
+			$preview_post_type = 'ink_portfolio';
+		} elseif ( 'blog_post' === $preset_key ) {
+			$preview_post_type = 'post';
+		}
+
+		if ( '' === $preview_post_type || ! self::is_elementor_editor_preview() ) {
 			return 0;
 		}
 
-		$preview_post_id = self::get_elementor_preview_post_id( 'ink_portfolio' );
+		$preview_post_id = self::get_elementor_preview_post_id( $preview_post_type );
 
 		if ( $preview_post_id > 0 ) {
 			return $preview_post_id;
 		}
 
-		return self::get_fallback_preview_post_id( 'ink_portfolio' );
+		return self::get_fallback_preview_post_id( $preview_post_type );
+	}
+
+	private static function get_posts_archive_label() {
+		$posts_page_id = (int) get_option( 'page_for_posts' );
+
+		if ( $posts_page_id > 0 ) {
+			$title = get_the_title( $posts_page_id );
+			if ( '' !== trim( (string) $title ) ) {
+				return wp_strip_all_tags( (string) $title );
+			}
+		}
+
+		return 'Blog';
+	}
+
+	private static function get_posts_archive_url() {
+		$posts_page_id = (int) get_option( 'page_for_posts' );
+
+		if ( $posts_page_id > 0 ) {
+			$permalink = get_permalink( $posts_page_id );
+			if ( $permalink ) {
+				return $permalink;
+			}
+		}
+
+		return home_url( '/blog/' );
 	}
 
 	private static function get_elementor_preview_post_id( $required_post_type = '' ) {

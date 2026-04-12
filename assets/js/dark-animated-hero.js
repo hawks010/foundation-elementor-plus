@@ -1,36 +1,68 @@
 (function () {
   'use strict';
 
-  const READY_ATTR = 'data-foundation-inkfire-splash-ready';
+  const splashSections = Array.from(
+    document.querySelectorAll('[data-foundation-inkfire-splash]')
+  );
+  if (!splashSections.length) return;
+
   const AUTOPLAY_STORAGE_KEY = 'foundation_inkfire_autoplay_mode_v1';
   const urlModeOverride = new URLSearchParams(window.location.search).get('foundation_inkfire_mode');
   const touchDeviceQuery = window.matchMedia('(hover: none) and (pointer: coarse)');
   const isTouchDevice = touchDeviceQuery.matches || navigator.maxTouchPoints > 0;
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection || null;
+  const saveDataEnabled = !!(connection && connection.saveData);
+  const effectiveConnection = connection && typeof connection.effectiveType === 'string'
+    ? connection.effectiveType
+    : '';
+  const hasVerySlowConnection = /(^|-)2g$/.test(effectiveConnection) || effectiveConnection === 'slow-2g';
+  const hardwareConcurrency = typeof navigator.hardwareConcurrency === 'number'
+    ? navigator.hardwareConcurrency
+    : 0;
   const defaultPalette = ['#08352F', '#0E6055', '#138170', '#07A079', '#32B190', '#CE3D27', '#D85814', '#E27200', '#EC853D', '#F18E5C'];
   const globalPalette = Array.isArray(window.FOUNDATION_INKFIRE_SPLASH_CONFIG?.palette)
     ? window.FOUNDATION_INKFIRE_SPLASH_CONFIG.palette
     : defaultPalette;
-  const shouldDisableFluid =
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
-    !hasWebGL() ||
-    typeof window.foundationInkfireGenerateCanvas !== 'function';
 
-  let currentMode = isTouchDevice ? 'auto' : 'hover';
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    splashSections.forEach(disableFluidForSection);
+    return;
+  }
+
+  if (!hasWebGL() || typeof window.foundationInkfireGenerateCanvas !== 'function') {
+    splashSections.forEach(disableFluidForSection);
+    return;
+  }
+
+  let currentMode = 'hover';
   if (urlModeOverride === 'hover' || urlModeOverride === 'auto') {
     currentMode = urlModeOverride;
   } else {
     try {
       const storedMode = localStorage.getItem(AUTOPLAY_STORAGE_KEY);
-      if (storedMode === 'hover' || storedMode === 'auto') currentMode = storedMode;
+      if (storedMode === 'hover') currentMode = storedMode;
     } catch (error) {}
   }
 
-  if (isTouchDevice && currentMode === 'hover') {
-    currentMode = 'auto';
+  if (isTouchDevice) {
+    splashSections.forEach(disableFluidForSection);
+    return;
   }
 
-  const sectionStates = [];
-  let visibilityObserver = 'IntersectionObserver' in window
+  if (saveDataEnabled || hasVerySlowConnection) {
+    splashSections.forEach(disableFluidForSection);
+    return;
+  }
+
+  let visibilityObserver = null;
+
+  const sectionStates = splashSections
+    .map((section) => createSectionState(section))
+    .filter(Boolean);
+
+  if (!sectionStates.length) return;
+
+  visibilityObserver = 'IntersectionObserver' in window
     ? new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
@@ -63,72 +95,13 @@
       )
     : null;
 
-  function getSplashSections(scope) {
-    const root = scope || document;
-    const sections = [];
-
-    if (root.matches && root.matches('[data-foundation-inkfire-splash]')) {
-      sections.push(root);
-    }
-
-    if (root.querySelectorAll) {
-      root.querySelectorAll('[data-foundation-inkfire-splash]').forEach((section) => {
-        sections.push(section);
-      });
-    }
-
-    return sections.filter((section) => section && section.getAttribute(READY_ATTR) !== 'true');
-  }
-
-  function registerSection(section) {
-    if (!section || section.getAttribute(READY_ATTR) === 'true') {
-      return;
-    }
-
-    section.setAttribute(READY_ATTR, 'true');
-
-    if (shouldDisableFluid) {
-      disableFluidForSection(section);
-      return;
-    }
-
-    const state = createSectionState(section);
-    if (!state) {
-      return;
-    }
-
-    sectionStates.push(state);
-
+  sectionStates.forEach((state) => {
     if (visibilityObserver) {
       visibilityObserver.observe(state.section);
     } else {
       state.isVisible = true;
     }
-
-    if (isSectionInViewport(state.section)) {
-      state.isVisible = true;
-    }
-
-    if (currentMode === 'auto') {
-      if (state.isVisible) {
-        primeVisibleSection(state);
-      } else {
-        setPaused(state, true);
-      }
-    } else if (state.isVisible && state.section.matches(':hover')) {
-      restoreFluidDissipation(state);
-      setPaused(state, false);
-      scheduleHoverSettle(state);
-    } else {
-      setPaused(state, true);
-    }
-  }
-
-  function registerSections(scope) {
-    getSplashSections(scope).forEach(registerSection);
-  }
-
-  registerSections(document);
+  });
 
   function disableFluidForSection(section) {
     const canvas = section.querySelector('.foundation-inkfire-splash__canvas');
@@ -171,13 +144,13 @@
     const maxChannel = Math.max(red, green, blue);
     const minChannel = Math.min(red, green, blue);
     const brightness = (red * 0.299 + green * 0.587 + blue * 0.114) / 255;
-    let intensity = typeof forcedIntensity === 'number' ? forcedIntensity : 0.082;
+    let intensity = typeof forcedIntensity === 'number' ? forcedIntensity : 0.11;
 
     if (typeof forcedIntensity !== 'number') {
-      if (brightness < 0.22) intensity = 0.098;
-      if (brightness > 0.86) intensity = 0.05;
+      if (brightness < 0.22) intensity = 0.135;
+      if (brightness > 0.86) intensity = 0.06;
     }
-    if (maxChannel - minChannel < 18) intensity *= 0.9;
+    if (maxChannel - minChannel < 18) intensity *= 0.92;
 
     return {
       r: (red / 255) * intensity,
@@ -210,32 +183,33 @@
     const isHomepageHero = section.classList.contains('foundation-inkfire-splash--preset-home');
     const isMobileViewport = window.matchMedia('(max-width: 768px)').matches;
     const isTabletViewport = window.matchMedia('(max-width: 1024px)').matches;
+    const isCompactLaptopViewport = window.matchMedia('(max-width: 1199px)').matches;
     const isLargeViewport = window.innerWidth >= 1500;
     const isDenseScreen = window.devicePixelRatio > 1.5;
+    const useLiteFluid = isCompactLaptopViewport || (hardwareConcurrency > 0 && hardwareConcurrency <= 4);
     const isOrangePalette = paletteKey === 'inkfire_orange';
     const isGradientPalette = paletteKey === 'inkfire_gradient';
     const isWarmPalette = isOrangePalette || isGradientPalette;
-    const forcedPaletteIntensity = isTouchDevice
-      ? (isHomepageHero ? 0.086 : (isWarmPalette ? 0.082 : 0.078))
-      : (isHomepageHero ? 0.094 : (isWarmPalette ? 0.088 : 0.082));
     const fluidPalette = palette
-      .map((hex) => hexToFluidColor(hex, forcedPaletteIntensity))
+      .map((hex) => hexToFluidColor(hex, isHomepageHero ? 0.14 : (isWarmPalette ? 0.125 : 0.12)))
       .filter(Boolean);
 
-    const simResolution = isMobileViewport ? 40 : (isHomepageHero ? 88 : (isLargeViewport ? 92 : 84));
+    const simResolution = isMobileViewport ? 56 : (useLiteFluid ? 64 : (isHomepageHero ? 112 : (isLargeViewport ? 104 : 96)));
     const dyeResolution = isMobileViewport
-      ? 384
-      : (isHomepageHero
-        ? (isLargeViewport ? 896 : (isDenseScreen ? 832 : 768))
-        : (isTabletViewport ? 640 : (isLargeViewport ? 832 : 768)));
-    const bloomIterations = isTouchDevice ? 3 : (isHomepageHero ? 4 : 3);
-    const bloomResolution = isTouchDevice ? 160 : (isHomepageHero ? 224 : (isWarmPalette ? 192 : 176));
-    const bloomIntensity = isTouchDevice ? 0.11 : (isHomepageHero ? 0.18 : (isWarmPalette ? 0.16 : 0.14));
-    const bloomThreshold = isTouchDevice ? 0.74 : (isHomepageHero ? 0.71 : (isWarmPalette ? 0.7 : 0.72));
-    const bloomSoftKnee = isTouchDevice ? 0.24 : (isHomepageHero ? 0.28 : (isWarmPalette ? 0.3 : 0.26));
-    const maxPixelRatio = isTouchDevice ? 1 : (isHomepageHero ? 1.12 : (isWarmPalette ? 1.1 : 1.05));
-    const densityDissipation = isTouchDevice ? 0.94 : 0.9;
-    const velocityDissipation = isTouchDevice ? 0.34 : 0.3;
+      ? 448
+      : (useLiteFluid
+        ? 512
+        : (isHomepageHero
+        ? (isLargeViewport ? 1024 : (isDenseScreen ? 960 : 896))
+        : (isTabletViewport ? 768 : (isLargeViewport ? 960 : 896))));
+    const bloomIterations = useLiteFluid ? 3 : (isHomepageHero ? 5 : 4);
+    const bloomResolution = useLiteFluid ? 192 : (isHomepageHero ? 320 : (isWarmPalette ? 256 : 224));
+    const bloomIntensity = useLiteFluid ? 0.24 : (isHomepageHero ? 0.38 : (isWarmPalette ? 0.34 : 0.3));
+    const bloomThreshold = isHomepageHero ? 0.58 : (isWarmPalette ? 0.6 : 0.64);
+    const bloomSoftKnee = isHomepageHero ? 0.5 : (isWarmPalette ? 0.48 : 0.42);
+    const maxPixelRatio = useLiteFluid ? 1 : (isHomepageHero ? 1.35 : (isWarmPalette ? 1.3 : 1.2));
+    const densityDissipation = 0.88;
+    const velocityDissipation = 0.3;
 
     window.foundationInkfireGenerateCanvas(canvas, {
       SIM_RESOLUTION: simResolution,
@@ -250,7 +224,6 @@
       BLOOM_INTENSITY: bloomIntensity,
       BLOOM_THRESHOLD: bloomThreshold,
       BLOOM_SOFT_KNEE: bloomSoftKnee,
-      ALLOW_TOUCH_INPUT: !isTouchDevice,
       PAUSED: false,
       BRAND_PALETTE: palette
     });
@@ -279,15 +252,7 @@
       baseDensityDissipation: densityDissipation,
       baseVelocityDissipation: velocityDissipation,
       idleDensityDissipation: 2.2,
-      idleVelocityDissipation: 1.15,
-      autoAcceleration: isTouchDevice ? 0.00024 : 0.00029,
-      autoFriction: isTouchDevice ? 0.952 : 0.958,
-      autoForceMultiplier: isTouchDevice ? 3900 : 4300,
-      autoColorCycleStep: isTouchDevice ? 0.0042 : 0.0047,
-      autoRadius: isTouchDevice ? 0.21 : 0.22,
-      autoMinForceThreshold: isTouchDevice ? 4.2 : 4.5,
-      autoStartVelocityX: isTouchDevice ? 0.0084 : 0.0088,
-      autoStartVelocityY: isTouchDevice ? 0.0068 : 0.0072
+      idleVelocityDissipation: 1.15
     };
 
     section.addEventListener('mouseenter', (event) => {
@@ -352,15 +317,6 @@
     );
   }
 
-  function clearFluid(state) {
-    if (
-      state.canvas.__foundationInkfireFluid &&
-      typeof state.canvas.__foundationInkfireFluid.clear === 'function'
-    ) {
-      state.canvas.__foundationInkfireFluid.clear();
-    }
-  }
-
   function clearHoverSettleTimers(state) {
     window.clearTimeout(state.idleClearTimeoutId);
     window.clearTimeout(state.idlePauseTimeoutId);
@@ -385,7 +341,6 @@
       if (currentMode !== 'hover') return;
       endInteraction(state);
       state.section.classList.remove('foundation-inkfire-splash--active');
-      clearFluid(state);
       restoreFluidDissipation(state);
       setPaused(state, true);
     }, 1100);
@@ -567,20 +522,20 @@
         state.targetY = 0.24 + Math.random() * 0.48;
       }
 
-      state.velocityX += (state.targetX - state.pointerX) * state.autoAcceleration;
-      state.velocityY += (state.targetY - state.pointerY) * state.autoAcceleration;
-      state.velocityX *= state.autoFriction;
-      state.velocityY *= state.autoFriction;
+      state.velocityX += (state.targetX - state.pointerX) * 0.0004;
+      state.velocityY += (state.targetY - state.pointerY) * 0.0004;
+      state.velocityX *= 0.96;
+      state.velocityY *= 0.96;
       state.pointerX += state.velocityX;
       state.pointerY += state.velocityY;
 
-      const forceX = state.velocityX * state.autoForceMultiplier;
-      const forceY = state.velocityY * state.autoForceMultiplier;
+      const forceX = state.velocityX * 5600;
+      const forceY = state.velocityY * 5600;
 
-      state.colorCycle += state.autoColorCycleStep;
+      state.colorCycle += 0.006;
       const fluidColor = pickAmbientColor(state, state.colorCycle);
 
-      if (Math.abs(forceX) + Math.abs(forceY) > state.autoMinForceThreshold) {
+      if (Math.abs(forceX) + Math.abs(forceY) > 4) {
         state.canvas.__foundationInkfireFluid.triggerSplat(
           state.pointerX,
           state.pointerY,
@@ -589,7 +544,7 @@
           fluidColor.r,
           fluidColor.g,
           fluidColor.b,
-          state.autoRadius
+          0.26
         );
       }
     }
@@ -602,8 +557,8 @@
     if (!state.isVisible) return;
     state.pointerX = 0.5;
     state.pointerY = 0.5;
-    state.velocityX = state.autoStartVelocityX;
-    state.velocityY = state.autoStartVelocityY;
+    state.velocityX = 0.012;
+    state.velocityY = 0.01;
     seedAutoplay(state);
     triggerHoverBurst(state);
     runAutoplayLoop(state);
@@ -750,47 +705,6 @@
     },
     { passive: true }
   );
-
-  function bindElementorHooks() {
-    if (!window.elementorFrontend || !window.elementorFrontend.hooks) {
-      return;
-    }
-
-    const hookHandler = ($scope) => {
-      registerSections($scope && $scope[0] ? $scope[0] : $scope);
-    };
-
-    window.elementorFrontend.hooks.addAction(
-      'frontend/element_ready/foundation-dark-animated-hero.default',
-      hookHandler
-    );
-    window.elementorFrontend.hooks.addAction('frontend/element_ready/global', hookHandler);
-  }
-
-  if (window.elementorFrontend && window.elementorFrontend.hooks) {
-    bindElementorHooks();
-  } else {
-    window.addEventListener('elementor/frontend/init', bindElementorHooks, { once: true });
-  }
-
-  if ('MutationObserver' in window && document.documentElement) {
-    const sectionObserver = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        mutation.addedNodes.forEach((node) => {
-          if (!(node instanceof Element)) {
-            return;
-          }
-
-          registerSections(node);
-        });
-      });
-    });
-
-    sectionObserver.observe(document.documentElement, {
-      childList: true,
-      subtree: true
-    });
-  }
 
   updateMode(currentMode);
   sectionStates.forEach((state) => {

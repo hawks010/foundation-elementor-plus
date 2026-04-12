@@ -8,19 +8,19 @@ use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
 use Elementor\Icons_Manager;
 use Elementor\Repeater;
-use FoundationElementorPlus\Widgets\Base_Widget;
+use Elementor\Widget_Base;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Y_Hero_Widget extends Base_Widget {
+class Y_Hero_Widget extends Widget_Base {
 	public function get_name() {
 		return 'foundation-y-hero';
 	}
 
 	public function get_title() {
-		return esc_html__( 'Y Hero', 'foundation-elementor-plus' );
+		return esc_html__( 'Foundation Y Hero', 'foundation-elementor-plus' );
 	}
 
 	public function get_icon() {
@@ -36,7 +36,7 @@ class Y_Hero_Widget extends Base_Widget {
 	}
 
 	public function get_style_depends(): array {
-		return $this->get_foundation_style_depends( array( 'foundation-elementor-plus-y-hero' ) );
+		return array( 'foundation-elementor-plus-y-hero' );
 	}
 
 	public function get_script_depends(): array {
@@ -50,7 +50,6 @@ class Y_Hero_Widget extends Base_Widget {
 		$this->register_left_card_style_controls();
 		$this->register_right_content_style_controls();
 		$this->register_control_style_controls();
-		$this->register_accessibility_controls();
 	}
 
 	protected function render() {
@@ -78,7 +77,7 @@ class Y_Hero_Widget extends Base_Widget {
 			$this->add_link_attributes( 'cta_link', $settings['cta_link'] );
 		}
 		?>
-		<section <?php echo $this->get_widget_root_attributes( $settings, array( 'id' => $widget_id, 'class' => 'foundation-y-hero', 'data-foundation-y-hero' => true, 'data-mobile-breakpoint' => (string) $breakpoint ) ); ?>>
+		<section id="<?php echo esc_attr( $widget_id ); ?>" class="foundation-y-hero" data-foundation-y-hero data-mobile-breakpoint="<?php echo esc_attr( (string) $breakpoint ); ?>">
 			<div class="foundation-y-hero__shell">
 				<div class="foundation-y-hero__grid">
 					<div class="foundation-y-hero__left">
@@ -790,7 +789,7 @@ class Y_Hero_Widget extends Base_Widget {
 				'type'        => Controls_Manager::MEDIA,
 				'label_block' => true,
 				'default'     => array(
-					'url' => 'https://inkfire.co.uk/wp-content/uploads/2025/12/Untitled-1.png',
+					'url' => 'https://beta.inkfire.co.uk/wp-content/uploads/2025/12/Untitled-1.png',
 				),
 				'dynamic'     => array(
 					'active' => true,
@@ -977,16 +976,16 @@ class Y_Hero_Widget extends Base_Widget {
 				'label'      => esc_html__( 'Overlay Opacity', 'foundation-elementor-plus' ),
 				'description'=> esc_html__( 'Keeps the shell artwork decorative only. Use low values for a subtle glass overlay.', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( '' ),
+				'size_units' => array( 'px' ),
 				'range'      => array(
-					'' => array(
+					'px' => array(
 						'min'  => 0,
 						'max'  => 0.3,
 						'step' => 0.01,
 					),
 				),
 				'default'    => array(
-					'unit' => '',
+					'unit' => 'px',
 					'size' => 0.08,
 				),
 				'selectors'  => array(

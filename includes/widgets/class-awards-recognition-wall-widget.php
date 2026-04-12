@@ -44,6 +44,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 
 	protected function register_controls() {
 		$this->register_header_controls();
+		$this->register_source_controls();
 		$this->register_cards_controls();
 		$this->register_layout_style_controls();
 		$this->register_header_style_controls();
@@ -54,14 +55,23 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 	protected function render() {
 		$settings  = $this->get_settings_for_display();
 		$widget_id = 'foundation-awards-wall-' . $this->get_id();
-		$cards     = $this->prepare_cards( $settings['cards'] ?? array() );
+		$cards     = $this->get_render_cards( $settings );
 		$blocks    = $this->group_cards_by_block( $cards );
+		$classes   = array( 'foundation-awards-wall' );
+
+		if ( 'posts' === ( $settings['content_mode'] ?? 'manual' ) ) {
+			$classes[] = 'foundation-awards-wall--posts';
+		}
+
+		if ( 'posts' === ( $settings['content_mode'] ?? 'manual' ) && 'yes' === ( $settings['posts_compact_incomplete_blocks'] ?? 'yes' ) ) {
+			$classes[] = 'foundation-awards-wall--compact-incomplete';
+		}
 
 		if ( empty( $cards ) && 'yes' !== ( $settings['show_header'] ?? 'yes' ) ) {
 			return;
 		}
 		?>
-		<section <?php echo $this->get_widget_root_attributes( $settings, array( 'id' => $widget_id, 'class' => 'foundation-awards-wall', 'aria-labelledby' => $widget_id . '-title' ) ); ?>>
+		<section <?php echo $this->get_widget_root_attributes( $settings, array( 'id' => $widget_id, 'class' => implode( ' ', $classes ), 'aria-labelledby' => $widget_id . '-title' ) ); ?>>
 			<div class="foundation-awards-wall__inner">
 				<?php if ( 'yes' === ( $settings['show_header'] ?? 'yes' ) ) : ?>
 					<header class="foundation-awards-wall__header">
@@ -155,6 +165,225 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 		$this->end_controls_section();
 	}
 
+	private function register_source_controls() {
+		$this->start_controls_section(
+			'section_source',
+			array(
+				'label' => esc_html__( 'Content Source', 'foundation-elementor-plus' ),
+			)
+		);
+
+		$this->add_control(
+			'content_mode',
+			array(
+				'label'   => esc_html__( 'Content Mode', 'foundation-elementor-plus' ),
+				'type'    => Controls_Manager::SELECT,
+				'default' => 'manual',
+				'options' => array(
+					'manual' => esc_html__( 'Manual cards', 'foundation-elementor-plus' ),
+					'posts'  => esc_html__( 'Blog posts', 'foundation-elementor-plus' ),
+				),
+			)
+		);
+
+		$this->add_control(
+			'posts_per_page',
+			array(
+				'label'     => esc_html__( 'Posts to Show', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::NUMBER,
+				'min'       => 1,
+				'max'       => 24,
+				'step'      => 1,
+				'default'   => 8,
+				'condition' => array(
+					'content_mode' => 'posts',
+				),
+			)
+		);
+
+		$this->add_control(
+			'posts_categories',
+			array(
+				'label'       => esc_html__( 'Include Categories', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::SELECT2,
+				'multiple'    => true,
+				'label_block' => true,
+				'options'     => $this->get_post_category_options(),
+				'description' => esc_html__( 'Leave empty to include all blog posts.', 'foundation-elementor-plus' ),
+				'condition'   => array(
+					'content_mode' => 'posts',
+				),
+			)
+		);
+
+		$this->add_control(
+			'posts_category_ids',
+			array(
+				'label'       => esc_html__( 'Category IDs', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::TEXT,
+				'description' => esc_html__( 'Advanced fallback. Optional comma-separated post category IDs.', 'foundation-elementor-plus' ),
+				'condition'   => array(
+					'content_mode' => 'posts',
+				),
+			)
+		);
+
+		$this->add_control(
+			'posts_exclude_category_ids',
+			array(
+				'label'       => esc_html__( 'Exclude Category IDs', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::TEXT,
+				'description' => esc_html__( 'Optional comma-separated category IDs to exclude.', 'foundation-elementor-plus' ),
+				'condition'   => array(
+					'content_mode' => 'posts',
+				),
+			)
+		);
+
+		$this->add_control(
+			'posts_offset',
+			array(
+				'label'     => esc_html__( 'Offset', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::NUMBER,
+				'min'       => 0,
+				'max'       => 100,
+				'step'      => 1,
+				'default'   => 0,
+				'condition' => array(
+					'content_mode' => 'posts',
+				),
+			)
+		);
+
+		$this->add_control(
+			'posts_orderby',
+			array(
+				'label'     => esc_html__( 'Order By', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'date',
+				'options'   => array(
+					'date'       => esc_html__( 'Date', 'foundation-elementor-plus' ),
+					'title'      => esc_html__( 'Title', 'foundation-elementor-plus' ),
+					'menu_order' => esc_html__( 'Menu Order', 'foundation-elementor-plus' ),
+					'rand'       => esc_html__( 'Random', 'foundation-elementor-plus' ),
+				),
+				'condition' => array(
+					'content_mode' => 'posts',
+				),
+			)
+		);
+
+		$this->add_control(
+			'posts_order',
+			array(
+				'label'     => esc_html__( 'Order', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'DESC',
+				'options'   => array(
+					'DESC' => esc_html__( 'Descending', 'foundation-elementor-plus' ),
+					'ASC'  => esc_html__( 'Ascending', 'foundation-elementor-plus' ),
+				),
+				'condition' => array(
+					'content_mode' => 'posts',
+				),
+			)
+		);
+
+		$this->add_control(
+			'posts_excerpt_policy',
+			array(
+				'label'     => esc_html__( 'Excerpt Visibility', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'feature_only',
+				'options'   => array(
+					'all'          => esc_html__( 'All cards', 'foundation-elementor-plus' ),
+					'feature_only' => esc_html__( 'Feature cards only', 'foundation-elementor-plus' ),
+					'none'         => esc_html__( 'No excerpts', 'foundation-elementor-plus' ),
+				),
+				'condition' => array(
+					'content_mode' => 'posts',
+				),
+			)
+		);
+
+		$this->add_control(
+			'posts_excerpt_length',
+			array(
+				'label'     => esc_html__( 'Small Card Excerpt Length', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::NUMBER,
+				'min'       => 8,
+				'max'       => 80,
+				'step'      => 1,
+				'default'   => 22,
+				'condition' => array(
+					'content_mode' => 'posts',
+				),
+			)
+		);
+
+		$this->add_control(
+			'posts_feature_excerpt_length',
+			array(
+				'label'     => esc_html__( 'Feature Card Excerpt Length', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::NUMBER,
+				'min'       => 12,
+				'max'       => 120,
+				'step'      => 1,
+				'default'   => 34,
+				'condition' => array(
+					'content_mode' => 'posts',
+				),
+			)
+		);
+
+		$this->add_control(
+			'posts_compact_incomplete_blocks',
+			array(
+				'label'        => esc_html__( 'Compact Incomplete Blocks', 'foundation-elementor-plus' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => esc_html__( 'Yes', 'foundation-elementor-plus' ),
+				'label_off'    => esc_html__( 'No', 'foundation-elementor-plus' ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'description'  => esc_html__( 'Prevents partial final blocks from leaving large editorial gaps.', 'foundation-elementor-plus' ),
+				'condition'    => array(
+					'content_mode' => 'posts',
+				),
+			)
+		);
+
+		$this->add_control(
+			'posts_include_a11y_card',
+			array(
+				'label'        => esc_html__( 'Include [ink_access_meta] Card', 'foundation-elementor-plus' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => esc_html__( 'Yes', 'foundation-elementor-plus' ),
+				'label_off'    => esc_html__( 'No', 'foundation-elementor-plus' ),
+				'return_value' => 'yes',
+				'default'      => '',
+				'condition'    => array(
+					'content_mode' => 'posts',
+				),
+			)
+		);
+
+		$this->add_control(
+			'posts_a11y_slot',
+			array(
+				'label'     => esc_html__( 'A11y Card Slot', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'b1_full',
+				'options'   => $this->get_slot_options(),
+				'condition' => array(
+					'content_mode'             => 'posts',
+					'posts_include_a11y_card' => 'yes',
+				),
+			)
+		);
+
+		$this->end_controls_section();
+	}
+
 	private function register_cards_controls() {
 		$this->start_controls_section(
 			'section_cards',
@@ -206,6 +435,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 					'logo'    => esc_html__( 'Logo / Mark Card', 'foundation-elementor-plus' ),
 					'image'   => esc_html__( 'Image Card', 'foundation-elementor-plus' ),
 					'photo'   => esc_html__( 'Photo Overlay Card', 'foundation-elementor-plus' ),
+					'shortcode' => esc_html__( 'Shortcode Card', 'foundation-elementor-plus' ),
 				),
 			)
 		);
@@ -264,6 +494,20 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 				'label' => esc_html__( 'Description', 'foundation-elementor-plus' ),
 				'type'  => Controls_Manager::TEXTAREA,
 				'rows'  => 4,
+			)
+		);
+
+		$repeater->add_control(
+			'shortcode',
+			array(
+				'label'       => esc_html__( 'Shortcode', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::TEXTAREA,
+				'rows'        => 3,
+				'default'     => '[ink_access_meta]',
+				'label_block' => true,
+				'condition'   => array(
+					'card_type' => 'shortcode',
+				),
 			)
 		);
 
@@ -369,6 +613,9 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 				'fields'      => $repeater->get_controls(),
 				'default'     => $this->get_default_cards(),
 				'title_field' => '{{{ admin_label }}}',
+				'condition'   => array(
+					'content_mode' => 'manual',
+				),
 			)
 		);
 
@@ -876,6 +1123,192 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 		$this->end_controls_section();
 	}
 
+	private function register_accessibility_controls() {
+		// Reserved for future a11y-specific controls while keeping older widget
+		// registration flows stable for existing templates and CSS generation.
+	}
+
+	private function get_render_cards( array $settings ) {
+		if ( 'posts' === ( $settings['content_mode'] ?? 'manual' ) ) {
+			return $this->prepare_post_cards( $settings );
+		}
+
+		return $this->prepare_cards( $settings['cards'] ?? array() );
+	}
+
+	private function prepare_post_cards( array $settings ) {
+		$slots      = array_keys( $this->get_slot_map() );
+		$a11y_slot  = 'yes' === ( $settings['posts_include_a11y_card'] ?? '' ) ? (string) ( $settings['posts_a11y_slot'] ?? 'b1_full' ) : '';
+		$post_slots = array_values(
+			array_filter(
+				$slots,
+				static function( $slot ) use ( $a11y_slot ) {
+					return $slot !== $a11y_slot;
+				}
+			)
+		);
+		$limit      = max( 1, min( 24, absint( $settings['posts_per_page'] ?? 8 ) ) );
+		$query_args = array(
+			'post_type'           => 'post',
+			'post_status'         => 'publish',
+			'posts_per_page'      => $limit,
+			'orderby'             => $this->normalize_posts_orderby( $settings['posts_orderby'] ?? 'date' ),
+			'order'               => 'ASC' === ( $settings['posts_order'] ?? 'DESC' ) ? 'ASC' : 'DESC',
+			'ignore_sticky_posts' => true,
+			'no_found_rows'       => true,
+		);
+
+		$selected_category_ids = isset( $settings['posts_categories'] ) ? wp_parse_id_list( $settings['posts_categories'] ) : array();
+		$category_ids          = ! empty( $selected_category_ids ) ? $selected_category_ids : ( isset( $settings['posts_category_ids'] ) ? wp_parse_id_list( $settings['posts_category_ids'] ) : array() );
+		$exclude_category_ids  = isset( $settings['posts_exclude_category_ids'] ) ? wp_parse_id_list( $settings['posts_exclude_category_ids'] ) : array();
+		$offset                = absint( $settings['posts_offset'] ?? 0 );
+
+		if ( ! empty( $category_ids ) ) {
+			$query_args['category__in'] = $category_ids;
+		}
+
+		if ( ! empty( $exclude_category_ids ) ) {
+			$query_args['category__not_in'] = $exclude_category_ids;
+		}
+
+		if ( $offset > 0 ) {
+			$query_args['offset'] = $offset;
+		}
+
+		$query     = new \WP_Query( $query_args );
+		$raw_cards = array();
+		$surfaces  = array( 'teal', 'navy', 'green', 'dark', 'navy' );
+		$excerpt_policy         = isset( $settings['posts_excerpt_policy'] ) ? (string) $settings['posts_excerpt_policy'] : 'feature_only';
+		$small_excerpt_length   = max( 8, min( 80, absint( $settings['posts_excerpt_length'] ?? 22 ) ) );
+		$feature_excerpt_length  = max( 12, min( 120, absint( $settings['posts_feature_excerpt_length'] ?? 34 ) ) );
+
+		foreach ( $query->posts as $index => $post ) {
+			if ( ! isset( $post_slots[ $index ] ) ) {
+				break;
+			}
+
+			$slot_key  = $post_slots[ $index ];
+			$is_feature = false !== strpos( $slot_key, '_feature' );
+			$image_url = get_the_post_thumbnail_url( $post, 'large' );
+			$terms     = get_the_category( $post->ID );
+			$term_name = $this->resolve_post_eyebrow_label( $post, $terms );
+			$tag_names = array();
+
+			foreach ( array_slice( $terms, 0, 4 ) as $term ) {
+				if ( in_array( $term->slug, array( 'featured', 'blog' ), true ) ) {
+					continue;
+				}
+
+				$tag_names[] = $term->name;
+			}
+
+			$show_excerpt = 'none' !== $excerpt_policy && ( 'all' === $excerpt_policy || $is_feature );
+			$description  = '';
+
+			if ( $show_excerpt ) {
+				$description = wp_trim_words(
+					get_the_excerpt( $post ),
+					$is_feature ? $feature_excerpt_length : $small_excerpt_length
+				);
+			}
+
+			$raw_cards[] = array(
+				'admin_label'     => get_the_title( $post ),
+				'layout_slot'     => $slot_key,
+				'card_type'       => $is_feature ? 'feature' : ( $image_url ? 'photo' : 'text' ),
+				'surface_preset'  => $surfaces[ $index % count( $surfaces ) ],
+				'eyebrow'         => $term_name,
+				'title'           => get_the_title( $post ),
+				'meta'            => get_the_date( 'j M Y', $post ),
+				'description'     => $description,
+				'tags'            => implode( "\n", $tag_names ),
+				'link'            => array( 'url' => get_permalink( $post ) ),
+				'media_mode'      => $image_url ? 'image' : 'none',
+				'media_image_url' => $image_url ? $image_url : '',
+				'media_image_alt' => get_the_title( $post ),
+			);
+		}
+
+		if ( 'yes' === ( $settings['posts_include_a11y_card'] ?? '' ) && '' !== $a11y_slot ) {
+			$raw_cards[] = array(
+				'admin_label'    => esc_html__( 'Accessibility Tools', 'foundation-elementor-plus' ),
+				'layout_slot'    => $a11y_slot,
+				'card_type'      => 'shortcode',
+				'surface_preset' => 'dark',
+				'eyebrow'        => esc_html__( 'Accessibility', 'foundation-elementor-plus' ),
+				'title'          => esc_html__( 'Reading & accessibility tools', 'foundation-elementor-plus' ),
+				'meta'           => esc_html__( 'Built by Inkfire', 'foundation-elementor-plus' ),
+				'shortcode'      => '[ink_access_meta]',
+				'media_mode'     => 'none',
+			);
+		}
+
+		wp_reset_postdata();
+
+		return $this->prepare_cards( $raw_cards );
+	}
+
+	private function normalize_posts_orderby( $value ) {
+		$allowed = array( 'date', 'title', 'menu_order', 'rand' );
+
+		return in_array( $value, $allowed, true ) ? $value : 'date';
+	}
+
+	private function resolve_post_eyebrow_label( \WP_Post $post, array $terms ) {
+		$term_signals = array();
+
+		foreach ( $terms as $term ) {
+			$term_signals[] = strtolower( trim( $term->slug . ' ' . $term->name ) );
+		}
+
+		$title_signal = strtolower( get_the_title( $post ) );
+		$signals      = array_merge( $term_signals, array( $title_signal ) );
+		$label_map    = array(
+			esc_html__( 'Case Study', 'foundation-elementor-plus' ) => array( 'case-stud', 'client-stor', 'client stor' ),
+			esc_html__( 'Recognition', 'foundation-elementor-plus' ) => array( 'award', 'recognition', 'press', 'media', 'winner' ),
+			esc_html__( 'Accessibility', 'foundation-elementor-plus' ) => array( 'accessib', 'a11y', 'inclusive design' ),
+			esc_html__( 'Guide', 'foundation-elementor-plus' ) => array( 'guide', 'how to', 'how-to', 'tool', 'resource', 'tips', 'seo', 'marketing', 'mentoring', 'blog' ),
+			esc_html__( "What's New", 'foundation-elementor-plus' ) => array( 'what', 'news', 'update', 'journal' ),
+		);
+
+		foreach ( $label_map as $label => $needles ) {
+			foreach ( $signals as $signal ) {
+				foreach ( $needles as $needle ) {
+					if ( false !== strpos( $signal, $needle ) ) {
+						return $label;
+					}
+				}
+			}
+		}
+
+		if ( ! empty( $terms ) ) {
+			return $terms[0]->name;
+		}
+
+		return esc_html__( 'Journal', 'foundation-elementor-plus' );
+	}
+
+	private function get_post_category_options() {
+		$options = array();
+		$terms   = get_categories(
+			array(
+				'hide_empty' => false,
+				'orderby'    => 'name',
+				'order'      => 'ASC',
+			)
+		);
+
+		if ( is_wp_error( $terms ) ) {
+			return $options;
+		}
+
+		foreach ( $terms as $term ) {
+			$options[ (string) $term->term_id ] = sprintf( '%s (%d)', $term->name, $term->count );
+		}
+
+		return $options;
+	}
+
 	private function prepare_cards( array $raw_cards ) {
 		$slot_map = $this->get_slot_map();
 		$cards    = array();
@@ -903,6 +1336,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 				'title'       => isset( $card['title'] ) ? (string) $card['title'] : '',
 				'meta'        => isset( $card['meta'] ) ? (string) $card['meta'] : '',
 				'description' => isset( $card['description'] ) ? (string) $card['description'] : '',
+				'shortcode'   => isset( $card['shortcode'] ) ? (string) $card['shortcode'] : '',
 				'tags'        => $this->parse_tags( $card['tags'] ?? '' ),
 				'link'        => $card['link'] ?? array(),
 				'media_mode'  => $this->normalize_media_mode( $card['media_mode'] ?? 'image' ),
@@ -969,7 +1403,9 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 		$full_cards   = $block['full'];
 		$orientation  = $block['orientation'];
 		$has_feature  = isset( $cards['feature'] );
-		$has_rows     = isset( $cards['row_1'] ) || isset( $cards['row_2'] ) || isset( $cards['row_3'] );
+		$has_any_rows = isset( $cards['row_1'] ) || isset( $cards['row_2'] ) || isset( $cards['row_3'] );
+		$has_rows     = isset( $cards['row_1'] ) && isset( $cards['row_2'] ) && isset( $cards['row_3'] );
+		$partial_rows = array();
 		$has_stacks   = isset( $cards['stack_top'] ) && isset( $cards['stack_bottom'] );
 		$is_fallback  = ! $has_feature || ! $has_stacks;
 		$block_class  = array(
@@ -977,6 +1413,10 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 			'foundation-awards-wall__block--feature-' . $orientation,
 			$has_rows ? 'foundation-awards-wall__block--with-rows' : 'foundation-awards-wall__block--without-rows',
 		);
+
+		if ( $has_any_rows && ! $has_rows ) {
+			$block_class[] = 'foundation-awards-wall__block--partial-rows';
+		}
 
 		if ( $is_fallback ) {
 			$block_class[] = 'foundation-awards-wall__block--fallback';
@@ -986,6 +1426,23 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 
 		if ( 'right' === $orientation ) {
 			$ordered_roles = array( 'stack_top', 'stack_bottom', 'feature', 'row_1', 'row_2', 'row_3' );
+		}
+
+		if ( ! $has_rows ) {
+			foreach ( array( 'row_1', 'row_2', 'row_3' ) as $row_role ) {
+				if ( isset( $cards[ $row_role ] ) ) {
+					$partial_rows[] = $cards[ $row_role ];
+				}
+			}
+
+			$ordered_roles = array_values(
+				array_filter(
+					$ordered_roles,
+					static function( $role ) {
+						return 0 !== strpos( $role, 'row_' );
+					}
+				)
+			);
 		}
 		?>
 		<div class="<?php echo esc_attr( implode( ' ', $block_class ) ); ?>">
@@ -1007,10 +1464,14 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 				<?php endif; ?>
 			</div>
 
-			<?php if ( ! empty( $full_cards ) || ( ! $is_fallback && ! empty( $overflow ) ) ) : ?>
+			<?php if ( ! empty( $full_cards ) || ! empty( $partial_rows ) || ( ! $is_fallback && ! empty( $overflow ) ) ) : ?>
 				<div class="foundation-awards-wall__full-stack" role="list" aria-label="<?php echo esc_attr( sprintf( 'Extended recognition cards %d', $block_index ) ); ?>">
 					<?php foreach ( $full_cards as $full_card ) : ?>
 						<?php $this->render_card( $full_card, $widget_id, $block_index ); ?>
+					<?php endforeach; ?>
+
+					<?php foreach ( $partial_rows as $partial_row_card ) : ?>
+						<?php $this->render_card( $partial_row_card, $widget_id, $block_index, true ); ?>
 					<?php endforeach; ?>
 
 					<?php if ( ! $is_fallback ) : ?>
@@ -1032,6 +1493,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 			'foundation-awards-wall__card--role-' . str_replace( '_', '-', $role ),
 			'foundation-awards-wall__card--type-' . $card['type'],
 			'foundation-awards-wall__card--surface-' . $card['surface'],
+			'foundation-awards-wall__card--size-' . $this->get_card_size_variant( $card, $force_full ),
 		);
 		$tag       = ! empty( $card['link']['url'] ) ? 'a' : 'div';
 		$link_attr = $this->build_link_attributes( $card['link'] ?? array() );
@@ -1050,6 +1512,10 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 
 		if ( 'photo' === $card['type'] ) {
 			$classes[] = 'foundation-awards-wall__card--photo';
+		}
+
+		if ( 'shortcode' === $card['type'] ) {
+			$classes[] = 'foundation-awards-wall__card--shortcode';
 		}
 		?>
 		<article class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>" data-foundation-awards-hover role="listitem" aria-labelledby="<?php echo esc_attr( $card_id ); ?>">
@@ -1074,6 +1540,17 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 						<?php endif; ?>
 					</div>
 				</<?php echo $tag; ?>>
+			<?php elseif ( 'shortcode' === $card['type'] ) : ?>
+				<div class="foundation-awards-wall__card-inner foundation-awards-wall__shortcode-card">
+					<div class="foundation-awards-wall__top">
+						<?php $this->render_text_content( $card, $card_id ); ?>
+					</div>
+					<?php if ( ! empty( $card['shortcode'] ) ) : ?>
+						<div class="foundation-awards-wall__shortcode-content">
+							<?php echo do_shortcode( wp_kses_post( $card['shortcode'] ) ); ?>
+						</div>
+					<?php endif; ?>
+				</div>
 			<?php elseif ( 'image' === $card['type'] ) : ?>
 				<<?php echo $tag; ?> class="foundation-awards-wall__card-inner foundation-awards-wall__image-link"<?php echo $link_attr; ?>>
 					<?php if ( ! empty( $card['image_url'] ) ) : ?>
@@ -1097,6 +1574,24 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 			<?php endif; ?>
 		</article>
 		<?php
+	}
+
+	private function get_card_size_variant( array $card, $force_full = false ) {
+		$role = $force_full ? 'full' : $card['role'];
+
+		if ( 'shortcode' === $card['type'] ) {
+			return 'utility';
+		}
+
+		if ( 'feature' === $card['type'] || 'feature' === $role ) {
+			return 'feature';
+		}
+
+		if ( in_array( $role, array( 'stack_top', 'stack_bottom', 'row_1', 'row_2', 'row_3' ), true ) ) {
+			return 'compact';
+		}
+
+		return 'standard';
 	}
 
 	private function render_text_content( array $card, $title_id ) {
@@ -1207,7 +1702,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 	}
 
 	private function normalize_card_type( $value ) {
-		$allowed = array( 'feature', 'text', 'logo', 'image', 'photo' );
+		$allowed = array( 'feature', 'text', 'logo', 'image', 'photo', 'shortcode' );
 
 		return in_array( $value, $allowed, true ) ? $value : 'text';
 	}

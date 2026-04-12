@@ -9,19 +9,19 @@ use Elementor\Group_Control_Typography;
 use Elementor\Icons_Manager;
 use Elementor\Repeater;
 use Elementor\Utils;
-use FoundationElementorPlus\Widgets\Base_Widget;
+use Elementor\Widget_Base;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Portfolio_Mosaic_Widget extends Base_Widget {
+class Portfolio_Mosaic_Widget extends Widget_Base {
 	public function get_name() {
 		return 'foundation-portfolio-mosaic';
 	}
 
 	public function get_title() {
-		return esc_html__( 'Portfolio Grid', 'foundation-elementor-plus' );
+		return esc_html__( 'Foundation Dynamic Grid', 'foundation-elementor-plus' );
 	}
 
 	public function get_icon() {
@@ -33,11 +33,11 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 	}
 
 	public function get_keywords() {
-		return array( 'foundation', 'portfolio', 'grid', 'mosaic', 'related', 'projects' );
+		return array( 'foundation', 'dynamic', 'grid', 'mosaic', 'portfolio', 'blog', 'archive', 'search', 'posts', 'projects' );
 	}
 
 	public function get_style_depends(): array {
-		return $this->get_foundation_style_depends( array( 'foundation-elementor-plus-portfolio-mosaic' ) );
+		return array( 'foundation-elementor-plus-portfolio-mosaic' );
 	}
 
 	public function get_script_depends(): array {
@@ -50,18 +50,19 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 		$this->register_source_controls();
 		$this->register_manual_controls();
 		$this->register_query_controls();
+		$this->register_embedded_card_controls();
 		$this->register_cta_controls();
 		$this->register_layout_controls();
 		$this->register_heading_style_controls();
 		$this->register_card_style_controls();
 		$this->register_card_typography_style_controls();
 		$this->register_media_style_controls();
-		$this->register_accessibility_controls();
 	}
 
 	protected function render() {
 		$settings  = $this->get_settings_for_display();
 		$cards     = $this->get_cards( $settings );
+		$cards     = $this->maybe_insert_embedded_shortcode_cards( $cards, $settings );
 		$cards     = $this->maybe_insert_cta_card( $cards, $settings );
 		$cards     = $this->apply_layout_pattern( $cards, $settings );
 		$filters   = $this->get_filter_items( $cards );
@@ -100,7 +101,14 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 		}
 		?>
 		<section
-			<?php echo $this->get_widget_root_attributes( $settings, array( 'id' => $widget_id, 'class' => implode( ' ', $section_classes ), 'data-foundation-portfolio-mosaic' => true, 'data-foundation-portfolio-tilt' => 'yes' === ( $settings['enable_card_tilt'] ?? 'yes' ) ? 'yes' : 'no', 'data-foundation-portfolio-feature-min-columns' => $this->normalize_feature_span_min_columns( $settings['feature_span_min_columns'] ?? '4' ), 'data-foundation-portfolio-load-more' => $load_more_enabled ? 'yes' : 'no', 'data-foundation-portfolio-initial-limit' => $initial_visible_cards, 'data-foundation-portfolio-load-more-step' => $load_more_step ) ); ?>
+			id="<?php echo esc_attr( $widget_id ); ?>"
+				class="<?php echo esc_attr( implode( ' ', $section_classes ) ); ?>"
+				data-foundation-portfolio-mosaic
+				data-foundation-portfolio-tilt="<?php echo esc_attr( 'yes' === ( $settings['enable_card_tilt'] ?? 'yes' ) ? 'yes' : 'no' ); ?>"
+				data-foundation-portfolio-feature-min-columns="<?php echo esc_attr( $this->normalize_feature_span_min_columns( $settings['feature_span_min_columns'] ?? '4' ) ); ?>"
+				data-foundation-portfolio-load-more="<?php echo esc_attr( $load_more_enabled ? 'yes' : 'no' ); ?>"
+				data-foundation-portfolio-initial-limit="<?php echo esc_attr( $initial_visible_cards ); ?>"
+				data-foundation-portfolio-load-more-step="<?php echo esc_attr( $load_more_step ); ?>"
 			>
 			<div class="foundation-portfolio-mosaic__wrap">
 				<?php $this->render_header( $settings ); ?>
@@ -112,6 +120,11 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 							<?php
 							if ( 'cta' === $card['type'] ) {
 								$this->render_cta_card( $card, $settings );
+								continue;
+							}
+
+							if ( 'shortcode' === ( $card['type'] ?? '' ) ) {
+								$this->render_shortcode_card( $card, $settings );
 								continue;
 							}
 
@@ -303,7 +316,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 				array(
 					'label'     => esc_html__( 'Load More Label', 'foundation-elementor-plus' ),
 					'type'      => Controls_Manager::TEXT,
-					'default'   => esc_html__( 'Load More Work', 'foundation-elementor-plus' ),
+					'default'   => esc_html__( 'Load More Items', 'foundation-elementor-plus' ),
 					'condition' => array(
 						'enable_load_more' => 'yes',
 					),
@@ -456,8 +469,8 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 				'type'    => Controls_Manager::SELECT,
 				'default' => 'query',
 				'options' => array(
-					'query'  => esc_html__( 'Portfolio Query', 'foundation-elementor-plus' ),
-					'manual' => esc_html__( 'Manual / Dynamic Cards', 'foundation-elementor-plus' ),
+					'query'  => esc_html__( 'Dynamic Query', 'foundation-elementor-plus' ),
+					'manual' => esc_html__( 'Manual Cards', 'foundation-elementor-plus' ),
 				),
 			)
 		);
@@ -466,7 +479,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			'manual_mode_note',
 			array(
 				'type'            => Controls_Manager::RAW_HTML,
-				'raw'             => esc_html__( 'Manual mode supports Elementor dynamic tags on text, media, and links. Query mode supports latest portfolios or automatically related items inside a single Portfolio template.', 'foundation-elementor-plus' ),
+				'raw'             => esc_html__( 'Manual mode supports Elementor dynamic tags on text, media, and links. Dynamic query mode can pull portfolio items, blog posts, or the current archive/search context.', 'foundation-elementor-plus' ),
 				'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
 			)
 		);
@@ -709,7 +722,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 		$this->start_controls_section(
 			'section_query',
 			array(
-				'label'     => esc_html__( 'Portfolio Query', 'foundation-elementor-plus' ),
+				'label'     => esc_html__( 'Dynamic Query', 'foundation-elementor-plus' ),
 				'condition' => array(
 					'source_mode' => 'query',
 				),
@@ -720,7 +733,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			'query_note',
 			array(
 				'type'            => Controls_Manager::RAW_HTML,
-				'raw'             => esc_html__( 'Use the archive with a 3-column showcase grid and Wide 2x1 featured cards for the cleanest premium balance. Switch to Related on single portfolio templates.', 'foundation-elementor-plus' ),
+				'raw'             => esc_html__( 'Use Related for single portfolio templates, or switch to Current Archive / Search to mirror the page context the widget sits in. Portfolio and blog sources can also be combined for a mixed editorial grid.', 'foundation-elementor-plus' ),
 				'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
 			)
 		);
@@ -728,12 +741,13 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 		$this->add_control(
 			'query_scope',
 			array(
-				'label'   => esc_html__( 'Query Scope', 'foundation-elementor-plus' ),
+				'label'   => esc_html__( 'Query Mode', 'foundation-elementor-plus' ),
 				'type'    => Controls_Manager::SELECT,
 				'default' => 'all',
 				'options' => array(
-					'all'     => esc_html__( 'Latest / Ordered Portfolio Posts', 'foundation-elementor-plus' ),
-					'related' => esc_html__( 'Related To Current Portfolio', 'foundation-elementor-plus' ),
+					'all'           => esc_html__( 'Latest / Ordered Items', 'foundation-elementor-plus' ),
+					'related'       => esc_html__( 'Related To Current Portfolio', 'foundation-elementor-plus' ),
+					'current_query' => esc_html__( 'Current Archive / Search Context', 'foundation-elementor-plus' ),
 				),
 			)
 		);
@@ -745,9 +759,12 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 				'type'    => Controls_Manager::SELECT,
 				'default' => 'portfolio',
 				'options' => array(
-					'portfolio'             => esc_html__( 'Portfolio Only', 'foundation-elementor-plus' ),
-					'portfolio_case_study'  => esc_html__( 'Portfolio + Case Studies', 'foundation-elementor-plus' ),
-					'case_study'            => esc_html__( 'Case Studies Only', 'foundation-elementor-plus' ),
+					'portfolio'            => esc_html__( 'Portfolio Items', 'foundation-elementor-plus' ),
+					'portfolio_case_study' => esc_html__( 'Portfolio + Blog Posts', 'foundation-elementor-plus' ),
+					'case_study'           => esc_html__( 'Blog Posts / Articles', 'foundation-elementor-plus' ),
+				),
+				'condition' => array(
+					'query_scope!' => 'current_query',
 				),
 			)
 		);
@@ -780,7 +797,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 				'default' => 0,
 				'min'     => 0,
 				'condition' => array(
-					'query_scope!' => 'related',
+					'query_scope!' => 'current_query',
 				),
 			)
 		);
@@ -797,6 +814,9 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 					'title'      => esc_html__( 'Title', 'foundation-elementor-plus' ),
 					'rand'       => esc_html__( 'Random', 'foundation-elementor-plus' ),
 				),
+				'condition' => array(
+					'query_scope!' => 'current_query',
+				),
 			)
 		);
 
@@ -809,6 +829,9 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 				'options' => array(
 					'ASC'  => esc_html__( 'Ascending', 'foundation-elementor-plus' ),
 					'DESC' => esc_html__( 'Descending', 'foundation-elementor-plus' ),
+				),
+				'condition' => array(
+					'query_scope!' => 'current_query',
 				),
 			)
 		);
@@ -829,7 +852,10 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 				'type'        => Controls_Manager::TEXT,
 				'default'     => '',
 				'placeholder' => 'marketing,web-branding',
-				'description' => esc_html__( 'Optional comma-separated type slugs to filter the query.', 'foundation-elementor-plus' ),
+				'description' => esc_html__( 'Optional comma-separated type slugs to filter portfolio queries. This is ignored for blog-only and current archive/search modes.', 'foundation-elementor-plus' ),
+				'condition'   => array(
+					'query_scope!' => 'current_query',
+				),
 			)
 		);
 
@@ -842,30 +868,37 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 				'label_off'    => esc_html__( 'No', 'foundation-elementor-plus' ),
 				'return_value' => 'yes',
 				'default'      => 'yes',
+				'condition'    => array(
+					'query_scope!' => 'current_query',
+				),
 			)
 		);
 
 		$this->add_control(
 			'show_term_kicker',
 			array(
-				'label'        => esc_html__( 'Use Portfolio Type As Supporting Label Fallback', 'foundation-elementor-plus' ),
+				'label'        => esc_html__( 'Use First Term As Supporting Label Fallback', 'foundation-elementor-plus' ),
 				'type'         => Controls_Manager::SWITCHER,
 				'label_on'     => esc_html__( 'Yes', 'foundation-elementor-plus' ),
 				'label_off'    => esc_html__( 'No', 'foundation-elementor-plus' ),
 				'return_value' => 'yes',
 				'default'      => 'yes',
+				'condition'    => array(
+					'query_scope!' => 'current_query',
+				),
 			)
 		);
 
 		$this->add_control(
 			'case_study_category_slugs',
 			array(
-				'label'       => esc_html__( 'Case Study Category Slugs', 'foundation-elementor-plus' ),
+				'label'       => esc_html__( 'Blog Category Slugs', 'foundation-elementor-plus' ),
 				'type'        => Controls_Manager::TEXT,
 				'default'     => 'case-studies',
 				'placeholder' => 'case-studies',
-				'description' => esc_html__( 'Comma-separated blog category slugs used when case studies are included.', 'foundation-elementor-plus' ),
+				'description' => esc_html__( 'Comma-separated blog category slugs used when blog posts are included.', 'foundation-elementor-plus' ),
 				'condition'   => array(
+					'query_scope!' => 'current_query',
 					'query_content_source!' => 'portfolio',
 				),
 			)
@@ -878,8 +911,9 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 				'type'        => Controls_Manager::TEXT,
 				'default'     => 'blog,featured,case-studies,news',
 				'placeholder' => 'blog,featured,case-studies,news',
-				'description' => esc_html__( 'These categories are skipped when choosing the case study pill/tab label.', 'foundation-elementor-plus' ),
+				'description' => esc_html__( 'These categories are skipped when choosing the blog pill/tab label.', 'foundation-elementor-plus' ),
 				'condition'   => array(
+					'query_scope!' => 'current_query',
 					'query_content_source!' => 'portfolio',
 				),
 			)
@@ -911,9 +945,159 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			array(
 				'label'     => esc_html__( 'All Tab Label', 'foundation-elementor-plus' ),
 				'type'      => Controls_Manager::TEXT,
-				'default'   => esc_html__( 'All Work', 'foundation-elementor-plus' ),
+				'default'   => esc_html__( 'All Items', 'foundation-elementor-plus' ),
 				'condition' => array(
 					'show_filter_tabs' => 'yes',
+				),
+			)
+		);
+
+
+		$this->end_controls_section();
+	}
+
+	private function register_embedded_card_controls() {
+		$this->start_controls_section(
+			'section_embedded_cards',
+			array(
+				'label' => esc_html__( 'Embedded Cards', 'foundation-elementor-plus' ),
+			)
+		);
+
+		$this->add_control(
+			'embedded_cards_note',
+			array(
+				'type'            => Controls_Manager::RAW_HTML,
+				'raw'             => esc_html__( 'Drop helper shortcodes like the blog footer card or accessibility tools card into any grid layout. Use position mode to inject them before a specific item, or send them to the end of the grid.', 'foundation-elementor-plus' ),
+				'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+			)
+		);
+
+		$this->add_control(
+			'post_footer_heading',
+			array(
+				'label'     => esc_html__( 'Embedded Widget Card', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_control(
+			'show_post_footer_card',
+			array(
+				'label'        => esc_html__( 'Include [ink_post_footer] Card', 'foundation-elementor-plus' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => esc_html__( 'Yes', 'foundation-elementor-plus' ),
+				'label_off'    => esc_html__( 'No', 'foundation-elementor-plus' ),
+				'return_value' => 'yes',
+				'default'      => '',
+				'description'  => esc_html__( 'Adds the blog footer widget into the grid for article, archive, and search-based layouts.', 'foundation-elementor-plus' ),
+			)
+		);
+
+		$this->add_control(
+			'post_footer_card_insert_mode',
+			array(
+				'label'     => esc_html__( 'Footer Card Placement', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'end',
+				'options'   => array(
+					'end'      => esc_html__( 'At End Of Grid', 'foundation-elementor-plus' ),
+					'position' => esc_html__( 'Insert At Position', 'foundation-elementor-plus' ),
+				),
+				'condition' => array(
+					'show_post_footer_card' => 'yes',
+				),
+			)
+		);
+
+		$this->add_control(
+			'post_footer_card_position',
+			array(
+				'label'       => esc_html__( 'Footer Card Position', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::NUMBER,
+				'default'     => 3,
+				'min'         => 0,
+				'description' => esc_html__( 'Zero inserts before the first dynamic item.', 'foundation-elementor-plus' ),
+				'condition'   => array(
+					'show_post_footer_card'      => 'yes',
+					'post_footer_card_insert_mode' => 'position',
+				),
+			)
+		);
+
+		$this->add_control(
+			'post_footer_card_size',
+			array(
+				'label'     => esc_html__( 'Footer Card Size', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'feature',
+				'options'   => array(
+					'standard' => esc_html__( 'Standard', 'foundation-elementor-plus' ),
+					'feature'  => esc_html__( 'Feature', 'foundation-elementor-plus' ),
+				),
+				'condition' => array(
+					'show_post_footer_card' => 'yes',
+				),
+			)
+		);
+
+		$this->add_control(
+			'show_a11y_card',
+			array(
+				'label'        => esc_html__( 'Include [ink_access_meta] Card', 'foundation-elementor-plus' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => esc_html__( 'Yes', 'foundation-elementor-plus' ),
+				'label_off'    => esc_html__( 'No', 'foundation-elementor-plus' ),
+				'return_value' => 'yes',
+				'default'      => '',
+				'description'  => esc_html__( 'Adds the accessibility tools shortcode into the grid with the same placement options as the footer widget card.', 'foundation-elementor-plus' ),
+			)
+		);
+
+		$this->add_control(
+			'a11y_card_insert_mode',
+			array(
+				'label'     => esc_html__( 'A11y Card Placement', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'end',
+				'options'   => array(
+					'end'      => esc_html__( 'At End Of Grid', 'foundation-elementor-plus' ),
+					'position' => esc_html__( 'Insert At Position', 'foundation-elementor-plus' ),
+				),
+				'condition' => array(
+					'show_a11y_card' => 'yes',
+				),
+			)
+		);
+
+		$this->add_control(
+			'a11y_card_position',
+			array(
+				'label'       => esc_html__( 'A11y Card Position', 'foundation-elementor-plus' ),
+				'type'        => Controls_Manager::NUMBER,
+				'default'     => 4,
+				'min'         => 0,
+				'description' => esc_html__( 'Zero inserts before the first dynamic item.', 'foundation-elementor-plus' ),
+				'condition'   => array(
+					'show_a11y_card'        => 'yes',
+					'a11y_card_insert_mode' => 'position',
+				),
+			)
+		);
+
+		$this->add_control(
+			'a11y_card_size',
+			array(
+				'label'     => esc_html__( 'A11y Card Size', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'feature',
+				'options'   => array(
+					'standard' => esc_html__( 'Standard', 'foundation-elementor-plus' ),
+					'feature'  => esc_html__( 'Feature', 'foundation-elementor-plus' ),
+				),
+				'condition' => array(
+					'show_a11y_card' => 'yes',
 				),
 			)
 		);
@@ -1008,6 +1192,30 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 					'accent' => esc_html__( 'Accent', 'foundation-elementor-plus' ),
 					'dark'   => esc_html__( 'Dark', 'foundation-elementor-plus' ),
 				),
+				'description' => esc_html__( 'Controls the CTA card text tone and the default background family when the CTA background is set to follow theme.', 'foundation-elementor-plus' ),
+				'condition' => array(
+					'show_cta_card' => 'yes',
+				),
+			)
+		);
+
+		$this->add_control(
+			'cta_background_style',
+			array(
+				'label'     => esc_html__( 'CTA Background', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'use_style',
+				'options'   => array(
+					'use_style'    => esc_html__( 'Use Style Tab Setting', 'foundation-elementor-plus' ),
+					'theme'        => esc_html__( 'Follow CTA Theme', 'foundation-elementor-plus' ),
+					'cta_gradient' => esc_html__( 'Ink CTA Gradient', 'foundation-elementor-plus' ),
+					'dark'         => esc_html__( 'Dark Glass', 'foundation-elementor-plus' ),
+					'navy'         => esc_html__( 'Navy Glass', 'foundation-elementor-plus' ),
+					'green'        => esc_html__( 'Green Glass', 'foundation-elementor-plus' ),
+					'white'        => esc_html__( 'White Glass', 'foundation-elementor-plus' ),
+					'orange'       => esc_html__( 'Orange Glass', 'foundation-elementor-plus' ),
+				),
+				'description' => esc_html__( 'Pick a direct background here when you want the promo card to ignore the style-tab override.', 'foundation-elementor-plus' ),
 				'condition' => array(
 					'show_cta_card' => 'yes',
 				),
@@ -1145,7 +1353,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Section Padding', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%', 'em', 'rem', 'vw', 'vh', 'custom' ),
+				'size_units' => array( 'px', '%', 'em', 'rem' ),
 				'default'    => array(
 					'top'      => 0,
 					'right'    => 0,
@@ -1165,7 +1373,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Content Width', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', '%', 'vw', 'rem' ),
+				'size_units' => array( 'px', '%' ),
 				'default'    => array(
 					'unit' => '%',
 					'size' => 95,
@@ -1181,7 +1389,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 					),
 				),
 				'selectors'  => array(
-					'{{WRAPPER}} .foundation-portfolio-mosaic__wrap' => 'width: min(100%, {{SIZE}}{{UNIT}}); max-width: none;',
+					'{{WRAPPER}} .foundation-portfolio-mosaic__wrap' => 'width: {{SIZE}}{{UNIT}}; max-width: none;',
 				),
 			)
 		);
@@ -1200,7 +1408,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Header Max Width', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', '%', 'vw', 'rem' ),
+				'size_units' => array( 'px', '%' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 760,
@@ -1226,7 +1434,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Grid Gap', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 24,
@@ -1285,7 +1493,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Showcase Minimum Column Width', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vw' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 280,
@@ -1311,7 +1519,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Compact Minimum Column Width', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vw' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 220,
@@ -1336,7 +1544,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Card Radius', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 30,
@@ -1367,7 +1575,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Media Radius', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 22,
@@ -1389,7 +1597,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Glass Blur', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 18,
@@ -1411,7 +1619,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Standard Card Min Height', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vh', 'vw' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 390,
@@ -1436,7 +1644,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Feature Card Min Height', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vh', 'vw' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 560,
@@ -1462,7 +1670,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Compact Card Min Height', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vh', 'vw' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 300,
@@ -1487,7 +1695,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Media Minimum Height', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vh', 'vw' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 210,
@@ -1509,7 +1717,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Card Padding', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', 'em', 'rem', '%', 'vw', 'vh', 'custom' ),
+				'size_units' => array( 'px', 'em', 'rem', '%' ),
 				'default'    => array(
 					'top'      => 28,
 					'right'    => 28,
@@ -1573,7 +1781,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Stack Pills Below Card Width', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vw' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 360,
@@ -1724,10 +1932,11 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 		$this->add_control(
 			'cta_glass_preset',
 			array(
-				'label'   => esc_html__( 'CTA Card Glass Override', 'foundation-elementor-plus' ),
+				'label'       => esc_html__( 'CTA Background Override', 'foundation-elementor-plus' ),
 				'type'    => Controls_Manager::SELECT,
 				'default' => 'inherit',
-				'options' => $this->get_glass_preset_options(),
+				'options' => $this->get_glass_preset_options( true ),
+				'description' => esc_html__( 'Used when CTA Background is left on "Use Style Tab Setting". Set this to Theme Default if you want CTA Theme to drive the background.', 'foundation-elementor-plus' ),
 			)
 		);
 
@@ -2211,10 +2420,10 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 				return;
 		}
 
-		$all_label = ! empty( $settings['filter_all_label'] ) ? $settings['filter_all_label'] : esc_html__( 'All Work', 'foundation-elementor-plus' );
+		$all_label = ! empty( $settings['filter_all_label'] ) ? $settings['filter_all_label'] : esc_html__( 'All Items', 'foundation-elementor-plus' );
 		?>
 		<div class="foundation-portfolio-mosaic__filters" data-foundation-portfolio-filters>
-			<div class="foundation-portfolio-mosaic__filters-scroll" role="tablist" aria-label="<?php esc_attr_e( 'Filter portfolio items', 'foundation-elementor-plus' ); ?>">
+			<div class="foundation-portfolio-mosaic__filters-scroll" role="tablist" aria-label="<?php esc_attr_e( 'Filter items', 'foundation-elementor-plus' ); ?>">
 				<button
 					class="foundation-portfolio-mosaic__filter is-active"
 					type="button"
@@ -2249,7 +2458,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 				return;
 			}
 
-			$label = ! empty( $settings['load_more_label'] ) ? $settings['load_more_label'] : esc_html__( 'Load More Work', 'foundation-elementor-plus' );
+			$label = ! empty( $settings['load_more_label'] ) ? $settings['load_more_label'] : esc_html__( 'Load More Items', 'foundation-elementor-plus' );
 			?>
 			<div class="foundation-portfolio-mosaic__load-more-wrap" data-foundation-portfolio-load-more-wrap hidden>
 				<button
@@ -2403,6 +2612,44 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 		<?php
 	}
 
+	private function render_shortcode_card( array $card, array $settings ) {
+		$classes = array(
+			'foundation-portfolio-mosaic__card-shell',
+			'foundation-portfolio-mosaic__card-shell--shortcode',
+		);
+
+		if ( ! empty( $card['layout_classes'] ) && is_array( $card['layout_classes'] ) ) {
+			$classes = array_merge( $classes, $card['layout_classes'] );
+		}
+
+		if ( $this->is_post_footer_card( $card ) ) {
+			$classes[] = 'foundation-portfolio-mosaic__card-shell--post-footer';
+		}
+
+		if ( $this->is_a11y_card( $card ) ) {
+			$classes[] = 'foundation-portfolio-mosaic__card-shell--a11y';
+		}
+
+		if ( $this->is_support_shortcode_card( $card ) ) {
+			$classes[] = 'foundation-portfolio-mosaic__card-shell--support-shortcode';
+		}
+
+		if ( $this->is_featured_card( $card ) ) {
+			$classes[] = 'is-featured';
+		}
+
+		$style = '--foundation-portfolio-hover:' . esc_attr( $card['hover_color'] ?? '#f6b59f' ) . ';';
+		?>
+		<article class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>" style="<?php echo esc_attr( $style ); ?>" data-foundation-portfolio-mosaic-card data-foundation-portfolio-static-card="yes" role="listitem">
+			<div class="foundation-portfolio-mosaic__shortcode-card">
+				<div class="foundation-portfolio-mosaic__shortcode-content">
+					<?php echo do_shortcode( wp_kses_post( $card['shortcode'] ?? '' ) ); ?>
+				</div>
+			</div>
+		</article>
+		<?php
+	}
+
 	private function render_media( array $card ) {
 		if ( 'video' === $card['media_type'] && ! empty( $card['video_url'] ) ) {
 			?>
@@ -2422,8 +2669,14 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			return;
 		}
 
-		$image_url = ! empty( $card['image_url'] ) ? $card['image_url'] : '';
-		$image_alt = ! empty( $card['image_alt'] ) ? $card['image_alt'] : $card['project_name'];
+		$image_url       = ! empty( $card['image_url'] ) ? $card['image_url'] : '';
+		$image_id        = ! empty( $card['image_id'] ) ? (int) $card['image_id'] : 0;
+		$image_alt       = ! empty( $card['image_alt'] ) ? $card['image_alt'] : $card['project_name'];
+		$is_featured     = $this->is_featured_card( $card );
+		$attachment_size = $is_featured ? 'full' : 'large';
+		$image_sizes     = $is_featured
+			? '(min-width: 1500px) 42vw, (min-width: 1100px) 50vw, (min-width: 768px) 50vw, 100vw'
+			: '(min-width: 1500px) 22vw, (min-width: 1100px) 26vw, (min-width: 768px) 50vw, 100vw';
 
 		if ( '' === $image_url ) {
 			?>
@@ -2437,7 +2690,25 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 
 		?>
 		<div class="foundation-portfolio-mosaic__media foundation-portfolio-mosaic__media--image">
-			<img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $image_alt ); ?>" loading="lazy" decoding="async">
+			<?php
+			if ( $image_id > 0 ) {
+				echo wp_get_attachment_image(
+					$image_id,
+					$attachment_size,
+					false,
+					array(
+						'alt'      => $image_alt,
+						'loading'  => 'lazy',
+						'decoding' => 'async',
+						'sizes'    => $image_sizes,
+					)
+				); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			} else {
+				?>
+				<img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $image_alt ); ?>" loading="lazy" decoding="async" sizes="<?php echo esc_attr( $image_sizes ); ?>">
+				<?php
+			}
+			?>
 		</div>
 		<?php
 	}
@@ -2448,6 +2719,10 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 		}
 
 		return $this->get_query_cards( $settings );
+	}
+
+	private function normalize_query_scope( $value ) {
+		return in_array( (string) $value, array( 'all', 'related', 'current_query' ), true ) ? (string) $value : 'all';
 	}
 
 	private function get_manual_cards( array $settings ) {
@@ -2470,6 +2745,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 				'video_url'     => ! empty( $item['video_url']['url'] ) ? $item['video_url']['url'] : '',
 				'poster_url'    => $this->get_media_url( $item['video_poster'] ?? array() ),
 				'image_url'     => $this->get_media_url( $item['image'] ?? array() ),
+				'image_id'      => ! empty( $item['image']['id'] ) ? (int) $item['image']['id'] : 0,
 				'image_alt'     => $image_alt,
 				'card_size'     => $this->normalize_card_size( $item['card_size'] ?? 'standard' ),
 				'card_theme'    => $this->normalize_card_theme( $item['card_theme'] ?? 'dark' ),
@@ -2490,8 +2766,14 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 	}
 
 	private function get_query_cards( array $settings ) {
-		$content_source  = $settings['query_content_source'] ?? 'portfolio';
-		$posts_per_page  = ! empty( $settings['posts_per_page'] ) ? max( 1, (int) $settings['posts_per_page'] ) : 12;
+		$query_scope    = $this->normalize_query_scope( $settings['query_scope'] ?? 'all' );
+		$content_source = $settings['query_content_source'] ?? 'portfolio';
+		$posts_per_page = ! empty( $settings['posts_per_page'] ) ? max( 1, (int) $settings['posts_per_page'] ) : 12;
+
+		if ( 'current_query' === $query_scope ) {
+			return $this->get_current_query_cards( $settings, $posts_per_page );
+		}
+
 		$current_post_id = $this->get_current_portfolio_id();
 		$args            = array(
 			'post_type'           => 'ink_portfolio',
@@ -2521,7 +2803,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			);
 		}
 
-		if ( 'related' === ( $settings['query_scope'] ?? 'all' ) && $current_post_id ) {
+		if ( 'related' === $query_scope && $current_post_id ) {
 			$related_terms = wp_get_post_terms( $current_post_id, 'ink_portfolio_type', array( 'fields' => 'ids' ) );
 
 			if ( ! is_wp_error( $related_terms ) && ! empty( $related_terms ) ) {
@@ -2566,6 +2848,99 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 		return $this->merge_query_cards( $portfolio_cards, $case_study_cards, $settings, $posts_per_page );
 	}
 
+	private function get_current_query_cards( array $settings, $limit ) {
+		$query_vars = array();
+
+		if ( isset( $GLOBALS['wp_query'] ) && $GLOBALS['wp_query'] instanceof \WP_Query && ! empty( $GLOBALS['wp_query']->query_vars ) ) {
+			$query_vars = $GLOBALS['wp_query']->query_vars;
+		}
+
+		if ( empty( $query_vars ) ) {
+			$query_vars = array(
+				'post_type'           => 'post',
+				'post_status'         => 'publish',
+				'orderby'             => ! empty( $settings['orderby'] ) ? $settings['orderby'] : 'date',
+				'order'               => ! empty( $settings['order'] ) ? $settings['order'] : 'DESC',
+				'ignore_sticky_posts' => true,
+			);
+		}
+
+		$query_vars['posts_per_page'] = max( 1, (int) $limit );
+		$query_vars['post_status']    = 'publish';
+		$query_vars['no_found_rows']  = true;
+		$query_vars['ignore_sticky_posts'] = true;
+
+		$query = new \WP_Query( $query_vars );
+		$cards  = array();
+
+		if ( $query->have_posts() ) {
+			while ( $query->have_posts() ) {
+				$query->the_post();
+				$cards[] = $this->build_dynamic_query_card( get_the_ID(), $settings );
+			}
+
+			wp_reset_postdata();
+		}
+
+		return $cards;
+	}
+
+	private function build_dynamic_query_card( $post_id, array $settings ) {
+		$post_type = get_post_type( $post_id );
+
+		if ( 'ink_portfolio' === $post_type ) {
+			return $this->build_portfolio_query_card( $post_id, $settings );
+		}
+
+		return $this->build_generic_query_card( $post_id, $settings );
+	}
+
+	private function build_generic_query_card( $post_id, array $settings, array $ignored_slugs = array() ) {
+		$post_type   = get_post_type( $post_id ) ?: 'post';
+		$post_title  = get_the_title( $post_id );
+		$terms       = $this->get_dynamic_filter_terms( $post_id, $post_type, $ignored_slugs );
+		$term_label  = ! empty( $terms ) ? $terms[0]['label'] : $this->get_dynamic_item_label( $post_type );
+		$thumb_id    = get_post_thumbnail_id( $post_id );
+		$image_url   = get_the_post_thumbnail_url( $post_id, 'large' );
+		$excerpt     = trim( (string) get_the_excerpt( $post_id ) );
+		$content     = get_post_field( 'post_content', $post_id );
+		$headline    = $excerpt ? $excerpt : wp_trim_words( wp_strip_all_tags( strip_shortcodes( $content ) ), 16 );
+		$description = wp_trim_words( wp_strip_all_tags( strip_shortcodes( $content ) ), 24 );
+
+		return array(
+			'type'          => 'dynamic',
+			'post_type'     => $post_type,
+			'source_kind'   => $post_type,
+			'post_id'       => $post_id,
+			'project_name'  => $post_title ? $post_title : $this->get_dynamic_item_label( $post_type ),
+			'category_pill' => $term_label,
+			'badge_text'    => $this->get_dynamic_item_label( $post_type ),
+			'kicker'        => $term_label,
+			'headline'      => $this->limit_card_text( $headline, 118 ),
+			'description'   => $this->limit_card_text( $description, 170 ),
+			'media_type'    => 'image',
+			'video_url'     => '',
+			'poster_url'    => '',
+			'image_url'     => $image_url,
+			'image_id'      => $thumb_id,
+			'image_alt'     => $this->get_attachment_alt( $thumb_id, $post_title ),
+			'card_size'     => 'standard',
+			'card_theme'    => 'dark',
+			'hover_color'   => '#62d0ff',
+			'is_featured'   => false,
+			'layout_classes'=> array(),
+			'filter_terms'  => $terms,
+			'url'           => array(
+				'url'         => get_permalink( $post_id ),
+				'is_external' => false,
+				'nofollow'    => false,
+			),
+			'sort_date'     => (string) get_post_field( 'post_date', $post_id ),
+			'sort_title'    => $post_title,
+			'sort_order'    => 9999,
+		);
+	}
+
 	private function build_portfolio_query_card( $post_id, array $settings ) {
 		$project_name = get_the_title( $post_id );
 		$type_terms   = $this->get_post_filter_terms( $post_id, 'ink_portfolio_type' );
@@ -2578,6 +2953,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 		return array(
 			'type'          => 'portfolio',
 			'post_type'     => 'ink_portfolio',
+			'source_kind'   => 'portfolio',
 			'post_id'       => $post_id,
 			'project_name'  => $project_name,
 			'category_pill' => $type_label,
@@ -2589,6 +2965,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			'video_url'     => (string) get_post_meta( $post_id, '_ink_portfolio_video_url', true ),
 			'poster_url'    => (string) get_post_meta( $post_id, '_ink_portfolio_video_poster', true ),
 			'image_url'     => $image_url ? $image_url : (string) get_post_meta( $post_id, '_ink_portfolio_video_poster', true ),
+			'image_id'      => $thumb_id,
 			'image_alt'     => $this->get_attachment_alt( $thumb_id, $project_name ),
 			'card_size'     => $this->normalize_card_size( (string) get_post_meta( $post_id, '_ink_portfolio_card_size', true ) ),
 			'card_theme'    => $this->normalize_card_theme( (string) get_post_meta( $post_id, '_ink_portfolio_card_theme', true ) ),
@@ -2626,51 +3003,11 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 		$query = new \WP_Query( $args );
 		$cards = array();
 
-		if ( $query->have_posts() ) {
-			while ( $query->have_posts() ) {
-				$query->the_post();
-				$post_id       = get_the_ID();
-					$project_name  = get_the_title( $post_id );
-					$filter_terms  = $this->get_post_category_filter_terms( $post_id, $ignore_slugs );
-					$category_pill = ! empty( $filter_terms ) ? $filter_terms[0]['label'] : esc_html__( 'Case Study', 'foundation-elementor-plus' );
-					$thumb_id      = get_post_thumbnail_id( $post_id );
-					$image_url     = get_the_post_thumbnail_url( $post_id, 'large' );
-					$excerpt       = trim( (string) get_the_excerpt( $post_id ) );
-					$content       = get_post_field( 'post_content', $post_id );
-					$headline      = $excerpt ? $excerpt : wp_trim_words( wp_strip_all_tags( strip_shortcodes( $content ) ), 16 );
-					$description   = wp_trim_words( wp_strip_all_tags( strip_shortcodes( $content ) ), 24 );
-
-					$cards[] = array(
-						'type'          => 'portfolio',
-						'post_type'     => 'post',
-						'post_id'       => $post_id,
-						'project_name'  => $project_name,
-						'category_pill' => $category_pill,
-						'badge_text'    => esc_html__( 'Case Study', 'foundation-elementor-plus' ),
-						'kicker'        => $category_pill,
-						'headline'      => $this->limit_card_text( $headline, 96 ),
-						'description'   => $this->limit_card_text( $description, 140 ),
-						'media_type'    => 'image',
-						'video_url'     => '',
-						'poster_url'    => '',
-						'image_url'     => $image_url,
-					'image_alt'     => $this->get_attachment_alt( $thumb_id, $project_name ),
-					'card_size'     => 'standard',
-					'card_theme'    => 'dark',
-					'hover_color'   => '#f5977a',
-					'is_featured'   => false,
-					'layout_classes'=> array(),
-					'filter_terms'  => $filter_terms,
-					'url'           => array(
-						'url'         => get_permalink( $post_id ),
-						'is_external' => false,
-						'nofollow'    => false,
-					),
-					'sort_date'     => (string) get_post_field( 'post_date', $post_id ),
-					'sort_title'    => $project_name,
-					'sort_order'    => 9999,
-				);
-			}
+			if ( $query->have_posts() ) {
+				while ( $query->have_posts() ) {
+					$query->the_post();
+					$cards[] = $this->build_generic_query_card( get_the_ID(), $settings, $ignore_slugs );
+				}
 
 			wp_reset_postdata();
 		}
@@ -2729,19 +3066,85 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 		return array_slice( $cards, 0, max( 1, (int) $limit ) );
 	}
 
-		private function maybe_insert_cta_card( array $cards, array $settings ) {
+	private function get_dynamic_filter_terms( $post_id, $post_type, array $ignored_slugs = array() ) {
+		if ( 'ink_portfolio' === $post_type ) {
+			return $this->get_post_filter_terms( $post_id, 'ink_portfolio_type' );
+		}
+
+		if ( 'post' === $post_type ) {
+			return $this->get_post_category_filter_terms( $post_id, $ignored_slugs );
+		}
+
+		$taxonomies = get_object_taxonomies( $post_type, 'objects' );
+		$filters    = array();
+
+		if ( empty( $taxonomies ) || ! is_array( $taxonomies ) ) {
+			return $filters;
+		}
+
+		foreach ( $taxonomies as $taxonomy ) {
+			if ( ! $taxonomy instanceof \WP_Taxonomy || empty( $taxonomy->name ) || 'post_format' === $taxonomy->name ) {
+				continue;
+			}
+
+			$terms = get_the_terms( $post_id, $taxonomy->name );
+
+			if ( is_wp_error( $terms ) || empty( $terms ) ) {
+				continue;
+			}
+
+			foreach ( $terms as $term ) {
+				if ( ! $term instanceof \WP_Term || in_array( $term->slug, $ignored_slugs, true ) ) {
+					continue;
+				}
+
+				$filters[] = array(
+					'slug'  => $term->slug,
+					'label' => html_entity_decode( wp_strip_all_tags( $term->name ), ENT_QUOTES, get_bloginfo( 'charset' ) ),
+				);
+			}
+
+			if ( ! empty( $filters ) ) {
+				break;
+			}
+		}
+
+		return $filters;
+	}
+
+	private function get_dynamic_item_label( $post_type ) {
+		switch ( $post_type ) {
+			case 'ink_portfolio':
+				return esc_html__( 'Portfolio Project', 'foundation-elementor-plus' );
+			case 'post':
+				return esc_html__( 'Article', 'foundation-elementor-plus' );
+			case 'page':
+				return esc_html__( 'Page', 'foundation-elementor-plus' );
+			default:
+				$post_type_object = get_post_type_object( $post_type );
+
+				if ( $post_type_object instanceof \WP_Post_Type && ! empty( $post_type_object->labels->singular_name ) ) {
+					return html_entity_decode( wp_strip_all_tags( $post_type_object->labels->singular_name ), ENT_QUOTES, get_bloginfo( 'charset' ) );
+				}
+
+				return esc_html__( 'Item', 'foundation-elementor-plus' );
+		}
+	}
+
+	private function maybe_insert_cta_card( array $cards, array $settings ) {
 			if ( 'yes' !== ( $settings['show_cta_card'] ?? '' ) ) {
 				return $cards;
 		}
 
 		$cta_card = array(
-			'type'        => 'cta',
-			'kicker'      => ! empty( $settings['cta_kicker'] ) ? $settings['cta_kicker'] : '',
-			'headline'    => ! empty( $settings['cta_title'] ) ? $settings['cta_title'] : esc_html__( 'Ready to start your next project?', 'foundation-elementor-plus' ),
-			'button_text' => ! empty( $settings['cta_button_text'] ) ? $settings['cta_button_text'] : esc_html__( 'Get in touch', 'foundation-elementor-plus' ),
-			'card_size'   => $this->normalize_card_size( $settings['cta_size'] ?? 'standard' ),
-			'card_theme'  => $this->normalize_card_theme( $settings['cta_theme'] ?? 'accent' ),
-			'hover_color' => ! empty( $settings['cta_hover_color'] ) ? $settings['cta_hover_color'] : '#9af0ff',
+			'type'             => 'cta',
+			'kicker'           => ! empty( $settings['cta_kicker'] ) ? $settings['cta_kicker'] : '',
+			'headline'         => ! empty( $settings['cta_title'] ) ? $settings['cta_title'] : esc_html__( 'Ready to start your next project?', 'foundation-elementor-plus' ),
+			'button_text'      => ! empty( $settings['cta_button_text'] ) ? $settings['cta_button_text'] : esc_html__( 'Get in touch', 'foundation-elementor-plus' ),
+			'card_size'        => $this->normalize_card_size( $settings['cta_size'] ?? 'standard' ),
+			'card_theme'       => $this->normalize_card_theme( $settings['cta_theme'] ?? 'accent' ),
+			'background_style' => $this->normalize_cta_background_style( $settings['cta_background_style'] ?? 'use_style' ),
+			'hover_color'      => ! empty( $settings['cta_hover_color'] ) ? $settings['cta_hover_color'] : '#9af0ff',
 			'is_featured' => false,
 			'layout_classes' => array(),
 			'url'         => $this->normalize_url_setting( $settings['cta_url'] ?? array() ),
@@ -2760,7 +3163,110 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			return $cards;
 		}
 
-		private function should_render_header( array $settings ) {
+	private function maybe_insert_embedded_shortcode_cards( array $cards, array $settings ) {
+		$insertions = array();
+
+		if ( 'yes' === ( $settings['show_post_footer_card'] ?? '' ) && $this->supports_post_footer_card( $cards, $settings ) ) {
+			$insertions[] = array(
+				'insert_mode' => ( 'position' === ( $settings['post_footer_card_insert_mode'] ?? 'end' ) ) ? 'position' : 'end',
+				'position'    => isset( $settings['post_footer_card_position'] ) ? max( 0, (int) $settings['post_footer_card_position'] ) : count( $cards ),
+				'card'        => array(
+					'type'           => 'shortcode',
+					'shortcode'      => '[ink_post_footer]',
+					'card_size'      => $this->normalize_card_size( $settings['post_footer_card_size'] ?? 'feature' ),
+					'hover_color'    => '#f6b59f',
+					'is_featured'    => false,
+					'layout_classes' => array(),
+					'is_post_footer' => true,
+					'filter_terms'   => array(),
+				),
+			);
+		}
+
+		if ( 'yes' === ( $settings['show_a11y_card'] ?? '' ) ) {
+			$insertions[] = array(
+				'insert_mode' => ( 'position' === ( $settings['a11y_card_insert_mode'] ?? 'end' ) ) ? 'position' : 'end',
+				'position'    => isset( $settings['a11y_card_position'] ) ? max( 0, (int) $settings['a11y_card_position'] ) : count( $cards ),
+				'card'        => array(
+					'type'           => 'shortcode',
+					'shortcode'      => '[ink_access_meta]',
+					'card_size'      => $this->normalize_card_size( $settings['a11y_card_size'] ?? 'feature' ),
+					'hover_color'    => '#8ce7d2',
+					'is_featured'    => false,
+					'layout_classes' => array(),
+					'is_a11y_card'   => true,
+					'filter_terms'   => array(),
+				),
+			);
+		}
+
+		if ( empty( $insertions ) ) {
+			return $cards;
+		}
+
+		$positioned = array_values(
+			array_filter(
+				$insertions,
+				static function( $insertion ) {
+					return 'position' === ( $insertion['insert_mode'] ?? 'end' );
+				}
+			)
+		);
+		$ending = array_values(
+			array_filter(
+				$insertions,
+				static function( $insertion ) {
+					return 'position' !== ( $insertion['insert_mode'] ?? 'end' );
+				}
+			)
+		);
+
+		usort(
+			$positioned,
+			static function( $left, $right ) {
+				return (int) ( $left['position'] ?? 0 ) <=> (int) ( $right['position'] ?? 0 );
+			}
+		);
+
+		$result = $cards;
+		$offset = 0;
+
+		foreach ( $positioned as $insertion ) {
+			$position = min( max( 0, (int) ( $insertion['position'] ?? 0 ) ), count( $cards ) );
+			array_splice( $result, $position + $offset, 0, array( $insertion['card'] ) );
+			$offset++;
+		}
+
+		foreach ( $ending as $insertion ) {
+			$result[] = $insertion['card'];
+		}
+
+		return $result;
+	}
+
+	private function supports_post_footer_card( array $cards, array $settings ) {
+		unset( $settings );
+
+		foreach ( $cards as $card ) {
+			if ( 'post' === ( $card['post_type'] ?? '' ) ) {
+				return true;
+			}
+		}
+
+		if ( is_search() || is_home() || is_singular( 'post' ) || is_category() || is_tag() || is_author() || is_date() ) {
+			return true;
+		}
+
+		$queried_object = get_queried_object();
+
+		if ( $queried_object instanceof \WP_Post_Type && 'post' === $queried_object->name ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	private function should_render_header( array $settings ) {
 			if ( 'yes' !== ( $settings['show_header'] ?? '' ) ) {
 			return false;
 		}
@@ -2869,7 +3375,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 		if ( empty( $filters ) ) {
 			$filters[] = array(
 				'slug'  => 'case-study',
-				'label' => esc_html__( 'Case Study', 'foundation-elementor-plus' ),
+				'label' => esc_html__( 'Article', 'foundation-elementor-plus' ),
 			);
 		}
 
@@ -2978,8 +3484,8 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 		return $fallback;
 	}
 
-	private function get_glass_preset_options() {
-		return array(
+	private function get_glass_preset_options( $include_cta_gradient = false ) {
+		$options = array(
 			'inherit' => esc_html__( 'Theme Default', 'foundation-elementor-plus' ),
 			'dark'    => esc_html__( 'Dark Glass', 'foundation-elementor-plus' ),
 			'navy'    => esc_html__( 'Navy Glass', 'foundation-elementor-plus' ),
@@ -2987,14 +3493,38 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			'white'   => esc_html__( 'White Glass', 'foundation-elementor-plus' ),
 			'orange'  => esc_html__( 'Orange Glass', 'foundation-elementor-plus' ),
 		);
+
+		if ( $include_cta_gradient ) {
+			$options['cta_gradient'] = esc_html__( 'Ink CTA Gradient', 'foundation-elementor-plus' );
+		}
+
+		return $options;
 	}
 
 	private function resolve_card_glass_preset( array $card, array $settings, $card_type ) {
-		$preset = 'cta' === $card_type
-			? ( $settings['cta_glass_preset'] ?? 'orange' )
-			: ( $this->is_featured_card( $card )
-				? ( $settings['feature_glass_preset'] ?? 'navy' )
-				: ( $settings['standard_glass_preset'] ?? 'inherit' ) );
+		if ( 'cta' === $card_type ) {
+			$background_style = $this->normalize_cta_background_style( $card['background_style'] ?? 'use_style' );
+
+			if ( 'theme' === $background_style ) {
+				return $this->map_card_theme_to_glass_preset( $card['card_theme'] ?? 'dark' );
+			}
+
+			if ( 'use_style' !== $background_style ) {
+				return $this->normalize_glass_preset( $background_style );
+			}
+
+			$preset = $this->normalize_glass_preset( $settings['cta_glass_preset'] ?? 'inherit' );
+
+			if ( 'inherit' !== $preset ) {
+				return $preset;
+			}
+
+			return $this->map_card_theme_to_glass_preset( $card['card_theme'] ?? 'dark' );
+		}
+
+		$preset = $this->is_featured_card( $card )
+			? ( $settings['feature_glass_preset'] ?? 'navy' )
+			: ( $settings['standard_glass_preset'] ?? 'inherit' );
 
 		$preset = $this->normalize_glass_preset( $preset );
 
@@ -3002,15 +3532,7 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			return $preset;
 		}
 
-		switch ( $card['card_theme'] ?? 'dark' ) {
-			case 'light':
-				return 'white';
-			case 'accent':
-				return 'green';
-			case 'dark':
-			default:
-				return 'dark';
-		}
+		return $this->map_card_theme_to_glass_preset( $card['card_theme'] ?? 'dark' );
 	}
 
 	private function normalize_grid_variant( $value ) {
@@ -3034,7 +3556,23 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 	}
 
 	private function normalize_glass_preset( $value ) {
-		return in_array( (string) $value, array( 'inherit', 'dark', 'navy', 'green', 'white', 'orange' ), true ) ? (string) $value : 'inherit';
+		return in_array( (string) $value, array( 'inherit', 'dark', 'navy', 'green', 'white', 'orange', 'cta_gradient' ), true ) ? (string) $value : 'inherit';
+	}
+
+	private function normalize_cta_background_style( $value ) {
+		return in_array( (string) $value, array( 'use_style', 'theme', 'dark', 'navy', 'green', 'white', 'orange', 'cta_gradient' ), true ) ? (string) $value : 'use_style';
+	}
+
+	private function map_card_theme_to_glass_preset( $theme ) {
+		switch ( $theme ) {
+			case 'light':
+				return 'white';
+			case 'accent':
+				return 'green';
+			case 'dark':
+			default:
+				return 'dark';
+		}
 	}
 
 	private function normalize_card_size( $value ) {
@@ -3047,6 +3585,18 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 		}
 
 		return 'feature' === ( $card['card_size'] ?? 'standard' );
+	}
+
+	private function is_post_footer_card( array $card ) {
+		return 'shortcode' === ( $card['type'] ?? '' ) && ! empty( $card['is_post_footer'] );
+	}
+
+	private function is_a11y_card( array $card ) {
+		return 'shortcode' === ( $card['type'] ?? '' ) && ! empty( $card['is_a11y_card'] );
+	}
+
+	private function is_support_shortcode_card( array $card ) {
+		return 'shortcode' === ( $card['type'] ?? '' ) && ( $this->is_post_footer_card( $card ) || $this->is_a11y_card( $card ) );
 	}
 
 	private function apply_layout_pattern( array $cards, array $settings ) {
@@ -3064,11 +3614,12 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 			$is_mirrored = 1 === ( $block_index % 2 );
 			$slot_class  = '';
 			$is_featured = false;
+			$is_support_shortcode = $this->is_support_shortcode_card( $card );
 
 			if ( $is_mirrored ) {
 				switch ( $slot_index ) {
 					case 0:
-						$slot_class = 'is-pattern-stack-top-left';
+						$slot_class = $is_support_shortcode ? 'is-pattern-support-feature-left' : 'is-pattern-stack-top-left';
 						break;
 					case 1:
 						$slot_class = 'is-pattern-stack-bottom-left';
@@ -3088,10 +3639,10 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 						$is_featured = true;
 						break;
 					case 1:
-						$slot_class = 'is-pattern-stack-top-right';
+						$slot_class = $is_support_shortcode ? 'is-pattern-support-feature-right' : 'is-pattern-stack-top-right';
 						break;
 					case 2:
-						$slot_class = 'is-pattern-stack-bottom-right';
+						$slot_class = 'is-pattern-row';
 						break;
 					default:
 						$slot_class = 'is-pattern-row';
@@ -3189,13 +3740,36 @@ class Portfolio_Mosaic_Widget extends Base_Widget {
 	}
 
 	private function get_card_link_label( array $card ) {
+		$post_type = ! empty( $card['post_type'] ) ? (string) $card['post_type'] : '';
+
+		switch ( $post_type ) {
+			case 'ink_portfolio':
+				$default_label = esc_html__( 'View portfolio project', 'foundation-elementor-plus' );
+				break;
+			case 'post':
+				$default_label = esc_html__( 'Read article', 'foundation-elementor-plus' );
+				break;
+			case 'page':
+				$default_label = esc_html__( 'View page', 'foundation-elementor-plus' );
+				break;
+			default:
+				$dynamic_label = $this->get_dynamic_item_label( $post_type );
+				$default_label = sprintf(
+					/* translators: %s is a generic item label. */
+					esc_html__( 'View %s', 'foundation-elementor-plus' ),
+					$dynamic_label
+				);
+				break;
+		}
+
 		if ( empty( $card['project_name'] ) ) {
-			return esc_html__( 'View portfolio project', 'foundation-elementor-plus' );
+			return $default_label;
 		}
 
 		return sprintf(
-			/* translators: %s is the portfolio project name. */
-			esc_html__( 'View portfolio project: %s', 'foundation-elementor-plus' ),
+			/* translators: %s is the item name. */
+			esc_html__( '%1$s: %2$s', 'foundation-elementor-plus' ),
+			$default_label,
 			$card['project_name']
 		);
 	}

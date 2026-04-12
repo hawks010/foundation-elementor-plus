@@ -4,7 +4,7 @@ Tags: elementor, widgets, agency, design
 Requires at least: 6.4
 Tested up to: 6.9.4
 Requires PHP: 7.4
-Stable tag: 1.3.4
+Stable tag: 1.3.36
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,10 @@ Yes. Add this to `wp-config.php` before deleting the plugin:
 `define( 'FOUNDATION_ELEMENTOR_PLUS_PRESERVE_DATA', true );`
 
 == Changelog ==
+
+= 1.3.5 =
+* Added a breadcrumb position control for Dark Animated Hero blog presets so the glass breadcrumb shortcode can sit above the content, below the buttons, or be hidden.
+* Tightened Dark Animated Hero preset defaults and aligned plugin header metadata with the packaged readme version.
 
 = 1.3.4 =
 * Refined Elementor control panels for key widgets, including Portfolio Menu, Dark Animated Hero, Awards Wall, Rubik's Gallery, and Linktree.

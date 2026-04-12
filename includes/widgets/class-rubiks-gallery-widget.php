@@ -3,23 +3,22 @@
 namespace FoundationElementorPlus\Widgets;
 
 use Elementor\Controls_Manager;
-use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Box_Shadow;
 use Elementor\Repeater;
 use Elementor\Utils;
-use FoundationElementorPlus\Widgets\Base_Widget;
+use Elementor\Widget_Base;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Rubiks_Gallery_Widget extends Base_Widget {
+class Rubiks_Gallery_Widget extends Widget_Base {
 	public function get_name() {
 		return 'foundation-rubiks-gallery';
 	}
 
 	public function get_title() {
-		return esc_html__( "Rubik's Gallery", 'foundation-elementor-plus' );
+		return esc_html__( 'Foundation Rubiks Gallery', 'foundation-elementor-plus' );
 	}
 
 	public function get_icon() {
@@ -35,7 +34,7 @@ class Rubiks_Gallery_Widget extends Base_Widget {
 	}
 
 	public function get_style_depends(): array {
-		return $this->get_foundation_style_depends( array( 'foundation-elementor-plus-rubiks-gallery' ) );
+		return array( 'foundation-elementor-plus-rubiks-gallery' );
 	}
 
 	public function get_script_depends(): array {
@@ -46,7 +45,7 @@ class Rubiks_Gallery_Widget extends Base_Widget {
 		$this->start_controls_section(
 			'section_content',
 			array(
-				'label' => esc_html__( 'Media', 'foundation-elementor-plus' ),
+				'label' => esc_html__( 'Media Items', 'foundation-elementor-plus' ),
 			)
 		);
 
@@ -175,7 +174,7 @@ class Rubiks_Gallery_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Stage Padding', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 40,
@@ -193,51 +192,11 @@ class Rubiks_Gallery_Widget extends Base_Widget {
 		);
 
 		$this->add_responsive_control(
-			'stage_max_width',
-			array(
-				'label'      => esc_html__( 'Stage Max Width', 'foundation-elementor-plus' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', '%', 'vw', 'rem' ),
-				'range'      => array(
-					'px' => array(
-						'min' => 240,
-						'max' => 1400,
-					),
-					'%' => array(
-						'min' => 40,
-						'max' => 100,
-					),
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} .foundation-rubiks-gallery' => 'max-width: {{SIZE}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'stage_margin_bottom',
-			array(
-				'label'      => esc_html__( 'Bottom Margin', 'foundation-elementor-plus' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vh' ),
-				'range'      => array(
-					'px' => array(
-						'min' => 0,
-						'max' => 120,
-					),
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} .foundation-rubiks-gallery' => 'margin-bottom: {{SIZE}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
 			'card_gap',
 			array(
 				'label'      => esc_html__( 'Card Gap', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', 'vw', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 20,
@@ -259,7 +218,7 @@ class Rubiks_Gallery_Widget extends Base_Widget {
 			array(
 				'label'      => esc_html__( 'Media Radius', 'foundation-elementor-plus' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', 'rem', '%' ),
+				'size_units' => array( 'px' ),
 				'default'    => array(
 					'unit' => 'px',
 					'size' => 35,
@@ -346,57 +305,9 @@ class Rubiks_Gallery_Widget extends Base_Widget {
 		$this->end_controls_section();
 
 		$this->start_controls_section(
-			'section_cards',
-			array(
-				'label' => esc_html__( 'Cards & Surface', 'foundation-elementor-plus' ),
-				'tab'   => Controls_Manager::TAB_STYLE,
-			)
-		);
-
-		$this->add_control(
-			'surface_background',
-			array(
-				'label'     => esc_html__( 'Surface Background', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .foundation-rubiks-gallery__surface' => 'background: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'media_background',
-			array(
-				'label'     => esc_html__( 'Media Background', 'foundation-elementor-plus' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .foundation-rubiks-gallery__video, {{WRAPPER}} .foundation-rubiks-gallery__lottie' => 'background: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_group_control(
-			Group_Control_Border::get_type(),
-			array(
-				'name'     => 'card_border',
-				'selector' => '{{WRAPPER}} .foundation-rubiks-gallery__card::after',
-			)
-		);
-
-		$this->add_group_control(
-			Group_Control_Box_Shadow::get_type(),
-			array(
-				'name'     => 'surface_shadow',
-				'selector' => '{{WRAPPER}} .foundation-rubiks-gallery__card::before',
-			)
-		);
-
-		$this->end_controls_section();
-
-		$this->start_controls_section(
 			'section_media',
 			array(
-				'label' => esc_html__( 'Media Treatment', 'foundation-elementor-plus' ),
+				'label' => esc_html__( 'Media', 'foundation-elementor-plus' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
 			)
 		);
@@ -441,7 +352,6 @@ class Rubiks_Gallery_Widget extends Base_Widget {
 		);
 
 		$this->end_controls_section();
-		$this->register_accessibility_controls();
 	}
 
 	protected function render() {
@@ -457,7 +367,12 @@ class Rubiks_Gallery_Widget extends Base_Widget {
 		}
 		?>
 		<section
-			<?php echo $this->get_widget_root_attributes( $settings, array( 'id' => $widget_id, 'class' => 'foundation-rubiks-gallery', 'data-foundation-rubiks-gallery' => true, 'data-interval' => (string) $interval, 'data-pause-on-hover' => $pause_on_hover ? 'true' : 'false', 'aria-label' => esc_attr__( 'Portfolio media gallery', 'foundation-elementor-plus' ) ) ); ?>
+			id="<?php echo esc_attr( $widget_id ); ?>"
+			class="foundation-rubiks-gallery"
+			data-foundation-rubiks-gallery
+			data-interval="<?php echo esc_attr( (string) $interval ); ?>"
+			data-pause-on-hover="<?php echo $pause_on_hover ? 'true' : 'false'; ?>"
+			aria-label="<?php echo esc_attr__( 'Portfolio media gallery', 'foundation-elementor-plus' ); ?>"
 		>
 			<div class="foundation-rubiks-gallery__stage">
 				<?php foreach ( $seed_items as $index => $item ) : ?>

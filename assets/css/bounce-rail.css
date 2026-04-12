@@ -1,6 +1,6 @@
 .foundation-bounce-rail {
   --foundation-bounce-header-gap: 40px;
-  --foundation-bounce-copy-width: 75%;
+  --foundation-bounce-copy-width: 65%;
   --foundation-bounce-controls-min-width: 320px;
   --foundation-bounce-rail-gap: 22px;
   --foundation-bounce-track-right-bleed: max(0px, calc(50vw - 50%));
@@ -37,7 +37,7 @@
 .foundation-bounce-rail__header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 24px;
   margin-bottom: var(--foundation-bounce-header-gap);
 }
@@ -344,7 +344,7 @@
   .foundation-bounce-rail__controls {
     flex-wrap: wrap;
     width: 100%;
-    justify-content: flex-end;
+    justify-content: flex-start;
   }
 
   .foundation-bounce-rail__column {

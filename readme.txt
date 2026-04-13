@@ -4,7 +4,7 @@ Tags: elementor, widgets, agency, design
 Requires at least: 6.4
 Tested up to: 6.9.4
 Requires PHP: 7.4
-Stable tag: 1.3.38
+Stable tag: 1.3.39
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,11 @@ Yes. Add this to `wp-config.php` before deleting the plugin:
 `define( 'FOUNDATION_ELEMENTOR_PLUS_PRESERVE_DATA', true );`
 
 == Changelog ==
+
+= 1.3.39 =
+* Tightened the Live Events widget layout with better wrapping, more compact spacing, and cleaner expanded content flow.
+* Added richer editor controls for image sizing, spacing, typography, pill styling, and button styling.
+* Switched the default event accents to green and orange glass treatments for pills and CTAs.
 
 = 1.3.38 =
 * Added the Live Events Elementor widget with stacked glass accordion cards for upcoming and past events.

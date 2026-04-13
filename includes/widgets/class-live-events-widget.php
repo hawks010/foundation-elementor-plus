@@ -377,6 +377,182 @@ class Live_Events_Widget extends Widget_Base {
 			)
 		);
 
+		$this->add_responsive_control(
+			'shell_gap',
+			array(
+				'label'      => esc_html__( 'Shell Gap', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'rem' ),
+				'default'    => array(
+					'unit' => 'px',
+					'size' => 22,
+				),
+				'range'      => array(
+					'px' => array( 'min' => 0, 'max' => 80 ),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-live-events' => '--foundation-live-events-shell-gap: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'group_gap',
+			array(
+				'label'      => esc_html__( 'Section Gap', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'rem' ),
+				'default'    => array(
+					'unit' => 'px',
+					'size' => 12,
+				),
+				'range'      => array(
+					'px' => array( 'min' => 0, 'max' => 48 ),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-live-events' => '--foundation-live-events-group-gap: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'item_gap',
+			array(
+				'label'      => esc_html__( 'Card Gap', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'rem' ),
+				'default'    => array(
+					'unit' => 'px',
+					'size' => 10,
+				),
+				'range'      => array(
+					'px' => array( 'min' => 0, 'max' => 40 ),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-live-events' => '--foundation-live-events-item-gap: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'card_radius',
+			array(
+				'label'      => esc_html__( 'Card Radius', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'rem' ),
+				'default'    => array(
+					'unit' => 'px',
+					'size' => 22,
+				),
+				'range'      => array(
+					'px' => array( 'min' => 0, 'max' => 80 ),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-live-events' => '--foundation-live-events-card-radius: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'image_column_width',
+			array(
+				'label'      => esc_html__( 'Image Width', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%' ),
+				'default'    => array(
+					'unit' => 'px',
+					'size' => 190,
+				),
+				'range'      => array(
+					'px' => array( 'min' => 120, 'max' => 420 ),
+					'%'  => array( 'min' => 18, 'max' => 45 ),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-live-events' => '--foundation-live-events-media-width: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'image_min_height',
+			array(
+				'label'      => esc_html__( 'Image Height', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'vh' ),
+				'default'    => array(
+					'unit' => 'px',
+					'size' => 176,
+				),
+				'range'      => array(
+					'px' => array( 'min' => 120, 'max' => 480 ),
+					'vh' => array( 'min' => 10, 'max' => 60 ),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-live-events' => '--foundation-live-events-media-min-height: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'content_padding',
+			array(
+				'label'      => esc_html__( 'Card Content Padding', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%', 'em', 'rem' ),
+				'default'    => array(
+					'top'      => 18,
+					'right'    => 18,
+					'bottom'   => 18,
+					'left'     => 18,
+					'unit'     => 'px',
+					'isLinked' => false,
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-live-events__content' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'panel_padding',
+			array(
+				'label'      => esc_html__( 'Expanded Content Padding', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%', 'em', 'rem' ),
+				'default'    => array(
+					'top'      => 0,
+					'right'    => 18,
+					'bottom'   => 18,
+					'left'     => 18,
+					'unit'     => 'px',
+					'isLinked' => false,
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-live-events__panel' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'chevron_width',
+			array(
+				'label'      => esc_html__( 'Chevron Column Width', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%' ),
+				'default'    => array(
+					'unit' => 'px',
+					'size' => 58,
+				),
+				'range'      => array(
+					'px' => array( 'min' => 36, 'max' => 140 ),
+					'%'  => array( 'min' => 4, 'max' => 16 ),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-live-events' => '--foundation-live-events-chevron-width: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
 		$this->end_controls_section();
 	}
 
@@ -449,6 +625,136 @@ class Live_Events_Widget extends Widget_Base {
 			)
 		);
 
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'eyebrow_typography',
+				'selector' => '{{WRAPPER}} .foundation-live-events__eyebrow',
+			)
+		);
+
+		$this->add_control(
+			'eyebrow_color',
+			array(
+				'label'     => esc_html__( 'Eyebrow Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'default'   => '#fbd0c3',
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-live-events__eyebrow' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'intro_typography',
+				'selector' => '{{WRAPPER}} .foundation-live-events__intro, {{WRAPPER}} .foundation-live-events__intro p',
+			)
+		);
+
+		$this->add_control(
+			'group_title_color',
+			array(
+				'label'     => esc_html__( 'Section Label Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'default'   => 'rgba(255, 255, 255, 0.72)',
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-live-events__group-title' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'group_title_typography',
+				'selector' => '{{WRAPPER}} .foundation-live-events__group-title',
+			)
+		);
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'section_image_style',
+			array(
+				'label' => esc_html__( 'Image', 'foundation-elementor-plus' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		$this->add_control(
+			'image_background',
+			array(
+				'label'     => esc_html__( 'Image Background', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'default'   => 'rgba(255, 255, 255, 0.04)',
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-live-events__media' => 'background: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'image_fit',
+			array(
+				'label'   => esc_html__( 'Image Fit', 'foundation-elementor-plus' ),
+				'type'    => Controls_Manager::SELECT,
+				'default' => 'cover',
+				'options' => array(
+					'cover'   => esc_html__( 'Cover', 'foundation-elementor-plus' ),
+					'contain' => esc_html__( 'Contain', 'foundation-elementor-plus' ),
+					'fill'    => esc_html__( 'Fill', 'foundation-elementor-plus' ),
+				),
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-live-events__image' => 'object-fit: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'image_position',
+			array(
+				'label'   => esc_html__( 'Image Position', 'foundation-elementor-plus' ),
+				'type'    => Controls_Manager::SELECT,
+				'default' => 'center center',
+				'options' => array(
+					'left top'       => esc_html__( 'Left Top', 'foundation-elementor-plus' ),
+					'left center'    => esc_html__( 'Left Center', 'foundation-elementor-plus' ),
+					'left bottom'    => esc_html__( 'Left Bottom', 'foundation-elementor-plus' ),
+					'center top'     => esc_html__( 'Center Top', 'foundation-elementor-plus' ),
+					'center center'  => esc_html__( 'Center Center', 'foundation-elementor-plus' ),
+					'center bottom'  => esc_html__( 'Center Bottom', 'foundation-elementor-plus' ),
+					'right top'      => esc_html__( 'Right Top', 'foundation-elementor-plus' ),
+					'right center'   => esc_html__( 'Right Center', 'foundation-elementor-plus' ),
+					'right bottom'   => esc_html__( 'Right Bottom', 'foundation-elementor-plus' ),
+				),
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-live-events__image' => 'object-position: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'image_padding',
+			array(
+				'label'      => esc_html__( 'Image Inner Padding', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%', 'em', 'rem' ),
+				'default'    => array(
+					'top'      => 0,
+					'right'    => 0,
+					'bottom'   => 0,
+					'left'     => 0,
+					'unit'     => 'px',
+					'isLinked' => false,
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-live-events__media' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -492,6 +798,202 @@ class Live_Events_Widget extends Widget_Base {
 			array(
 				'name'     => 'card_title_typography',
 				'selector' => '{{WRAPPER}} .foundation-live-events__item-title',
+			)
+		);
+
+		$this->add_control(
+			'card_title_color',
+			array(
+				'label'     => esc_html__( 'Card Title Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'default'   => '#ffffff',
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-live-events__item-title' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'summary_color',
+			array(
+				'label'     => esc_html__( 'Summary Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'default'   => 'rgba(255, 255, 255, 0.82)',
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-live-events__summary' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'summary_typography',
+				'selector' => '{{WRAPPER}} .foundation-live-events__summary',
+			)
+		);
+
+		$this->add_control(
+			'panel_text_color',
+			array(
+				'label'     => esc_html__( 'Expanded Text Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'default'   => 'rgba(255, 255, 255, 0.84)',
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-live-events__panel-copy, {{WRAPPER}} .foundation-live-events__panel-copy p, {{WRAPPER}} .foundation-live-events__panel-copy li' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'panel_typography',
+				'selector' => '{{WRAPPER}} .foundation-live-events__panel-copy, {{WRAPPER}} .foundation-live-events__panel-copy p, {{WRAPPER}} .foundation-live-events__panel-copy li',
+			)
+		);
+
+		$this->add_control(
+			'chevron_color',
+			array(
+				'label'     => esc_html__( 'Chevron Color', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'default'   => 'rgba(255, 255, 255, 0.72)',
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-live-events__chevron' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'section_pills_style',
+			array(
+				'label' => esc_html__( 'Meta Pills', 'foundation-elementor-plus' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		$this->add_control(
+			'pill_background_start',
+			array(
+				'label'     => esc_html__( 'Pill Gradient Start', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'default'   => 'rgba(11, 177, 156, 0.22)',
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-live-events' => '--foundation-live-events-pill-start: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'pill_background_end',
+			array(
+				'label'     => esc_html__( 'Pill Gradient End', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'default'   => 'rgba(18, 98, 92, 0.36)',
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-live-events' => '--foundation-live-events-pill-end: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'pill_border_color',
+			array(
+				'label'     => esc_html__( 'Pill Border', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'default'   => 'rgba(102, 245, 218, 0.2)',
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-live-events' => '--foundation-live-events-pill-border: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'pill_text_color',
+			array(
+				'label'     => esc_html__( 'Pill Text', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'default'   => '#dcfffa',
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-live-events__meta-pill' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'pill_typography',
+				'selector' => '{{WRAPPER}} .foundation-live-events__meta-pill',
+			)
+		);
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'section_button_style',
+			array(
+				'label' => esc_html__( 'Button', 'foundation-elementor-plus' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		$this->add_control(
+			'button_background_start',
+			array(
+				'label'     => esc_html__( 'Button Gradient Start', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'default'   => 'rgba(255, 153, 51, 0.38)',
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-live-events' => '--foundation-live-events-button-start: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'button_background_end',
+			array(
+				'label'     => esc_html__( 'Button Gradient End', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'default'   => 'rgba(224, 104, 0, 0.58)',
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-live-events' => '--foundation-live-events-button-end: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'button_border_color',
+			array(
+				'label'     => esc_html__( 'Button Border', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'default'   => 'rgba(255, 214, 179, 0.24)',
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-live-events' => '--foundation-live-events-button-border: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'button_text_color',
+			array(
+				'label'     => esc_html__( 'Button Text', 'foundation-elementor-plus' ),
+				'type'      => Controls_Manager::COLOR,
+				'default'   => '#ffffff',
+				'selectors' => array(
+					'{{WRAPPER}} .foundation-live-events__link' => 'color: {{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'button_typography',
+				'selector' => '{{WRAPPER}} .foundation-live-events__link',
 			)
 		);
 

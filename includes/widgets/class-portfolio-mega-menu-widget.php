@@ -358,6 +358,7 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 		$widget_id  = 'foundation-portfolio-mega-menu-' . $this->get_id();
 		$items      = $this->get_activity_items( $settings );
 		$nav_links  = $this->get_nav_links( $settings );
+		$socials    = $this->get_social_links();
 		$popup_id   = ! empty( $settings['cta_popup_id'] ) ? absint( $settings['cta_popup_id'] ) : 0;
 		$button_key = 'cta_button';
 		$button_url = ! empty( $settings['cta_button_url']['url'] ) ? $settings['cta_button_url'] : array( 'url' => home_url( '/contact-us/' ) );
@@ -376,18 +377,33 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 		?>
 		<section id="<?php echo esc_attr( $widget_id ); ?>" class="foundation-portfolio-mega-menu" data-foundation-portfolio-mega-menu>
 			<div class="foundation-portfolio-mega-menu__panel">
-				<?php if ( 'yes' === ( $settings['show_nav'] ?? 'yes' ) && ! empty( $nav_links ) ) : ?>
-					<nav class="foundation-portfolio-mega-menu__nav" aria-label="<?php echo esc_attr__( 'Inkfire In Action menu links', 'foundation-elementor-plus' ); ?>">
-						<?php foreach ( $nav_links as $index => $link ) : ?>
-							<?php
-							$key = 'nav_link_' . $index;
-							$this->add_link_attributes( $key, $link['url'] );
-							?>
-							<a class="foundation-portfolio-mega-menu__nav-link<?php echo ! empty( $link['is_all'] ) ? ' is-all' : ''; ?>" <?php echo $this->get_render_attribute_string( $key ); ?>>
-								<?php echo esc_html( $link['label'] ); ?>
-							</a>
-						<?php endforeach; ?>
-					</nav>
+				<?php if ( ( 'yes' === ( $settings['show_nav'] ?? 'yes' ) && ! empty( $nav_links ) ) || ! empty( $socials ) ) : ?>
+					<div class="foundation-portfolio-mega-menu__topbar">
+						<?php if ( 'yes' === ( $settings['show_nav'] ?? 'yes' ) && ! empty( $nav_links ) ) : ?>
+							<nav class="foundation-portfolio-mega-menu__nav" aria-label="<?php echo esc_attr__( 'Inkfire In Action menu links', 'foundation-elementor-plus' ); ?>">
+								<?php foreach ( $nav_links as $index => $link ) : ?>
+									<?php
+									$key = 'nav_link_' . $index;
+									$this->add_link_attributes( $key, $link['url'] );
+									?>
+									<a class="foundation-portfolio-mega-menu__nav-link<?php echo ! empty( $link['is_all'] ) ? ' is-all' : ''; ?>" <?php echo $this->get_render_attribute_string( $key ); ?>>
+										<?php echo esc_html( $link['label'] ); ?>
+									</a>
+								<?php endforeach; ?>
+							</nav>
+						<?php endif; ?>
+
+						<?php if ( ! empty( $socials ) ) : ?>
+							<div class="foundation-portfolio-mega-menu__socials" aria-label="<?php esc_attr_e( 'Inkfire social links', 'foundation-elementor-plus' ); ?>">
+								<?php foreach ( $socials as $social ) : ?>
+									<a class="foundation-portfolio-mega-menu__social-link" href="<?php echo esc_url( $social['url'] ); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php echo esc_attr( $social['label'] ); ?>" title="<?php echo esc_attr( $social['label'] ); ?>">
+										<?php echo $this->get_social_icon( $social['icon'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+										<span class="screen-reader-text"><?php echo esc_html( $social['label'] ); ?></span>
+									</a>
+								<?php endforeach; ?>
+							</div>
+						<?php endif; ?>
+					</div>
 				<?php endif; ?>
 
 				<div class="foundation-portfolio-mega-menu__grid">
@@ -639,10 +655,6 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 					'label' => esc_html__( 'Latest posts', 'foundation-elementor-plus' ),
 					'url'   => array( 'url' => $this->get_page_url_by_path( 'blog' ) ),
 				),
-				array(
-					'label' => esc_html__( 'Social posts', 'foundation-elementor-plus' ),
-					'url'   => array( 'url' => $this->get_page_url_by_path( 'social-media-management' ) ),
-				),
 			)
 		);
 
@@ -671,6 +683,42 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 		}
 
 		return home_url( '/' . trim( $path, '/' ) . '/' );
+	}
+
+	private function get_social_links(): array {
+		return array(
+			array(
+				'label' => esc_html__( 'LinkedIn', 'foundation-elementor-plus' ),
+				'url'   => 'https://uk.linkedin.com/company/inkfire',
+				'icon'  => 'linkedin',
+			),
+			array(
+				'label' => esc_html__( 'Instagram', 'foundation-elementor-plus' ),
+				'url'   => 'https://www.instagram.com/inkfirelimited/',
+				'icon'  => 'instagram',
+			),
+			array(
+				'label' => esc_html__( 'Facebook', 'foundation-elementor-plus' ),
+				'url'   => 'https://facebook.com/inkfirelimited',
+				'icon'  => 'facebook',
+			),
+			array(
+				'label' => esc_html__( 'X', 'foundation-elementor-plus' ),
+				'url'   => 'https://twitter.com/Inkfirelimited',
+				'icon'  => 'x',
+			),
+		);
+	}
+
+	private function get_social_icon( string $icon ): string {
+		$icons = array(
+			'facebook'  => '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M13.5 21v-8.2h2.77l.41-3.2H13.5V7.56c0-.93.26-1.56 1.59-1.56h1.69V3.14c-.82-.09-1.65-.13-2.48-.12-2.45 0-4.13 1.49-4.13 4.24V9.6H7.4v3.2h2.77V21h3.33Z"/></svg>',
+			'instagram' => '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 3.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 0 1 12 7.5Zm0 2A2.5 2.5 0 1 0 14.5 12 2.5 2.5 0 0 0 12 9.5Zm5.25-3a1.25 1.25 0 1 1-1.25 1.25 1.25 1.25 0 0 1 1.25-1.25Z"/></svg>',
+			'linkedin'  => '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.94 8.5A1.56 1.56 0 1 1 6.9 5.37a1.56 1.56 0 0 1 .04 3.13ZM5.5 10h2.88v8.5H5.5V10Zm4.7 0h2.76v1.16h.04c.38-.73 1.32-1.5 2.72-1.5 2.91 0 3.45 1.92 3.45 4.42v4.42h-2.88v-3.92c0-.93-.02-2.13-1.3-2.13s-1.5 1.01-1.5 2.06v3.99H10.2V10Z"/></svg>',
+			'x'         => '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m4 4 6.92 9.22L4.44 20h2.44l5.16-5.4L16.1 20H20l-7.25-9.66L18.8 4h-2.44l-4.73 4.95L7.9 4H4Zm3.12 1.8h1.88l7.88 12.4H15L7.12 5.8Z"/></svg>',
+		);
+
+		return $icons[ $icon ] ?? $icons['linkedin'];
 	}
 
 	private function get_arrow_icon(): string {

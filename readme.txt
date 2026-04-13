@@ -4,7 +4,7 @@ Tags: elementor, widgets, agency, design
 Requires at least: 6.4
 Tested up to: 6.9.4
 Requires PHP: 7.4
-Stable tag: 1.3.45
+Stable tag: 1.3.46
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,10 @@ Yes. Add this to `wp-config.php` before deleting the plugin:
 `define( 'FOUNDATION_ELEMENTOR_PLUS_PRESERVE_DATA', true );`
 
 == Changelog ==
+
+= 1.3.46 =
+* Removed the Social posts navigation pill from the Inkfire In Action mega menu.
+* Added green-glass social icon links for Inkfire's LinkedIn, Instagram, Facebook, and X profiles.
 
 = 1.3.45 =
 * Routed the Inkfire In Action mega-menu social link to the existing Social Media Management page so every menu pill has a live destination.

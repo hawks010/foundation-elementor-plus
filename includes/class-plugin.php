@@ -53,6 +53,7 @@ final class Plugin {
 	public function bootstrap() {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_menu', array( $this, 'register_admin_menu' ), 20 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 
 		if ( ! did_action( 'elementor/loaded' ) ) {
 			add_action( 'admin_notices', array( $this, 'render_missing_elementor_notice' ) );
@@ -65,6 +66,41 @@ final class Plugin {
 		add_action( 'elementor/widgets/register', array( $this, 'register_widgets' ) );
 		add_filter( 'the_content', array( $this, 'normalize_live_upload_urls' ), 20 );
 		add_filter( 'elementor/frontend/the_content', array( $this, 'normalize_live_upload_urls' ), 20 );
+	}
+
+	/**
+	 * Enqueue the shared Foundation admin shell for this plugin page.
+	 *
+	 * @param string $hook Current admin hook.
+	 */
+	public function enqueue_admin_assets( $hook ) {
+		if ( false === strpos( (string) $hook, self::MENU_SLUG ) ) {
+			return;
+		}
+
+		$asset_base    = FOUNDATION_ELEMENTOR_PLUS_URL . 'assets/admin/';
+		$asset_version = FOUNDATION_ELEMENTOR_PLUS_VERSION;
+
+		wp_enqueue_style(
+			'foundation-admin-shell',
+			$asset_base . 'foundation-admin-shell.css',
+			array(),
+			$asset_version
+		);
+
+		wp_enqueue_script(
+			'foundation-admin-shell',
+			$asset_base . 'foundation-admin-shell.js',
+			array( 'wp-element' ),
+			$asset_version,
+			true
+		);
+
+		wp_add_inline_script(
+			'foundation-admin-shell',
+			'window.foundationAdminShellData = ' . wp_json_encode( $this->get_shell_config() ) . ';',
+			'before'
+		);
 	}
 
 	/**
@@ -402,6 +438,89 @@ final class Plugin {
 	}
 
 	/**
+	 * Build the shared shell config.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function get_shell_config() {
+		$widget_count    = count( Widget_Registry::get_widget_manifest() );
+		$elementor_ready = did_action( 'elementor/loaded' );
+
+		return array(
+			'plugin'          => 'elementor-plus',
+			'rootId'          => 'foundation-admin-app',
+			'eyebrow'         => esc_html__( 'Foundation command centre', 'foundation-elementor-plus' ),
+			'title'           => esc_html__( 'Foundation Elementor Plus', 'foundation-elementor-plus' ),
+			'description'     => esc_html__( 'The widget suite now uses the same Foundation admin shell as the rest of the plugin family, while the existing Settings API group and option keys stay unchanged.', 'foundation-elementor-plus' ),
+			'badge'           => 'v' . FOUNDATION_ELEMENTOR_PLUS_VERSION,
+			'themeStorageKey' => 'foundation-elementor-plus-theme',
+			'actions'         => array(
+				array(
+					'label'   => esc_html__( 'Open Elementor Library', 'foundation-elementor-plus' ),
+					'href'    => admin_url( 'edit.php?post_type=elementor_library' ),
+					'variant' => 'solid',
+				),
+				array(
+					'label'   => esc_html__( 'GitHub backup', 'foundation-elementor-plus' ),
+					'href'    => 'https://github.com/hawks010/foundation-elementor-plus',
+					'target'  => '_blank',
+					'variant' => 'ghost',
+				),
+			),
+			'metrics'         => array(
+				array(
+					'label' => esc_html__( 'Plugin status', 'foundation-elementor-plus' ),
+					'value' => esc_html__( 'Active', 'foundation-elementor-plus' ),
+					'meta'  => sprintf( esc_html__( 'Running version %s.', 'foundation-elementor-plus' ), FOUNDATION_ELEMENTOR_PLUS_VERSION ),
+				),
+				array(
+					'label' => esc_html__( 'Elementor', 'foundation-elementor-plus' ),
+					'value' => $elementor_ready ? esc_html__( 'Connected', 'foundation-elementor-plus' ) : esc_html__( 'Missing', 'foundation-elementor-plus' ),
+					'meta'  => esc_html__( 'Widget registration depends on Elementor being active.', 'foundation-elementor-plus' ),
+					'tone'  => $elementor_ready ? 'accent' : 'danger',
+				),
+				array(
+					'label' => esc_html__( 'Available widgets', 'foundation-elementor-plus' ),
+					'value' => number_format_i18n( $widget_count ),
+					'meta'  => esc_html__( 'Registered Foundation widgets available to editors.', 'foundation-elementor-plus' ),
+				),
+			),
+			'sections'        => array(
+				array(
+					'id'          => 'elementor-widget-suite',
+					'navLabel'    => esc_html__( 'Widgets', 'foundation-elementor-plus' ),
+					'eyebrow'     => esc_html__( 'Widget suite', 'foundation-elementor-plus' ),
+					'title'       => esc_html__( 'Registered Elementor widgets', 'foundation-elementor-plus' ),
+					'description' => esc_html__( 'Editors still find these widgets inside Elementor under the configured Foundation category.', 'foundation-elementor-plus' ),
+					'templateId'  => 'foundation-elementor-widget-suite',
+				),
+				array(
+					'id'          => 'elementor-settings',
+					'navLabel'    => esc_html__( 'Settings', 'foundation-elementor-plus' ),
+					'eyebrow'     => esc_html__( 'Settings API', 'foundation-elementor-plus' ),
+					'title'       => esc_html__( 'Editor labels and feed integrations', 'foundation-elementor-plus' ),
+					'description' => esc_html__( 'This form still saves through `foundation_elementor_plus` and `foundation_elementor_plus_settings`.', 'foundation-elementor-plus' ),
+					'templateId'  => 'foundation-elementor-settings',
+				),
+			),
+		);
+	}
+
+	/**
+	 * Print a template for the shared shell to mount.
+	 *
+	 * @param string $id Template ID.
+	 * @param string $html Template markup.
+	 */
+	private function render_template( $id, $html ) {
+		printf(
+			'<template id="%1$s">%2$s</template>',
+			esc_attr( $id ),
+			$html
+		);
+	}
+
+	/**
 	 * Render the plugin admin page.
 	 */
 	public function render_admin_page() {
@@ -411,6 +530,62 @@ final class Plugin {
 
 		$settings          = $this->get_settings();
 		$widget_manifest   = Widget_Registry::get_widget_manifest();
+
+		ob_start();
+		?>
+		<div class="fp-card">
+			<h2><?php esc_html_e( 'Widget Suite', 'foundation-elementor-plus' ); ?></h2>
+			<p class="description"><?php esc_html_e( 'Editors can find these widgets in Elementor under the custom Foundation Plus category.', 'foundation-elementor-plus' ); ?></p>
+			<ul class="foundation-admin-list">
+				<?php foreach ( $widget_manifest as $widget_id => $widget ) : ?>
+					<li>
+						<strong><?php echo esc_html( $widget['title'] ); ?></strong>
+						<span><?php echo esc_html( $widget['description'] ); ?></span><br />
+						<code><?php echo esc_html( $widget_id ); ?></code>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+		</div>
+		<?php
+		$widget_markup = ob_get_clean();
+
+		ob_start();
+		?>
+		<div class="fp-card">
+			<h2><?php esc_html_e( 'Editor Settings', 'foundation-elementor-plus' ); ?></h2>
+			<form action="options.php" method="post">
+				<?php
+				settings_fields( 'foundation_elementor_plus' );
+				do_settings_sections( 'foundation-elementor-plus' );
+				submit_button( __( 'Save Settings', 'foundation-elementor-plus' ) );
+				?>
+			</form>
+			<p class="description">
+				<?php
+				printf(
+					/* translators: 1: widget category label, 2: widget category icon class */
+					esc_html__( 'Current editor category: %1$s (%2$s)', 'foundation-elementor-plus' ),
+					esc_html( $settings['widget_category_label'] ),
+					esc_html( $settings['widget_category_icon'] )
+				);
+				?>
+			</p>
+		</div>
+		<?php
+		$settings_markup = ob_get_clean();
+		?>
+		<div class="wrap foundation-admin-wrap">
+			<div id="foundation-admin-app">
+				<p><?php esc_html_e( 'Loading Foundation shell...', 'foundation-elementor-plus' ); ?></p>
+			</div>
+			<?php
+			$this->render_template( 'foundation-elementor-widget-suite', $widget_markup );
+			$this->render_template( 'foundation-elementor-settings', $settings_markup );
+			?>
+		</div>
+		<?php
+		return;
+
 		$elementor_ready   = did_action( 'elementor/loaded' );
 		$plugin_file       = plugin_basename( FOUNDATION_ELEMENTOR_PLUS_FILE );
 		$widget_count      = count( $widget_manifest );

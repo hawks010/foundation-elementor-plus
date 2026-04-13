@@ -4,7 +4,7 @@ Tags: elementor, widgets, agency, design
 Requires at least: 6.4
 Tested up to: 6.9.4
 Requires PHP: 7.4
-Stable tag: 1.3.39
+Stable tag: 1.3.41
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,14 @@ Yes. Add this to `wp-config.php` before deleting the plugin:
 `define( 'FOUNDATION_ELEMENTOR_PLUS_PRESERVE_DATA', true );`
 
 == Changelog ==
+
+= 1.3.41 =
+* Added a header visibility toggle to the Live Events widget.
+* Added width controls for the header title, header intro, card title, and card summary blocks.
+
+= 1.3.40 =
+* Added a shell-frame toggle to the Live Events widget so editors can switch to a fully transparent, padding-free wrapper when needed.
+* Kept shell-specific layout and style controls scoped to the framed mode.
 
 = 1.3.39 =
 * Tightened the Live Events widget layout with better wrapping, more compact spacing, and cleaner expanded content flow.

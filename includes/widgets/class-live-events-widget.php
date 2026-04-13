@@ -50,6 +50,8 @@ class Live_Events_Widget extends Widget_Base {
 	protected function render() {
 		$settings       = $this->get_settings_for_display();
 		$widget_id      = 'foundation-live-events-' . $this->get_id();
+		$show_header    = ! isset( $settings['show_header'] ) || 'yes' === $settings['show_header'];
+		$use_shell      = ! isset( $settings['use_shell_frame'] ) || 'yes' === $settings['use_shell_frame'];
 		$show_past      = isset( $settings['show_past_events'] ) && 'yes' === $settings['show_past_events'];
 		$default_open   = isset( $settings['default_open_first'] ) && 'yes' === $settings['default_open_first'];
 		$upcoming_label = ! empty( $settings['upcoming_heading'] ) ? $settings['upcoming_heading'] : esc_html__( 'Upcoming Events', 'foundation-elementor-plus' );
@@ -65,22 +67,24 @@ class Live_Events_Widget extends Widget_Base {
 			data-foundation-live-events
 			data-default-open="<?php echo $default_open ? 'yes' : 'no'; ?>"
 		>
-			<div class="foundation-live-events__shell">
-				<div class="foundation-live-events__hero">
-					<?php if ( ! empty( $settings['eyebrow'] ) ) : ?>
-						<p class="foundation-live-events__eyebrow"><?php echo esc_html( $settings['eyebrow'] ); ?></p>
-					<?php endif; ?>
+			<div class="foundation-live-events__shell<?php echo $use_shell ? '' : ' foundation-live-events__shell--plain'; ?>">
+				<?php if ( $show_header ) : ?>
+					<div class="foundation-live-events__hero">
+						<?php if ( ! empty( $settings['eyebrow'] ) ) : ?>
+							<p class="foundation-live-events__eyebrow"><?php echo esc_html( $settings['eyebrow'] ); ?></p>
+						<?php endif; ?>
 
-					<?php if ( ! empty( $settings['heading'] ) ) : ?>
-						<h2 class="foundation-live-events__title"><?php echo wp_kses_post( nl2br( esc_html( $settings['heading'] ) ) ); ?></h2>
-					<?php endif; ?>
+						<?php if ( ! empty( $settings['heading'] ) ) : ?>
+							<h2 class="foundation-live-events__title"><?php echo wp_kses_post( nl2br( esc_html( $settings['heading'] ) ) ); ?></h2>
+						<?php endif; ?>
 
-					<?php if ( ! empty( $settings['intro'] ) ) : ?>
-						<div class="foundation-live-events__intro">
-							<?php echo wp_kses_post( wpautop( $settings['intro'] ) ); ?>
-						</div>
-					<?php endif; ?>
-				</div>
+						<?php if ( ! empty( $settings['intro'] ) ) : ?>
+							<div class="foundation-live-events__intro">
+								<?php echo wp_kses_post( wpautop( $settings['intro'] ) ); ?>
+							</div>
+						<?php endif; ?>
+					</div>
+				<?php endif; ?>
 
 				<?php if ( ! empty( $upcoming ) ) : ?>
 					<?php $this->render_event_group( $upcoming_label, $upcoming, $widget_id, 'upcoming' ); ?>
@@ -192,6 +196,18 @@ class Live_Events_Widget extends Widget_Base {
 		);
 
 		$this->add_control(
+			'show_header',
+			array(
+				'label'        => esc_html__( 'Show Header', 'foundation-elementor-plus' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => esc_html__( 'Show', 'foundation-elementor-plus' ),
+				'label_off'    => esc_html__( 'Hide', 'foundation-elementor-plus' ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+			)
+		);
+
+		$this->add_control(
 			'eyebrow',
 			array(
 				'label'       => esc_html__( 'Eyebrow', 'foundation-elementor-plus' ),
@@ -199,6 +215,9 @@ class Live_Events_Widget extends Widget_Base {
 				'default'     => esc_html__( 'Where to find us next', 'foundation-elementor-plus' ),
 				'label_block' => true,
 				'dynamic'     => array( 'active' => true ),
+				'condition'   => array(
+					'show_header' => 'yes',
+				),
 			)
 		);
 
@@ -211,6 +230,9 @@ class Live_Events_Widget extends Widget_Base {
 				'default'     => "Events we're\nattending",
 				'label_block' => true,
 				'dynamic'     => array( 'active' => true ),
+				'condition'   => array(
+					'show_header' => 'yes',
+				),
 			)
 		);
 
@@ -222,6 +244,9 @@ class Live_Events_Widget extends Widget_Base {
 				'rows'    => 4,
 				'default' => esc_html__( 'A clean list of upcoming appearances, talks, and community events. Expand each card for the fuller details and booking information.', 'foundation-elementor-plus' ),
 				'dynamic' => array( 'active' => true ),
+				'condition' => array(
+					'show_header' => 'yes',
+				),
 			)
 		);
 
@@ -297,6 +322,19 @@ class Live_Events_Widget extends Widget_Base {
 			)
 		);
 
+		$this->add_control(
+			'use_shell_frame',
+			array(
+				'label'        => esc_html__( 'Use Shell Frame', 'foundation-elementor-plus' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => esc_html__( 'On', 'foundation-elementor-plus' ),
+				'label_off'    => esc_html__( 'Off', 'foundation-elementor-plus' ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'description'  => esc_html__( 'Turn this off for a transparent, padding-free wrapper with no shell background, border, or shadow.', 'foundation-elementor-plus' ),
+			)
+		);
+
 		$this->add_responsive_control(
 			'section_padding',
 			array(
@@ -335,6 +373,9 @@ class Live_Events_Widget extends Widget_Base {
 				'selectors'  => array(
 					'{{WRAPPER}} .foundation-live-events__shell' => 'width: {{SIZE}}{{UNIT}}; max-width: none;',
 				),
+				'condition'  => array(
+					'use_shell_frame' => 'yes',
+				),
 			)
 		);
 
@@ -355,6 +396,9 @@ class Live_Events_Widget extends Widget_Base {
 				'selectors'  => array(
 					'{{WRAPPER}} .foundation-live-events__shell' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				),
+				'condition'  => array(
+					'use_shell_frame' => 'yes',
+				),
 			)
 		);
 
@@ -374,6 +418,9 @@ class Live_Events_Widget extends Widget_Base {
 				'selectors'  => array(
 					'{{WRAPPER}} .foundation-live-events' => '--foundation-live-events-shell-radius: {{SIZE}}{{UNIT}};',
 				),
+				'condition'  => array(
+					'use_shell_frame' => 'yes',
+				),
 			)
 		);
 
@@ -392,6 +439,54 @@ class Live_Events_Widget extends Widget_Base {
 				),
 				'selectors'  => array(
 					'{{WRAPPER}} .foundation-live-events' => '--foundation-live-events-shell-gap: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'header_title_width',
+			array(
+				'label'      => esc_html__( 'Header Title Width', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%', 'vw' ),
+				'default'    => array(
+					'unit' => 'px',
+					'size' => 520,
+				),
+				'range'      => array(
+					'px' => array( 'min' => 160, 'max' => 1400 ),
+					'%'  => array( 'min' => 20, 'max' => 100 ),
+					'vw' => array( 'min' => 20, 'max' => 100 ),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-live-events__title' => 'max-width: {{SIZE}}{{UNIT}};',
+				),
+				'condition'  => array(
+					'show_header' => 'yes',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'header_intro_width',
+			array(
+				'label'      => esc_html__( 'Header Intro Width', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%', 'vw' ),
+				'default'    => array(
+					'unit' => 'px',
+					'size' => 760,
+				),
+				'range'      => array(
+					'px' => array( 'min' => 180, 'max' => 1800 ),
+					'%'  => array( 'min' => 20, 'max' => 100 ),
+					'vw' => array( 'min' => 20, 'max' => 100 ),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-live-events__intro, {{WRAPPER}} .foundation-live-events__intro p' => 'max-width: {{SIZE}}{{UNIT}};',
+				),
+				'condition'  => array(
+					'show_header' => 'yes',
 				),
 			)
 		);
@@ -494,6 +589,46 @@ class Live_Events_Widget extends Widget_Base {
 		);
 
 		$this->add_responsive_control(
+			'card_title_width',
+			array(
+				'label'      => esc_html__( 'Card Title Width', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%' ),
+				'default'    => array(
+					'unit' => '%',
+					'size' => 100,
+				),
+				'range'      => array(
+					'px' => array( 'min' => 120, 'max' => 1600 ),
+					'%'  => array( 'min' => 30, 'max' => 100 ),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-live-events__item-title' => 'max-width: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'card_summary_width',
+			array(
+				'label'      => esc_html__( 'Card Summary Width', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%' ),
+				'default'    => array(
+					'unit' => '%',
+					'size' => 100,
+				),
+				'range'      => array(
+					'px' => array( 'min' => 140, 'max' => 1600 ),
+					'%'  => array( 'min' => 30, 'max' => 100 ),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .foundation-live-events__summary' => 'max-width: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
 			'content_padding',
 			array(
 				'label'      => esc_html__( 'Card Content Padding', 'foundation-elementor-plus' ),
@@ -562,6 +697,9 @@ class Live_Events_Widget extends Widget_Base {
 			array(
 				'label' => esc_html__( 'Shell', 'foundation-elementor-plus' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
+				'condition' => array(
+					'use_shell_frame' => 'yes',
+				),
 			)
 		);
 

@@ -761,6 +761,75 @@ class Dark_Animated_Hero_Widget extends Widget_Base {
 			)
 		);
 
+		$this->add_responsive_control(
+			'left_title_width',
+			array(
+				'label'      => esc_html__( 'Left Title Width', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( '%', 'px' ),
+				'range'      => array(
+					'%' => array(
+						'min' => 20,
+						'max' => 100,
+					),
+					'px' => array(
+						'min' => 240,
+						'max' => 1800,
+					),
+				),
+				'description' => esc_html__( 'Applies to the headline when the hero resolves to left alignment.', 'foundation-elementor-plus' ),
+				'selectors'   => array(
+					'{{WRAPPER}} .foundation-inkfire-splash--align-left' => '--foundation-inkfire-left-title-width: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'left_subtitle_width',
+			array(
+				'label'      => esc_html__( 'Left Subtitle Width', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( '%', 'px' ),
+				'range'      => array(
+					'%' => array(
+						'min' => 20,
+						'max' => 100,
+					),
+					'px' => array(
+						'min' => 180,
+						'max' => 1200,
+					),
+				),
+				'description' => esc_html__( 'Applies to the subtitle line between the eyebrow and headline when the hero resolves to left alignment.', 'foundation-elementor-plus' ),
+				'selectors'   => array(
+					'{{WRAPPER}} .foundation-inkfire-splash--align-left' => '--foundation-inkfire-left-subtitle-width: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'left_paragraph_width',
+			array(
+				'label'      => esc_html__( 'Left Paragraph Width', 'foundation-elementor-plus' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( '%', 'px' ),
+				'range'      => array(
+					'%' => array(
+						'min' => 20,
+						'max' => 100,
+					),
+					'px' => array(
+						'min' => 240,
+						'max' => 1400,
+					),
+				),
+				'description' => esc_html__( 'Applies to the paragraph copy below the headline when the hero resolves to left alignment.', 'foundation-elementor-plus' ),
+				'selectors'   => array(
+					'{{WRAPPER}} .foundation-inkfire-splash--align-left' => '--foundation-inkfire-left-paragraph-width: {{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
 		$this->add_control(
 			'palette_key',
 			array(

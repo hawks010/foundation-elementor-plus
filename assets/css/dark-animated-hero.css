@@ -1423,6 +1423,15 @@
 .foundation-inkfire-splash--align-left .foundation-inkfire-kicker {
     align-self: flex-start;
     text-align: left;
+    max-width: var(--foundation-inkfire-left-subtitle-width, 100%);
+}
+
+.foundation-inkfire-splash--align-left .foundation-inkfire-headline {
+    max-width: var(--foundation-inkfire-left-title-width, 100%);
+}
+
+.foundation-inkfire-splash--align-left .foundation-inkfire-subhead {
+    max-width: var(--foundation-inkfire-left-paragraph-width, 100%);
 }
 
 .foundation-inkfire-splash--align-left .foundation-inkfire-meta-row {

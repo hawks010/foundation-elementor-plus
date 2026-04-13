@@ -4,7 +4,7 @@ Tags: elementor, widgets, agency, design
 Requires at least: 6.4
 Tested up to: 6.9.4
 Requires PHP: 7.4
-Stable tag: 1.3.42
+Stable tag: 1.3.43
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,10 @@ Yes. Add this to `wp-config.php` before deleting the plugin:
 `define( 'FOUNDATION_ELEMENTOR_PLUS_PRESERVE_DATA', true );`
 
 == Changelog ==
+
+= 1.3.43 =
+* Added a Blog posts by category source mode to Awards Wall for clearer dynamic category queries.
+* Kept the existing Blog posts mode backward compatible while exposing the same query, ordering, excerpt, and layout controls for category-driven walls.
 
 = 1.3.42 =
 * Added left-aligned width controls to Dark Animated Hero for the title, subtitle line, and paragraph copy.

@@ -59,11 +59,11 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 		$blocks    = $this->group_cards_by_block( $cards );
 		$classes   = array( 'foundation-awards-wall' );
 
-		if ( 'posts' === ( $settings['content_mode'] ?? 'manual' ) ) {
+		if ( $this->is_dynamic_posts_mode( $settings['content_mode'] ?? 'manual' ) ) {
 			$classes[] = 'foundation-awards-wall--posts';
 		}
 
-		if ( 'posts' === ( $settings['content_mode'] ?? 'manual' ) && 'yes' === ( $settings['posts_compact_incomplete_blocks'] ?? 'yes' ) ) {
+		if ( $this->is_dynamic_posts_mode( $settings['content_mode'] ?? 'manual' ) && 'yes' === ( $settings['posts_compact_incomplete_blocks'] ?? 'yes' ) ) {
 			$classes[] = 'foundation-awards-wall--compact-incomplete';
 		}
 
@@ -166,6 +166,10 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 	}
 
 	private function register_source_controls() {
+		$dynamic_posts_condition = array(
+			'content_mode' => array( 'posts', 'category_posts' ),
+		);
+
 		$this->start_controls_section(
 			'section_source',
 			array(
@@ -180,8 +184,21 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 				'type'    => Controls_Manager::SELECT,
 				'default' => 'manual',
 				'options' => array(
-					'manual' => esc_html__( 'Manual cards', 'foundation-elementor-plus' ),
-					'posts'  => esc_html__( 'Blog posts', 'foundation-elementor-plus' ),
+					'manual'         => esc_html__( 'Manual cards', 'foundation-elementor-plus' ),
+					'posts'          => esc_html__( 'Blog posts', 'foundation-elementor-plus' ),
+					'category_posts' => esc_html__( 'Blog posts by category', 'foundation-elementor-plus' ),
+				),
+			)
+		);
+
+		$this->add_control(
+			'category_posts_note',
+			array(
+				'type'            => Controls_Manager::RAW_HTML,
+				'raw'             => esc_html__( 'Choose Blog posts by category, then select one or more categories below. Leave the selector empty to fall back to all blog posts.', 'foundation-elementor-plus' ),
+				'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+				'condition'       => array(
+					'content_mode' => 'category_posts',
 				),
 			)
 		);
@@ -195,9 +212,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 				'max'       => 24,
 				'step'      => 1,
 				'default'   => 8,
-				'condition' => array(
-					'content_mode' => 'posts',
-				),
+				'condition' => $dynamic_posts_condition,
 			)
 		);
 
@@ -209,10 +224,8 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 				'multiple'    => true,
 				'label_block' => true,
 				'options'     => $this->get_post_category_options(),
-				'description' => esc_html__( 'Leave empty to include all blog posts.', 'foundation-elementor-plus' ),
-				'condition'   => array(
-					'content_mode' => 'posts',
-				),
+				'description' => esc_html__( 'Select categories for the dynamic post query. Leave empty to include all blog posts.', 'foundation-elementor-plus' ),
+				'condition'   => $dynamic_posts_condition,
 			)
 		);
 
@@ -222,9 +235,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 				'label'       => esc_html__( 'Category IDs', 'foundation-elementor-plus' ),
 				'type'        => Controls_Manager::TEXT,
 				'description' => esc_html__( 'Advanced fallback. Optional comma-separated post category IDs.', 'foundation-elementor-plus' ),
-				'condition'   => array(
-					'content_mode' => 'posts',
-				),
+				'condition'   => $dynamic_posts_condition,
 			)
 		);
 
@@ -234,9 +245,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 				'label'       => esc_html__( 'Exclude Category IDs', 'foundation-elementor-plus' ),
 				'type'        => Controls_Manager::TEXT,
 				'description' => esc_html__( 'Optional comma-separated category IDs to exclude.', 'foundation-elementor-plus' ),
-				'condition'   => array(
-					'content_mode' => 'posts',
-				),
+				'condition'   => $dynamic_posts_condition,
 			)
 		);
 
@@ -249,9 +258,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 				'max'       => 100,
 				'step'      => 1,
 				'default'   => 0,
-				'condition' => array(
-					'content_mode' => 'posts',
-				),
+				'condition' => $dynamic_posts_condition,
 			)
 		);
 
@@ -267,9 +274,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 					'menu_order' => esc_html__( 'Menu Order', 'foundation-elementor-plus' ),
 					'rand'       => esc_html__( 'Random', 'foundation-elementor-plus' ),
 				),
-				'condition' => array(
-					'content_mode' => 'posts',
-				),
+				'condition' => $dynamic_posts_condition,
 			)
 		);
 
@@ -283,9 +288,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 					'DESC' => esc_html__( 'Descending', 'foundation-elementor-plus' ),
 					'ASC'  => esc_html__( 'Ascending', 'foundation-elementor-plus' ),
 				),
-				'condition' => array(
-					'content_mode' => 'posts',
-				),
+				'condition' => $dynamic_posts_condition,
 			)
 		);
 
@@ -300,9 +303,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 					'feature_only' => esc_html__( 'Feature cards only', 'foundation-elementor-plus' ),
 					'none'         => esc_html__( 'No excerpts', 'foundation-elementor-plus' ),
 				),
-				'condition' => array(
-					'content_mode' => 'posts',
-				),
+				'condition' => $dynamic_posts_condition,
 			)
 		);
 
@@ -315,9 +316,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 				'max'       => 80,
 				'step'      => 1,
 				'default'   => 22,
-				'condition' => array(
-					'content_mode' => 'posts',
-				),
+				'condition' => $dynamic_posts_condition,
 			)
 		);
 
@@ -330,9 +329,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 				'max'       => 120,
 				'step'      => 1,
 				'default'   => 34,
-				'condition' => array(
-					'content_mode' => 'posts',
-				),
+				'condition' => $dynamic_posts_condition,
 			)
 		);
 
@@ -346,9 +343,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 				'return_value' => 'yes',
 				'default'      => 'yes',
 				'description'  => esc_html__( 'Prevents partial final blocks from leaving large editorial gaps.', 'foundation-elementor-plus' ),
-				'condition'    => array(
-					'content_mode' => 'posts',
-				),
+				'condition'    => $dynamic_posts_condition,
 			)
 		);
 
@@ -361,9 +356,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 				'label_off'    => esc_html__( 'No', 'foundation-elementor-plus' ),
 				'return_value' => 'yes',
 				'default'      => '',
-				'condition'    => array(
-					'content_mode' => 'posts',
-				),
+				'condition'    => $dynamic_posts_condition,
 			)
 		);
 
@@ -375,7 +368,7 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 				'default'   => 'b1_full',
 				'options'   => $this->get_slot_options(),
 				'condition' => array(
-					'content_mode'             => 'posts',
+					'content_mode'             => array( 'posts', 'category_posts' ),
 					'posts_include_a11y_card' => 'yes',
 				),
 			)
@@ -1129,11 +1122,15 @@ class Awards_Recognition_Wall_Widget extends Base_Widget {
 	}
 
 	private function get_render_cards( array $settings ) {
-		if ( 'posts' === ( $settings['content_mode'] ?? 'manual' ) ) {
+		if ( $this->is_dynamic_posts_mode( $settings['content_mode'] ?? 'manual' ) ) {
 			return $this->prepare_post_cards( $settings );
 		}
 
 		return $this->prepare_cards( $settings['cards'] ?? array() );
+	}
+
+	private function is_dynamic_posts_mode( $mode ) {
+		return in_array( (string) $mode, array( 'posts', 'category_posts' ), true );
 	}
 
 	private function prepare_post_cards( array $settings ) {

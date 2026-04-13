@@ -4,7 +4,7 @@ Tags: elementor, widgets, agency, design
 Requires at least: 6.4
 Tested up to: 6.9.4
 Requires PHP: 7.4
-Stable tag: 1.3.43
+Stable tag: 1.3.44
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,11 @@ Yes. Add this to `wp-config.php` before deleting the plugin:
 `define( 'FOUNDATION_ELEMENTOR_PLUS_PRESERVE_DATA', true );`
 
 == Changelog ==
+
+= 1.3.44 =
+* Retuned the former Portfolio Mega Menu for the Inkfire In Action hub.
+* Added mixed activity links for portfolio, case studies, back-to-work stories, client stories, latest posts, and social posts.
+* Updated the menu feed to use recent Inkfire activity from portfolio items and blog posts.
 
 = 1.3.43 =
 * Added a Blog posts by category source mode to Awards Wall for clearer dynamic category queries.

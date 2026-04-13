@@ -51,8 +51,8 @@ final class Widget_Registry {
 			),
 			'foundation-portfolio-mega-menu' => array(
 				'class'       => Widgets\Portfolio_Mega_Menu_Widget::class,
-				'title'       => 'Portfolio Mega Menu',
-				'description' => 'Compact portfolio mega-menu panel with latest work, menu links, and a project CTA card.',
+				'title'       => 'Inkfire In Action Mega Menu',
+				'description' => 'Compact mega-menu panel for the Inkfire In Action hub, mixed activity links, and a project CTA card.',
 			),
 			'foundation-awards-recognition-wall' => array(
 				'class'       => Widgets\Awards_Recognition_Wall_Widget::class,

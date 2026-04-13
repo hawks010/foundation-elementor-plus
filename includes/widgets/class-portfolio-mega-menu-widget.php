@@ -16,7 +16,7 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 	}
 
 	public function get_title() {
-		return esc_html__( 'Foundation Portfolio Mega Menu', 'foundation-elementor-plus' );
+		return esc_html__( 'Foundation Inkfire In Action Mega Menu', 'foundation-elementor-plus' );
 	}
 
 	public function get_icon() {
@@ -28,7 +28,7 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 	}
 
 	public function get_keywords() {
-		return array( 'foundation', 'portfolio', 'mega menu', 'header', 'case studies' );
+		return array( 'foundation', 'inkfire in action', 'portfolio', 'mega menu', 'header', 'case studies', 'stories', 'blog' );
 	}
 
 	public function get_style_depends(): array {
@@ -52,7 +52,7 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 			array(
 				'label'   => esc_html__( 'Eyebrow', 'foundation-elementor-plus' ),
 				'type'    => Controls_Manager::TEXT,
-				'default' => esc_html__( 'Selected work', 'foundation-elementor-plus' ),
+				'default' => esc_html__( 'Inkfire in action', 'foundation-elementor-plus' ),
 			)
 		);
 
@@ -62,7 +62,7 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 				'label'   => esc_html__( 'Title', 'foundation-elementor-plus' ),
 				'type'    => Controls_Manager::TEXTAREA,
 				'rows'    => 2,
-				'default' => esc_html__( 'Explore our portfolio', 'foundation-elementor-plus' ),
+				'default' => esc_html__( 'Latest work, stories & updates', 'foundation-elementor-plus' ),
 			)
 		);
 
@@ -72,14 +72,14 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 				'label'   => esc_html__( 'Intro', 'foundation-elementor-plus' ),
 				'type'    => Controls_Manager::TEXTAREA,
 				'rows'    => 3,
-				'default' => esc_html__( 'Browse recent work, jump to the service area that fits, or head straight into the full archive.', 'foundation-elementor-plus' ),
+				'default' => esc_html__( 'Follow the latest from Inkfire, from portfolio launches and case studies to back-to-work stories, client stories, blog posts, and social updates.', 'foundation-elementor-plus' ),
 			)
 		);
 
 		$this->add_control(
 			'posts_to_show',
 			array(
-				'label'   => esc_html__( 'Portfolio Cards', 'foundation-elementor-plus' ),
+				'label'   => esc_html__( 'Activity Cards', 'foundation-elementor-plus' ),
 				'type'    => Controls_Manager::NUMBER,
 				'default' => 3,
 				'min'     => 1,
@@ -117,7 +117,7 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 			array(
 				'label'   => esc_html__( 'All Work Label', 'foundation-elementor-plus' ),
 				'type'    => Controls_Manager::TEXT,
-				'default' => esc_html__( 'All work', 'foundation-elementor-plus' ),
+				'default' => esc_html__( 'Inkfire in Action', 'foundation-elementor-plus' ),
 				'condition' => array(
 					'show_nav' => 'yes',
 				),
@@ -130,7 +130,7 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 				'label'         => esc_html__( 'All Work URL', 'foundation-elementor-plus' ),
 				'type'          => Controls_Manager::URL,
 				'default'       => array(
-					'url' => home_url( '/portfolio/' ),
+					'url' => home_url( '/inkfire-in-action/' ),
 				),
 				'show_external' => false,
 				'condition'     => array(
@@ -154,7 +154,7 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 				'label'   => esc_html__( 'CTA Title', 'foundation-elementor-plus' ),
 				'type'    => Controls_Manager::TEXTAREA,
 				'rows'    => 2,
-				'default' => esc_html__( 'Ready to make something worth showing off?', 'foundation-elementor-plus' ),
+				'default' => esc_html__( 'Have something new to build?', 'foundation-elementor-plus' ),
 			)
 		);
 
@@ -204,7 +204,7 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 			array(
 				'label'   => esc_html__( 'Secondary Link Text', 'foundation-elementor-plus' ),
 				'type'    => Controls_Manager::TEXT,
-				'default' => esc_html__( 'Open all work', 'foundation-elementor-plus' ),
+				'default' => esc_html__( 'Explore Inkfire in Action', 'foundation-elementor-plus' ),
 			)
 		);
 
@@ -214,7 +214,7 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 				'label'         => esc_html__( 'Secondary Link URL', 'foundation-elementor-plus' ),
 				'type'          => Controls_Manager::URL,
 				'default'       => array(
-					'url' => home_url( '/portfolio/' ),
+					'url' => home_url( '/inkfire-in-action/' ),
 				),
 				'show_external' => false,
 			)
@@ -354,17 +354,17 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 	}
 
 	protected function render() {
-		$settings   = $this->get_settings_for_display();
+		$settings   = $this->normalize_inkfire_action_settings( $this->get_settings_for_display() );
 		$widget_id  = 'foundation-portfolio-mega-menu-' . $this->get_id();
-		$items      = $this->get_portfolio_items( $settings );
+		$items      = $this->get_activity_items( $settings );
 		$nav_links  = $this->get_nav_links( $settings );
 		$popup_id   = ! empty( $settings['cta_popup_id'] ) ? absint( $settings['cta_popup_id'] ) : 0;
 		$button_key = 'cta_button';
 		$button_url = ! empty( $settings['cta_button_url']['url'] ) ? $settings['cta_button_url'] : array( 'url' => home_url( '/contact-us/' ) );
 		$all_key    = 'all_work_button';
-		$all_url    = ! empty( $settings['all_work_url']['url'] ) ? $settings['all_work_url'] : array( 'url' => home_url( '/portfolio/' ) );
+		$all_url    = ! empty( $settings['all_work_url']['url'] ) ? $settings['all_work_url'] : array( 'url' => home_url( '/inkfire-in-action/' ) );
 		$sec_key    = 'secondary_link';
-		$sec_url    = ! empty( $settings['secondary_link_url']['url'] ) ? $settings['secondary_link_url'] : array( 'url' => home_url( '/portfolio/' ) );
+		$sec_url    = ! empty( $settings['secondary_link_url']['url'] ) ? $settings['secondary_link_url'] : array( 'url' => home_url( '/inkfire-in-action/' ) );
 
 		$this->add_link_attributes( $button_key, $button_url );
 		$this->add_link_attributes( $all_key, $all_url );
@@ -377,7 +377,7 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 		<section id="<?php echo esc_attr( $widget_id ); ?>" class="foundation-portfolio-mega-menu" data-foundation-portfolio-mega-menu>
 			<div class="foundation-portfolio-mega-menu__panel">
 				<?php if ( 'yes' === ( $settings['show_nav'] ?? 'yes' ) && ! empty( $nav_links ) ) : ?>
-					<nav class="foundation-portfolio-mega-menu__nav" aria-label="<?php echo esc_attr__( 'Portfolio menu links', 'foundation-elementor-plus' ); ?>">
+					<nav class="foundation-portfolio-mega-menu__nav" aria-label="<?php echo esc_attr__( 'Inkfire In Action menu links', 'foundation-elementor-plus' ); ?>">
 						<?php foreach ( $nav_links as $index => $link ) : ?>
 							<?php
 							$key = 'nav_link_' . $index;
@@ -443,7 +443,7 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 						$this->add_link_attributes( $key, $item['url'] );
 						?>
 						<article class="foundation-portfolio-mega-menu__card foundation-portfolio-mega-menu__card--project">
-							<a class="foundation-portfolio-mega-menu__project-link" <?php echo $this->get_render_attribute_string( $key ); ?> aria-label="<?php echo esc_attr( sprintf( __( 'Open portfolio project: %s', 'foundation-elementor-plus' ), $item['title'] ) ); ?>">
+							<a class="foundation-portfolio-mega-menu__project-link" <?php echo $this->get_render_attribute_string( $key ); ?> aria-label="<?php echo esc_attr( sprintf( __( 'Open Inkfire In Action item: %s', 'foundation-elementor-plus' ), $item['title'] ) ); ?>">
 								<div class="foundation-portfolio-mega-menu__project-media">
 									<?php if ( ! empty( $item['image'] ) ) : ?>
 										<img class="foundation-portfolio-mega-menu__image" src="<?php echo esc_url( $item['image'] ); ?>" alt="<?php echo esc_attr( $item['image_alt'] ); ?>" loading="lazy" />
@@ -453,7 +453,7 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 								</div>
 								<div class="foundation-portfolio-mega-menu__project-copy">
 									<p class="foundation-portfolio-mega-menu__breadcrumb">
-										<span><?php echo esc_html__( 'Portfolio', 'foundation-elementor-plus' ); ?></span>
+										<span><?php echo esc_html( $item['section'] ); ?></span>
 										<?php if ( ! empty( $item['term'] ) ) : ?>
 											<span class="foundation-portfolio-mega-menu__breadcrumb-sep" aria-hidden="true">/</span>
 											<span><?php echo esc_html( $item['term'] ); ?></span>
@@ -464,7 +464,7 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 										<p class="foundation-portfolio-mega-menu__project-excerpt"><?php echo esc_html( $item['excerpt'] ); ?></p>
 									<?php endif; ?>
 									<span class="foundation-portfolio-mega-menu__project-open">
-										<?php echo esc_html__( 'Open project', 'foundation-elementor-plus' ); ?>
+										<?php echo esc_html__( 'Open story', 'foundation-elementor-plus' ); ?>
 										<?php echo $this->get_arrow_icon(); ?>
 									</span>
 								</div>
@@ -477,18 +477,76 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 		<?php
 	}
 
-	private function get_portfolio_items( array $settings ): array {
+	private function normalize_inkfire_action_settings( array $settings ): array {
+		$text_replacements = array(
+			'eyebrow'             => array(
+				'old' => array( 'Selected work' ),
+				'new' => esc_html__( 'Inkfire in action', 'foundation-elementor-plus' ),
+			),
+			'title'               => array(
+				'old' => array( 'Explore our portfolio' ),
+				'new' => esc_html__( 'Latest work, stories & updates', 'foundation-elementor-plus' ),
+			),
+			'intro'               => array(
+				'old' => array( 'Browse recent work, jump to the service area that fits, or head straight into the full archive.', 'Browse the latest case studies, jump by discipline, or head straight into the full archive.' ),
+				'new' => esc_html__( 'Follow the latest from Inkfire, from portfolio launches and case studies to back-to-work stories, client stories, blog posts, and social updates.', 'foundation-elementor-plus' ),
+			),
+			'all_work_label'      => array(
+				'old' => array( 'All work', 'all work', 'open all', 'Open all' ),
+				'new' => esc_html__( 'Inkfire in Action', 'foundation-elementor-plus' ),
+			),
+			'cta_title'           => array(
+				'old' => array( 'Ready to make something worth showing off?', 'Need something bespoke?' ),
+				'new' => esc_html__( 'Have something new to build?', 'foundation-elementor-plus' ),
+			),
+			'secondary_link_text' => array(
+				'old' => array( 'Open all work', 'Explore all work' ),
+				'new' => esc_html__( 'Explore Inkfire in Action', 'foundation-elementor-plus' ),
+			),
+		);
+
+		foreach ( $text_replacements as $key => $replacement ) {
+			$current = isset( $settings[ $key ] ) ? trim( (string) $settings[ $key ] ) : '';
+
+			if ( '' === $current || in_array( $current, $replacement['old'], true ) ) {
+				$settings[ $key ] = $replacement['new'];
+			}
+		}
+
+		foreach ( array( 'all_work_url', 'secondary_link_url' ) as $link_key ) {
+			$url = isset( $settings[ $link_key ]['url'] ) ? trim( (string) $settings[ $link_key ]['url'] ) : '';
+
+			if ( '' === $url || $this->is_portfolio_archive_url( $url ) ) {
+				$settings[ $link_key ] = array( 'url' => home_url( '/inkfire-in-action/' ) );
+			}
+		}
+
+		if ( empty( $settings['order_by'] ) || 'menu_order' === $settings['order_by'] ) {
+			$settings['order_by'] = 'date';
+		}
+
+		return $settings;
+	}
+
+	private function is_portfolio_archive_url( string $url ): bool {
+		$path = (string) wp_parse_url( $url, PHP_URL_PATH );
+
+		return in_array( untrailingslashit( $path ), array( '/portfolio', 'portfolio' ), true );
+	}
+
+	private function get_activity_items( array $settings ): array {
 		$limit   = ! empty( $settings['posts_to_show'] ) ? min( 3, max( 1, (int) $settings['posts_to_show'] ) ) : 3;
 		$orderby = 'menu_order' === ( $settings['order_by'] ?? 'date' ) ? 'menu_order' : 'date';
 		$order   = 'menu_order' === $orderby ? 'ASC' : 'DESC';
 		$query   = new \WP_Query(
 			array(
-				'post_type'           => 'ink_portfolio',
+				'post_type'           => array( 'ink_portfolio', 'post' ),
 				'post_status'         => 'publish',
 				'posts_per_page'      => $limit,
 				'orderby'             => $orderby,
 				'order'               => $order,
 				'ignore_sticky_posts' => true,
+				'no_found_rows'       => true,
 			)
 		);
 		$items   = array();
@@ -501,8 +559,31 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 			$image_id = get_post_thumbnail_id( $post->ID );
 			$image    = $image_id ? wp_get_attachment_image_url( $image_id, 'large' ) : '';
 			$alt      = $image_id ? (string) get_post_meta( $image_id, '_wp_attachment_image_alt', true ) : '';
-			$terms    = get_the_terms( $post->ID, 'ink_portfolio_type' );
-			$term     = ( ! is_wp_error( $terms ) && ! empty( $terms ) && $terms[0] instanceof \WP_Term ) ? $terms[0]->name : '';
+			$section  = esc_html__( 'Latest activity', 'foundation-elementor-plus' );
+			$term     = '';
+
+			if ( 'ink_portfolio' === $post->post_type ) {
+				$terms   = get_the_terms( $post->ID, 'ink_portfolio_type' );
+				$section = esc_html__( 'Portfolio', 'foundation-elementor-plus' );
+				$term    = ( ! is_wp_error( $terms ) && ! empty( $terms ) && $terms[0] instanceof \WP_Term ) ? $terms[0]->name : '';
+			} else {
+				$terms   = get_the_category( $post->ID );
+				$section = esc_html__( 'Stories', 'foundation-elementor-plus' );
+
+				foreach ( $terms as $term_candidate ) {
+					if ( in_array( $term_candidate->slug, array( 'blog', 'featured' ), true ) ) {
+						continue;
+					}
+
+					$term = $term_candidate->name;
+					break;
+				}
+
+				if ( '' === $term && ! empty( $terms ) && $terms[0] instanceof \WP_Term ) {
+					$term = $terms[0]->name;
+				}
+			}
+
 			$excerpt  = trim( (string) get_post_meta( $post->ID, '_ink_portfolio_grid_description', true ) );
 
 			if ( '' === $excerpt ) {
@@ -514,6 +595,7 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 				'url'       => array( 'url' => get_permalink( $post ) ),
 				'image'     => $image,
 				'image_alt' => $alt ? $alt : get_the_title( $post ),
+				'section'   => $section,
 				'term'      => $term,
 				'excerpt'   => $excerpt,
 			);
@@ -526,61 +608,69 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 
 	private function get_nav_links( array $settings ): array {
 		$links = array();
-		$all   = ! empty( $settings['all_work_url']['url'] ) ? $settings['all_work_url'] : array( 'url' => home_url( '/portfolio/' ) );
+		$all   = ! empty( $settings['all_work_url']['url'] ) ? $settings['all_work_url'] : array( 'url' => home_url( '/inkfire-in-action/' ) );
 
 		$links[] = array(
-			'label'  => ! empty( $settings['all_work_label'] ) ? $settings['all_work_label'] : esc_html__( 'All work', 'foundation-elementor-plus' ),
+			'label'  => ! empty( $settings['all_work_label'] ) ? $settings['all_work_label'] : esc_html__( 'Inkfire in Action', 'foundation-elementor-plus' ),
 			'url'    => $all,
 			'is_all' => true,
 		);
 
-		$terms = get_terms(
+		$links = array_merge(
+			$links,
 			array(
-				'taxonomy'   => 'ink_portfolio_type',
-				'hide_empty' => false,
+				array(
+					'label' => esc_html__( 'Portfolio', 'foundation-elementor-plus' ),
+					'url'   => array( 'url' => home_url( '/portfolio/' ) ),
+				),
+				array(
+					'label' => esc_html__( 'Case studies', 'foundation-elementor-plus' ),
+					'url'   => array( 'url' => $this->get_category_url_by_slug( 'case-studies' ) ),
+				),
+				array(
+					'label' => esc_html__( 'Back to work', 'foundation-elementor-plus' ),
+					'url'   => array( 'url' => $this->get_category_url_by_slug( 'back-to-work' ) ),
+				),
+				array(
+					'label' => esc_html__( 'Client stories', 'foundation-elementor-plus' ),
+					'url'   => array( 'url' => $this->get_page_url_by_path( 'client-stories' ) ),
+				),
+				array(
+					'label' => esc_html__( 'Latest posts', 'foundation-elementor-plus' ),
+					'url'   => array( 'url' => $this->get_page_url_by_path( 'blog' ) ),
+				),
+				array(
+					'label' => esc_html__( 'Social posts', 'foundation-elementor-plus' ),
+					'url'   => array( 'url' => home_url( '/inkfire-in-action/#social-posts' ) ),
+				),
 			)
 		);
 
-		if ( ! is_wp_error( $terms ) ) {
-			$order_map = array(
-				'web-branding' => 1,
-				'marketing'    => 2,
-				'it'           => 3,
-			);
+		return $links;
+	}
 
-			usort(
-				$terms,
-				static function( $a, $b ) use ( $order_map ) {
-					$a_order = $order_map[ $a->slug ] ?? 99;
-					$b_order = $order_map[ $b->slug ] ?? 99;
+	private function get_category_url_by_slug( string $slug ): string {
+		$term = get_category_by_slug( $slug );
 
-					if ( $a_order === $b_order ) {
-						return strcasecmp( $a->name, $b->name );
-					}
+		if ( $term instanceof \WP_Term ) {
+			$link = get_category_link( $term );
 
-					return $a_order <=> $b_order;
-				}
-			);
-
-			foreach ( $terms as $term ) {
-				if ( ! $term instanceof \WP_Term ) {
-					continue;
-				}
-
-				$link = get_term_link( $term );
-
-				if ( is_wp_error( $link ) ) {
-					continue;
-				}
-
-				$links[] = array(
-					'label' => $term->name,
-					'url'   => array( 'url' => $link ),
-				);
+			if ( ! is_wp_error( $link ) ) {
+				return $link;
 			}
 		}
 
-		return array_slice( $links, 0, 4 );
+		return home_url( '/category/' . trim( $slug, '/' ) . '/' );
+	}
+
+	private function get_page_url_by_path( string $path ): string {
+		$page = get_page_by_path( $path );
+
+		if ( $page instanceof \WP_Post ) {
+			return get_permalink( $page );
+		}
+
+		return home_url( '/' . trim( $path, '/' ) . '/' );
 	}
 
 	private function get_arrow_icon(): string {

@@ -641,7 +641,7 @@ class Portfolio_Mega_Menu_Widget extends Widget_Base {
 				),
 				array(
 					'label' => esc_html__( 'Social posts', 'foundation-elementor-plus' ),
-					'url'   => array( 'url' => home_url( '/inkfire-in-action/#social-posts' ) ),
+					'url'   => array( 'url' => $this->get_page_url_by_path( 'social-media-management' ) ),
 				),
 			)
 		);

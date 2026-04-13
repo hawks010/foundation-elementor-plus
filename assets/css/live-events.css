@@ -1,0 +1,322 @@
+.elementor-widget-foundation-live-events,
+.elementor-widget-foundation-live-events .elementor-widget-container {
+  height: 100%;
+}
+
+.foundation-live-events {
+  --foundation-live-events-shell-radius: 38px;
+  --foundation-live-events-shell-bg: rgba(17, 20, 33, 0.94);
+  --foundation-live-events-card-bg: rgba(255, 255, 255, 0.07);
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  font-family: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+}
+
+.foundation-live-events,
+.foundation-live-events * {
+  box-sizing: border-box;
+}
+
+.foundation-live-events__shell {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  width: 95%;
+  margin: 0 auto;
+  padding: 30px;
+  border-radius: var(--foundation-live-events-shell-radius);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(251, 204, 190, 0.15), transparent 34%),
+    radial-gradient(circle at 100% 0%, rgba(18, 181, 165, 0.18), transparent 40%),
+    linear-gradient(135deg, rgba(12, 16, 28, 0.98), var(--foundation-live-events-shell-bg));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 18px 42px rgba(5, 8, 16, 0.3);
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.foundation-live-events__hero,
+.foundation-live-events__group,
+.foundation-live-events__empty {
+  position: relative;
+  z-index: 1;
+}
+
+.foundation-live-events__eyebrow {
+  margin: 0 0 12px;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.82rem;
+  line-height: 1.1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #fbd0c3;
+}
+
+.foundation-live-events__title {
+  margin: 0;
+  max-width: 10ch;
+  font-family: "Montserrat", sans-serif;
+  font-size: clamp(2.2rem, 5vw, 4.2rem);
+  line-height: 0.94;
+  letter-spacing: -0.055em;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.foundation-live-events__intro,
+.foundation-live-events__intro p {
+  margin: 14px 0 0;
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 1rem;
+  line-height: 1.55;
+  max-width: 72ch;
+}
+
+.foundation-live-events__group {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.foundation-live-events__group-title {
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.foundation-live-events__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.foundation-live-events__item {
+  background: var(--foundation-live-events-card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 26px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 10px 30px rgba(5, 8, 16, 0.22);
+  overflow: hidden;
+}
+
+.foundation-live-events__toggle {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+  display: grid;
+  grid-template-columns: minmax(0, 240px) minmax(0, 1fr) auto;
+  align-items: stretch;
+}
+
+.foundation-live-events__media {
+  min-height: 220px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.foundation-live-events__image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.foundation-live-events__content {
+  padding: 22px 22px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.foundation-live-events__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.foundation-live-events__meta-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.86);
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.foundation-live-events__item-title {
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+  font-size: clamp(1.35rem, 2vw, 2rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+}
+
+.foundation-live-events__summary {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.foundation-live-events__chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.foundation-live-events__chevron svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  transition: transform 0.25s ease;
+}
+
+.foundation-live-events__toggle[aria-expanded="true"] .foundation-live-events__chevron svg {
+  transform: rotate(180deg);
+}
+
+.foundation-live-events__panel {
+  padding: 0 22px 22px;
+  margin-left: calc(240px + 22px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.foundation-live-events__panel-copy,
+.foundation-live-events__panel-copy p,
+.foundation-live-events__panel-copy li {
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.foundation-live-events__panel-copy > *:first-child {
+  margin-top: 18px;
+}
+
+.foundation-live-events__panel-copy > *:last-child {
+  margin-bottom: 0;
+}
+
+.foundation-live-events__panel-footer {
+  margin-top: 18px;
+}
+
+.foundation-live-events__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(226, 114, 0, 0.55) 0%, rgba(219, 88, 68, 0.6) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  text-decoration: none;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.foundation-live-events__link:hover,
+.foundation-live-events__link:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(226, 114, 0, 0.26);
+}
+
+.foundation-live-events__link svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.foundation-live-events__empty {
+  padding: 22px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.84);
+}
+
+@media (max-width: 1024px) {
+  .foundation-live-events__toggle {
+    grid-template-columns: 1fr;
+  }
+
+  .foundation-live-events__media {
+    min-height: 240px;
+  }
+
+  .foundation-live-events__chevron {
+    width: auto;
+    padding: 0 22px 20px;
+    justify-content: flex-end;
+  }
+
+  .foundation-live-events__panel {
+    margin-left: 0;
+    padding: 0 22px 22px;
+  }
+}
+
+@media (max-width: 767px) {
+  .foundation-live-events__shell {
+    width: 100%;
+    padding: 20px 16px;
+    border-radius: 24px;
+  }
+
+  .foundation-live-events__title {
+    max-width: none;
+    font-size: 2.2rem;
+    line-height: 1;
+  }
+
+  .foundation-live-events__content {
+    padding: 18px 16px 12px;
+  }
+
+  .foundation-live-events__media {
+    min-height: 200px;
+  }
+
+  .foundation-live-events__panel,
+  .foundation-live-events__chevron {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}

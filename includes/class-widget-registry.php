@@ -64,6 +64,11 @@ final class Widget_Registry {
 				'title'       => 'Live Roles',
 				'description' => 'Mini careers hero with filterable live role rows, traffic-light status, and expandable details.',
 			),
+			'foundation-live-events' => array(
+				'class'       => Widgets\Live_Events_Widget::class,
+				'title'       => 'Live Events',
+				'description' => 'Expandable full-width glass event cards split into upcoming and past event groups.',
+			),
 			'foundation-team-loop' => array(
 				'class'       => Widgets\Team_Loop_Widget::class,
 				'title'       => 'Foundation Team Loop',
@@ -105,6 +110,7 @@ final class Widget_Registry {
 		require_once FOUNDATION_ELEMENTOR_PLUS_PATH . 'includes/widgets/class-portfolio-mega-menu-widget.php';
 		require_once FOUNDATION_ELEMENTOR_PLUS_PATH . 'includes/widgets/class-awards-recognition-wall-widget.php';
 		require_once FOUNDATION_ELEMENTOR_PLUS_PATH . 'includes/widgets/class-live-roles-widget.php';
+		require_once FOUNDATION_ELEMENTOR_PLUS_PATH . 'includes/widgets/class-live-events-widget.php';
 		require_once FOUNDATION_ELEMENTOR_PLUS_PATH . 'includes/widgets/class-team-loop-widget.php';
 		require_once FOUNDATION_ELEMENTOR_PLUS_PATH . 'includes/widgets/class-inkfire-linktree-widget.php';
 		require_once FOUNDATION_ELEMENTOR_PLUS_PATH . 'includes/widgets/class-rubiks-gallery-widget.php';
@@ -147,6 +153,7 @@ final class Widget_Registry {
 				'foundation-elementor-plus-portfolio-mega-menu' => 'assets/css/portfolio-mega-menu.css',
 				'foundation-elementor-plus-awards-wall'      => 'assets/css/awards-wall.css',
 				'foundation-elementor-plus-live-roles'       => 'assets/css/live-roles.css',
+				'foundation-elementor-plus-live-events'      => 'assets/css/live-events.css',
 				'foundation-elementor-plus-team-loop'        => 'assets/css/team-loop.css',
 				'foundation-elementor-plus-rubiks-gallery'   => 'assets/css/rubiks-gallery.css',
 				'foundation-elementor-plus-sender-newsletter' => 'assets/css/sender-newsletter.css',
@@ -167,6 +174,7 @@ final class Widget_Registry {
 				'foundation-elementor-plus-portfolio-mega-menu' => 'assets/js/portfolio-mega-menu.js',
 				'foundation-elementor-plus-awards-wall'      => 'assets/js/awards-wall.js',
 				'foundation-elementor-plus-live-roles'       => 'assets/js/live-roles.js',
+				'foundation-elementor-plus-live-events'      => 'assets/js/live-events.js',
 				'foundation-elementor-plus-team-loop'        => 'assets/js/team-loop.js',
 				'foundation-elementor-plus-rubiks-gallery'   => array(
 					'path' => 'assets/js/rubiks-gallery.js',
